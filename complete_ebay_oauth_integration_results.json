@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-06-24T10:20:25.930138",
+  "tests": {
+    "Mobile App Accessibility": "FAIL",
+    "Marketplace Status Endpoint": "PASS",
+    "OAuth Flow Simulation": "PASS"
+  },
+  "oauth_flow": {
+    "success": true,
+    "oauth_url_generated": true,
+    "state": "rQF0PvptxBnrvbTtlJ-ys19Xyq6HeclhTMmXXAdwclU",
+    "ready_for_user_interaction": true
+  },
+  "overall_status": "FAIL"
+}

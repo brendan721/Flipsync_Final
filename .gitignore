@@ -1,0 +1,121 @@
+# FlipSync .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment - CRITICAL: These are huge!
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+flipsync_env/
+*/venv/
+*/env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.dockerignore
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Test results
+test_*.json
+*_test_results.json
+*_validation_results.json
+
+# Cache
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Uploads
+uploads/
+
+# Node modules (if any)
+node_modules/
+
+# Flutter - CRITICAL: Build artifacts and large files
+mobile/flutter_app/.dart_tool/
+mobile/flutter_app/.flutter-plugins
+mobile/flutter_app/.flutter-plugins-dependencies
+mobile/flutter_app/.packages
+mobile/flutter_app/.pub-cache/
+mobile/flutter_app/.pub/
+mobile/flutter_app/build/
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
+mobile/ios/build/
+mobile/ios/Pods/
+**/android/.gradle/
+**/build/
+flutter.tar.xz
+flutter.tar
+*.tar.xz
+*.tar.gz
+*.tar
+
+# Secrets
+secrets.json
+*.key
+*.pem
+*.crt

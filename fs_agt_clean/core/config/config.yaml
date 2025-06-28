@@ -1,0 +1,160 @@
+# FlipSync Configuration File
+
+# Database Configuration - Production Security Enhanced
+database:
+  # connection_string: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"  # Commented out to use environment variable
+  connection_string: null  # Use DATABASE_URL environment variable instead
+  pool_size: 25  # Increased for better performance
+  max_overflow: 40  # Increased overflow capacity
+  echo: false
+  # Production Security Settings
+  ssl_mode: "require"  # Require SSL in production
+  ssl_cert_path: "/etc/ssl/certs/client-cert.pem"
+  ssl_key_path: "/etc/ssl/private/client-key.pem"
+  ssl_ca_path: "/etc/ssl/certs/ca-cert.pem"
+  connection_timeout: 10
+  command_timeout: 30
+  pool_pre_ping: true
+  pool_recycle: 1800  # Recycle connections every 30 minutes for better performance
+  max_retries: 3
+  retry_delay: 1
+  # Performance Optimization Settings
+  pool_timeout: 20  # Reduced timeout for faster failure detection
+  query_timeout: 15  # Maximum query execution time
+  slow_query_threshold: 100  # Log queries slower than 100ms
+  enable_query_cache: true
+  cache_size: 1000  # Number of prepared statements to cache
+
+# Redis Configuration - Production Security Enhanced
+redis:
+  host: "redis"
+  port: 6379
+  db: 0
+  password_env: "REDIS_PASSWORD"  # Use environment variable for production
+  password: null  # Development fallback
+  ssl: true  # Enable SSL/TLS in production
+  ssl_cert_reqs: "required"
+  ssl_ca_certs: "/etc/ssl/certs/redis-ca.pem"
+  ssl_certfile: "/etc/ssl/certs/redis-client.pem"
+  ssl_keyfile: "/etc/ssl/private/redis-client.key"
+  connection_timeout: 5
+  socket_timeout: 5
+  max_connections: 50
+
+# Authentication Configuration - Production Ready
+auth:
+  jwt_secret_env: "JWT_SECRET"  # Use environment variable for production
+  jwt_secret_fallback: null  # No fallback - force environment variable usage
+  jwt_algorithm: "HS256"
+  access_token_expire_minutes: 15  # Reduced from 30 for better security
+  refresh_token_expire_days: 7
+  development_mode: false
+  require_https: true  # Force HTTPS in production
+  token_issuer: "flipsync-api"
+  token_audience: "flipsync-app"
+  # Security enhancements
+  enable_token_blacklist: true
+  enable_refresh_token_rotation: true
+  max_concurrent_sessions: 5
+
+# API Configuration - Production Ready
+api:
+  cors_origins:
+    - "https://flipsync.app"
+    - "https://www.flipsync.app"
+    - "https://api.flipsync.app"
+    - "http://localhost:3000"
+    - "http://localhost:8081"
+    - "http://localhost:8082"
+  debug: false
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: null
+
+# Feature Flags
+feature_flags:
+  enable_ai_pricing: true
+  enable_advanced_analytics: true
+  enable_marketplace_sync: true
+  enable_inventory_management: true
+  enable_webhook_notifications: true
+  enable_ml_recommendations: true
+  enable_dashboard: true
+  enable_agent_coordination: true
+  enable_security_audit: true
+  enable_performance_monitoring: true
+  enable_rate_limiting: true
+  enable_token_rotation: true
+  enable_mfa: true
+  enable_social_auth: true
+  enable_password_reset: true
+  enable_ddos_protection: true
+  enable_csrf_protection: true
+  enable_xss_protection: true
+  enable_sql_injection_protection: true
+  enable_security_headers: true
+  enable_request_validation: true
+  enable_metrics: true
+  enable_prometheus: true
+  enable_grafana: true
+  enable_notifications: true
+  enable_email_notifications: true
+  enable_sms_notifications: true
+  enable_push_notifications: true
+  enable_webhook_module: true
+  enable_vector_store: true
+  enable_qdrant: true
+  enable_ollama: true
+  enable_ml_service: true
+  enable_dashboard_service: true
+  enable_metrics_service: true
+  enable_agent_coordinator: true
+  enable_token_manager: true
+  enable_token_rotation_service: true
+  enable_security_audit_logger: true
+  enable_compliance_audit_logger: true
+  enable_event_bus: true
+  enable_metrics_collector: true
+  enable_content_optimizer: true
+  enable_listing_generator: true
+  enable_vector_store: true
+  enable_qdrant_service: true
+  enable_webhook_module: true
+  enable_notification_service: true
+  enable_db_auth_service: true
+  enable_database: true
+  enable_redis_manager: true
+  enable_auth_service: true
+  enable_log_manager: true
+  enable_config_manager: true
+  enable_vault_client: true
+  enable_secret_manager: true
+  enable_auth_config: true
+  enable_redis_config: true
+  enable_vault_config: true
+  enable_vector_store_config: true
+  enable_notification_config: true
+  enable_metrics_config: true
+  enable_dashboard_config: true
+  enable_ml_config: true
+  enable_agent_config: true
+  enable_token_config: true
+  enable_security_config: true
+  enable_compliance_config: true
+  enable_event_config: true
+  enable_metrics_collector_config: true
+  enable_content_optimizer_config: true
+  enable_listing_generator_config: true
+  enable_vector_store_config: true
+  enable_qdrant_service_config: true
+  enable_webhook_module_config: true
+  enable_notification_service_config: true
+  enable_db_auth_service_config: true
+  enable_database_config: true
+  enable_redis_manager_config: true
+  enable_auth_service_config: true
+  enable_log_manager_config: true
+  enable_config_manager_config: true

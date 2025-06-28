@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct eBay Popup Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a73e8;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1557b0;
+        }
+        button.success {
+            background: #34a853;
+        }
+        button.danger {
+            background: #ea4335;
+        }
+        .log {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Direct eBay Popup Test</h1>
+        <p>This test simulates the exact same eBay OAuth flow that FlipSync uses.</p>
+
+        <div class="test-section">
+            <h3>Step 1: Get eBay OAuth URL</h3>
+            <button onclick="getOAuthUrl()">Get OAuth URL from Backend</button>
+            <div id="urlStatus" class="status info">Click button to get OAuth URL</div>
+            <div id="urlLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 2: Open eBay Popup</h3>
+            <button onclick="openEbayPopup()" id="popupBtn" disabled>Open eBay OAuth Popup</button>
+            <div id="popupStatus" class="status info">Get OAuth URL first</div>
+            <div id="popupLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 3: Complete OAuth Flow</h3>
+            <button onclick="completeOAuthFlow()" id="completeBtn" disabled>Complete Full Flow</button>
+            <div id="flowStatus" class="status info">Complete previous steps first</div>
+            <div id="flowLog" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        let oauthUrl = null;
+        let oauthState = null;
+
+        function log(elementId, message, type = 'info') {
+            const logElement = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : '#74c0fc';
+            logElement.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        async function getOAuthUrl() {
+            log('urlLog', '🔄 Requesting eBay OAuth URL from backend...', 'info');
+            updateStatus('urlStatus', 'Requesting OAuth URL...', 'info');
+
+            try {
+                const response = await fetch('http://localhost:8001/api/v1/marketplace/ebay/oauth/authorize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': 'http://localhost:3000'
+                    },
+                    body: JSON.stringify({
+                        scopes: [
+                            'https://api.ebay.com/oauth/api_scope',
+                            'https://api.ebay.com/oauth/api_scope/sell.inventory.readonly',
+                            'https://api.ebay.com/oauth/api_scope/sell.inventory',
+                            'https://api.ebay.com/oauth/api_scope/sell.account.readonly',
+                            'https://api.ebay.com/oauth/api_scope/sell.account',
+                            'https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly',
+                            'https://api.ebay.com/oauth/api_scope/sell.fulfillment',
+                            'https://api.ebay.com/oauth/api_scope/sell.analytics.readonly',
+                            'https://api.ebay.com/oauth/api_scope/sell.finances',
+                            'https://api.ebay.com/oauth/api_scope/commerce.identity.readonly'
+                        ]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    oauthUrl = data.data.authorization_url;
+                    oauthState = data.data.state;
+
+                    log('urlLog', '✅ OAuth URL received successfully', 'success');
+                    log('urlLog', `🔗 URL: ${oauthUrl.substring(0, 80)}...`, 'info');
+                    log('urlLog', `🔑 State: ${oauthState}`, 'info');
+
+                    updateStatus('urlStatus', 'OAuth URL received successfully', 'success');
+                    document.getElementById('popupBtn').disabled = false;
+                    document.getElementById('completeBtn').disabled = false;
+                    updateStatus('popupStatus', 'Ready to open popup', 'info');
+                } else {
+                    const errorText = await response.text();
+                    log('urlLog', `❌ Failed to get OAuth URL: ${response.status}`, 'error');
+                    log('urlLog', `❌ Error: ${errorText}`, 'error');
+                    updateStatus('urlStatus', 'Failed to get OAuth URL', 'error');
+                }
+            } catch (error) {
+                log('urlLog', `❌ Network error: ${error.message}`, 'error');
+                updateStatus('urlStatus', 'Network error occurred', 'error');
+            }
+        }
+
+        function openEbayPopup() {
+            if (!oauthUrl) {
+                log('popupLog', '❌ No OAuth URL available', 'error');
+                return;
+            }
+
+            log('popupLog', '🔄 Opening eBay OAuth popup...', 'info');
+            updateStatus('popupStatus', 'Opening popup...', 'info');
+
+            try {
+                // Calculate popup position (center of screen)
+                const screenWidth = window.screen.width;
+                const screenHeight = window.screen.height;
+                const popupWidth = 600;
+                const popupHeight = 700;
+                const left = (screenWidth - popupWidth) / 2;
+                const top = (screenHeight - popupHeight) / 2;
+
+                const popup = window.open(
+                    oauthUrl,
+                    'ebay-oauth-test',
+                    `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                );
+
+                if (popup) {
+                    log('popupLog', '✅ Popup opened successfully!', 'success');
+                    log('popupLog', '👀 Check the popup window for eBay login', 'info');
+                    updateStatus('popupStatus', 'Popup opened successfully', 'success');
+
+                    // Monitor popup status
+                    const checkClosed = setInterval(() => {
+                        if (popup.closed) {
+                            clearInterval(checkClosed);
+                            log('popupLog', '🔄 Popup was closed by user', 'info');
+                            updateStatus('popupStatus', 'Popup was closed', 'info');
+                        }
+                    }, 1000);
+
+                    // Listen for OAuth completion messages
+                    window.addEventListener('message', function(event) {
+                        if (event.data && event.data.source === 'ebay_oauth_callback') {
+                            clearInterval(checkClosed);
+                            log('popupLog', '📨 OAuth callback received!', 'success');
+                            log('popupLog', JSON.stringify(event.data, null, 2), 'info');
+                            updateStatus('popupStatus', 'OAuth callback received', 'success');
+                        }
+                    });
+
+                } else {
+                    log('popupLog', '❌ Popup was blocked by browser', 'error');
+                    log('popupLog', '💡 Please allow popups for this site', 'info');
+                    updateStatus('popupStatus', 'Popup blocked by browser', 'error');
+                }
+            } catch (error) {
+                log('popupLog', `❌ Error opening popup: ${error.message}`, 'error');
+                updateStatus('popupStatus', 'Error opening popup', 'error');
+            }
+        }
+
+        async function completeOAuthFlow() {
+            if (!oauthUrl) {
+                log('flowLog', '❌ No OAuth URL available', 'error');
+                return;
+            }
+
+            log('flowLog', '🚀 Starting complete OAuth flow test...', 'info');
+            updateStatus('flowStatus', 'Testing complete flow...', 'info');
+
+            try {
+                // Step 1: Open popup
+                log('flowLog', '1️⃣ Opening eBay authentication popup...', 'info');
+                const popup = window.open(
+                    oauthUrl,
+                    'ebay-oauth-complete',
+                    'width=600,height=700,scrollbars=yes,resizable=yes'
+                );
+
+                if (!popup) {
+                    log('flowLog', '❌ Popup blocked - cannot continue', 'error');
+                    updateStatus('flowStatus', 'Popup blocked', 'error');
+                    return;
+                }
+
+                log('flowLog', '✅ Popup opened - waiting for OAuth completion...', 'success');
+
+                // Step 2: Listen for OAuth completion
+                const oauthPromise = new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('OAuth timeout after 5 minutes'));
+                    }, 300000); // 5 minutes
+
+                    window.addEventListener('message', function(event) {
+                        if (event.data && event.data.source === 'ebay_oauth_callback') {
+                            clearTimeout(timeout);
+                            resolve(event.data);
+                        }
+                    });
+                });
+
+                try {
+                    const oauthResult = await oauthPromise;
+                    log('flowLog', '2️⃣ OAuth callback received!', 'success');
+
+                    if (oauthResult.success && oauthResult.code) {
+                        log('flowLog', `3️⃣ Authorization code: ${oauthResult.code.substring(0, 20)}...`, 'info');
+                        log('flowLog', '4️⃣ Exchanging code for tokens...', 'info');
+
+                        // Step 3: Exchange code for tokens
+                        const tokenResponse = await fetch('http://localhost:8001/api/v1/marketplace/ebay/oauth/callback', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Origin': 'http://localhost:3000'
+                            },
+                            body: JSON.stringify({
+                                code: oauthResult.code,
+                                state: oauthResult.state
+                            })
+                        });
+
+                        if (tokenResponse.ok) {
+                            const tokenData = await tokenResponse.json();
+                            log('flowLog', '✅ eBay account connected successfully!', 'success');
+                            log('flowLog', '🎉 Complete OAuth flow test PASSED!', 'success');
+                            updateStatus('flowStatus', 'OAuth flow completed successfully', 'success');
+                        } else {
+                            log('flowLog', `❌ Token exchange failed: ${tokenResponse.status}`, 'error');
+                            updateStatus('flowStatus', 'Token exchange failed', 'error');
+                        }
+                    } else {
+                        log('flowLog', `❌ OAuth failed: ${oauthResult.error || 'Unknown error'}`, 'error');
+                        updateStatus('flowStatus', 'OAuth authentication failed', 'error');
+                    }
+                } catch (error) {
+                    log('flowLog', `❌ OAuth flow error: ${error.message}`, 'error');
+                    updateStatus('flowStatus', 'OAuth flow failed', 'error');
+                }
+
+            } catch (error) {
+                log('flowLog', `❌ Complete flow error: ${error.message}`, 'error');
+                updateStatus('flowStatus', 'Complete flow failed', 'error');
+            }
+        }
+
+        // Auto-run initial test
+        window.addEventListener('load', () => {
+            log('urlLog', '🔧 Direct eBay popup test loaded', 'info');
+            log('urlLog', '💡 Click "Get OAuth URL from Backend" to start', 'info');
+        });
+    </script>
+</body>
+</html>

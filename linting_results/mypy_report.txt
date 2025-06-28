@@ -1,0 +1,2 @@
+fs_agt_clean/core/ai/prompt_templates.py: error: Source file found twice under different module names: "Flipsync_Final.fs_agt_clean.core.ai.prompt_templates" and "fs_agt_clean.core.ai.prompt_templates"
+Found 1 error in 1 file (errors prevented further checking)

@@ -1,0 +1,87 @@
+{
+  "agent_id": "workflow_77781556-a457-431b-994f-66e9a69280e8",
+  "timestamp": "2025-06-19T19:57:22.353009",
+  "state": {
+    "workflow": {
+      "workflow_id": "77781556-a457-431b-994f-66e9a69280e8",
+      "workflow_type": "product_analysis",
+      "participating_agents": [
+        "logistics",
+        "executive",
+        "content"
+      ],
+      "status": "completed",
+      "context": {
+        "product_data": {
+          "title": "Test Product",
+          "description": "A test product for workflow execution",
+          "price": 29.99,
+          "category": "electronics"
+        },
+        "image_url": "https://example.com/test-image.jpg"
+      },
+      "results": {},
+      "start_time": "2025-06-19T19:57:19.333694+00:00",
+      "end_time": "2025-06-19T19:57:22.346835+00:00",
+      "error_message": null,
+      "current_step_index": 3,
+      "progress": 0.0,
+      "metrics": {
+        "total_steps": 3,
+        "completed_steps": 0,
+        "failed_steps": 1,
+        "skipped_steps": 2,
+        "retry_count": 2,
+        "error_rate": 0.3333333333333333
+      },
+      "steps": [
+        {
+          "step_id": "content_analysis",
+          "name": "Content Analysis",
+          "status": "failed",
+          "agent_type": "content",
+          "retry_count": 2,
+          "error_message": "Step content_analysis failed: 'ContentAgent' object has no attribute 'agent_type'"
+        },
+        {
+          "step_id": "shipping_calculation",
+          "name": "Shipping Calculation",
+          "status": "skipped",
+          "agent_type": "logistics",
+          "retry_count": 0,
+          "error_message": null
+        },
+        {
+          "step_id": "executive_recommendations",
+          "name": "Executive Recommendations",
+          "status": "skipped",
+          "agent_type": "executive",
+          "retry_count": 0,
+          "error_message": null
+        }
+      ]
+    },
+    "checkpoint": {
+      "workflow_id": "77781556-a457-431b-994f-66e9a69280e8",
+      "current_step_index": 3,
+      "context": {
+        "product_data": {
+          "title": "Test Product",
+          "description": "A test product for workflow execution",
+          "price": 29.99,
+          "category": "electronics"
+        },
+        "image_url": "https://example.com/test-image.jpg"
+      },
+      "results": {},
+      "metrics": {
+        "total_steps": 3,
+        "completed_steps": 0,
+        "failed_steps": 1,
+        "retry_count": 2
+      },
+      "timestamp": "2025-06-19T19:57:22.352817+00:00"
+    },
+    "timestamp": "2025-06-19T19:57:22.352976+00:00"
+  }
+}

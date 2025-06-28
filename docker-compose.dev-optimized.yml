@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # Development API with volume mounts for instant code updates
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.optimized
+      target: development  # Use development stage
+    container_name: flipsync-dev-api
+    ports:
+      - "8001:8000"
+    volumes:
+      # Mount source code for instant updates (no rebuild needed)
+      - ./fs_agt_clean:/app/fs_agt_clean:ro
+      # Mount logs for debugging
+      - ./logs:/app/logs
+      # Mount temp directory
+      - ./temp:/app/temp
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=debug
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://flipsync_user:flipsync_password@db:5432/flipsync_db
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - flipsync-network
+    restart: unless-stopped
+    # Enable hot reload for development
+    command: ["python", "-m", "uvicorn", "fs_agt_clean.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]
+
+  # Production API (no volume mounts, optimized for performance)
+  api-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.optimized
+      target: production  # Use production stage
+    container_name: flipsync-prod-api
+    ports:
+      - "8002:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - LOG_LEVEL=info
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://flipsync_user:flipsync_password@db:5432/flipsync_db
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - flipsync-network
+    restart: unless-stopped
+    profiles:
+      - production  # Only start with --profile production
+
+  # Shared services (same for both dev and prod)
+  db:
+    image: postgres:15-alpine
+    container_name: flipsync-dev-db
+    environment:
+      POSTGRES_DB: flipsync_db
+      POSTGRES_USER: flipsync_user
+      POSTGRES_PASSWORD: flipsync_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flipsync_user -d flipsync_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flipsync-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: flipsync-dev-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flipsync-network
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: flipsync-dev-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - flipsync-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:
+
+networks:
+  flipsync-network:
+    driver: bridge

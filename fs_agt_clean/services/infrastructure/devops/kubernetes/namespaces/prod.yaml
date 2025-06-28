@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flipsync-prod
+  labels:
+    environment: production
+    app: flipsync
+    tier: agent-system
+  annotations:
+    flipsync.io/security-monitoring: "enabled"
+    flipsync.io/agent-coordination: "enabled"
+    flipsync.io/high-availability: "enabled"

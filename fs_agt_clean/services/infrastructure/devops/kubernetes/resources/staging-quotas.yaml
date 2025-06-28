@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: agent-resources-quota
+  namespace: flipsync-staging
+spec:
+  hard:
+    requests.cpu: "40"
+    requests.memory: 80Gi
+    limits.cpu: "80"
+    limits.memory: 160Gi
+    pods: "100"
+    services: "30"
+    persistentvolumeclaims: "25"
+    secrets: "50"
+    configmaps: "50"

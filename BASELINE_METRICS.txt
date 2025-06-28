@@ -1,0 +1,37 @@
+=== FlipSync Baseline Metrics Collection ===
+Date: Wed Jun 18 22:54:52 CDT 2025
+
+=== Python Codebase Analysis ===
+Total Python files:
+804
+Lines of Python code:
+ 224380 total
+=== Agent Architecture Verification ===
+Agent files found:
+35
+Detailed agent count by category:
+Executive agents:
+5
+Market agents:
+14
+Content agents:
+6
+Logistics agents:
+6
+Automation agents:
+3
+Conversational agents:
+0
+Service files found:
+225
+Database models found:
+30
+API route modules found:
+37
+=== Flutter/Dart Codebase Analysis ===
+Total Dart files:
+428
+Lines of Dart code:
+  93686 total
+
+=== Baseline Collection Complete ===

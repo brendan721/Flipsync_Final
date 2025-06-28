@@ -1,0 +1,66 @@
+{
+  "agent_id": "workflow_f8365952-2cc4-4df2-89e9-661d1bb9ee34",
+  "timestamp": "2025-06-19T19:57:22.349501",
+  "state": {
+    "workflow": {
+      "workflow_id": "f8365952-2cc4-4df2-89e9-661d1bb9ee34",
+      "workflow_type": "listing_optimization",
+      "participating_agents": [
+        "executive",
+        "content",
+        "market"
+      ],
+      "status": "pending",
+      "context": {
+        "listing_data": {
+          "title": "Optimizable Product",
+          "description": "Product that needs optimization",
+          "current_price": 19.99
+        },
+        "marketplace": "ebay"
+      },
+      "results": {},
+      "start_time": null,
+      "end_time": null,
+      "error_message": null,
+      "current_step_index": 0,
+      "progress": 0.0,
+      "metrics": {
+        "total_steps": 3,
+        "completed_steps": 0,
+        "failed_steps": 0,
+        "skipped_steps": 0,
+        "retry_count": 0,
+        "error_rate": 0.0
+      },
+      "steps": [
+        {
+          "step_id": "content_optimization",
+          "name": "Content Optimization",
+          "status": "pending",
+          "agent_type": "content",
+          "retry_count": 0,
+          "error_message": null
+        },
+        {
+          "step_id": "market_analysis",
+          "name": "Market Analysis",
+          "status": "pending",
+          "agent_type": "market",
+          "retry_count": 0,
+          "error_message": null
+        },
+        {
+          "step_id": "optimization_plan",
+          "name": "Optimization Plan",
+          "status": "pending",
+          "agent_type": "executive",
+          "retry_count": 0,
+          "error_message": null
+        }
+      ]
+    },
+    "checkpoint": {},
+    "timestamp": "2025-06-19T19:57:22.349447+00:00"
+  }
+}

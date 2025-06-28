@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-06-24T11:27:41.281856",
+  "steps": {
+    "Create Backup": "PASS",
+    "Update Imports": "PASS",
+    "Update Payment Imports": "PASS",
+    "Remove Duplicate Files": "PASS",
+    "Validate Migration": "FAIL"
+  },
+  "overall_status": "PARTIAL_SUCCESS"
+}

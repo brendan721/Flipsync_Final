@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug eBay Popup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        .log {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>🔍 eBay Popup Debug Tool</h1>
+    <p>This tool helps debug the eBay OAuth popup issue in FlipSync.</p>
+
+    <div class="test-section">
+        <h3>1. Test Backend API Connection</h3>
+        <button onclick="testBackendHealth()">Test Backend Health</button>
+        <button onclick="testEbayOAuthEndpoint()">Test eBay OAuth Endpoint</button>
+        <div id="api-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Popup Mechanism</h3>
+        <button onclick="testSimplePopup()">Test Simple Popup</button>
+        <button onclick="testEbayPopup()">Test eBay OAuth Popup</button>
+        <button onclick="testPopupBlocked()">Test Popup Blocker Detection</button>
+        <div id="popup-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test CORS Headers</h3>
+        <button onclick="testCorsHeaders()">Test CORS Headers</button>
+        <div id="cors-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Simulate Flutter OAuth Flow</h3>
+        <button onclick="simulateFlutterOAuth()">Simulate Flutter OAuth</button>
+        <div id="flutter-log" class="log"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const logElement = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            logElement.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        async function testBackendHealth() {
+            log('api-log', '🔄 Testing backend health...', 'info');
+            try {
+                const response = await fetch('http://localhost:8001/api/v1/health', {
+                    method: 'GET',
+                    headers: {
+                        'Origin': 'http://localhost:3000'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('api-log', `✅ Backend health OK: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    log('api-log', `❌ Backend health failed: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log('api-log', `❌ Backend health error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testEbayOAuthEndpoint() {
+            log('api-log', '🔄 Testing eBay OAuth endpoint...', 'info');
+            try {
+                const response = await fetch('http://localhost:8001/api/v1/marketplace/ebay/oauth/authorize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': 'http://localhost:3000'
+                    },
+                    body: JSON.stringify({
+                        scopes: ['https://api.ebay.com/oauth/api_scope']
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('api-log', `✅ eBay OAuth endpoint OK: ${data.data.authorization_url.substring(0, 100)}...`, 'success');
+                    window.lastOAuthUrl = data.data.authorization_url;
+                } else {
+                    log('api-log', `❌ eBay OAuth endpoint failed: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log('api-log', `❌ eBay OAuth endpoint error: ${error.message}`, 'error');
+            }
+        }
+
+        function testSimplePopup() {
+            log('popup-log', '🔄 Testing simple popup...', 'info');
+            try {
+                const popup = window.open('about:blank', 'test-popup', 'width=600,height=400');
+                if (popup) {
+                    log('popup-log', '✅ Simple popup opened successfully', 'success');
+                    popup.document.write('<h1>Test Popup</h1><p>This popup opened successfully!</p>');
+                    setTimeout(() => popup.close(), 3000);
+                } else {
+                    log('popup-log', '❌ Simple popup blocked or failed to open', 'error');
+                }
+            } catch (error) {
+                log('popup-log', `❌ Simple popup error: ${error.message}`, 'error');
+            }
+        }
+
+        function testEbayPopup() {
+            log('popup-log', '🔄 Testing eBay OAuth popup...', 'info');
+            if (!window.lastOAuthUrl) {
+                log('popup-log', '❌ No OAuth URL available. Run "Test eBay OAuth Endpoint" first.', 'error');
+                return;
+            }
+            
+            try {
+                const popup = window.open(
+                    window.lastOAuthUrl,
+                    'ebay-oauth',
+                    'width=600,height=700,scrollbars=yes,resizable=yes'
+                );
+                
+                if (popup) {
+                    log('popup-log', '✅ eBay OAuth popup opened successfully', 'success');
+                    log('popup-log', `🔗 URL: ${window.lastOAuthUrl.substring(0, 100)}...`, 'info');
+                } else {
+                    log('popup-log', '❌ eBay OAuth popup blocked or failed to open', 'error');
+                }
+            } catch (error) {
+                log('popup-log', `❌ eBay OAuth popup error: ${error.message}`, 'error');
+            }
+        }
+
+        function testPopupBlocked() {
+            log('popup-log', '🔄 Testing popup blocker detection...', 'info');
+            try {
+                const popup = window.open('', 'popup-test', 'width=1,height=1');
+                if (popup) {
+                    popup.close();
+                    log('popup-log', '✅ Popups are allowed', 'success');
+                } else {
+                    log('popup-log', '❌ Popups are blocked by browser', 'error');
+                }
+            } catch (error) {
+                log('popup-log', `❌ Popup blocker test error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCorsHeaders() {
+            log('cors-log', '🔄 Testing CORS headers...', 'info');
+            try {
+                const response = await fetch('http://localhost:8001/api/v1/health', {
+                    method: 'GET',
+                    headers: {
+                        'Origin': 'http://localhost:3000'
+                    }
+                });
+                
+                const corsOrigin = response.headers.get('Access-Control-Allow-Origin');
+                const corsCredentials = response.headers.get('Access-Control-Allow-Credentials');
+                const corsHeaders = response.headers.get('Access-Control-Allow-Headers');
+                
+                log('cors-log', `✅ CORS Origin: ${corsOrigin}`, 'success');
+                log('cors-log', `✅ CORS Credentials: ${corsCredentials}`, 'success');
+                log('cors-log', `✅ CORS Headers: ${corsHeaders}`, 'success');
+                
+            } catch (error) {
+                log('cors-log', `❌ CORS test error: ${error.message}`, 'error');
+            }
+        }
+
+        async function simulateFlutterOAuth() {
+            log('flutter-log', '🔄 Simulating Flutter OAuth flow...', 'info');
+            
+            try {
+                // Step 1: Get OAuth URL
+                log('flutter-log', '1. Getting OAuth URL from backend...', 'info');
+                const response = await fetch('http://localhost:8001/api/v1/marketplace/ebay/oauth/authorize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': 'http://localhost:3000'
+                    },
+                    body: JSON.stringify({
+                        scopes: [
+                            'https://api.ebay.com/oauth/api_scope',
+                            'https://api.ebay.com/oauth/api_scope/sell.inventory'
+                        ]
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`OAuth URL request failed: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const authUrl = data.data.authorization_url;
+                log('flutter-log', '✅ OAuth URL received successfully', 'success');
+                
+                // Step 2: Open popup
+                log('flutter-log', '2. Opening OAuth popup...', 'info');
+                const popup = window.open(
+                    authUrl,
+                    'ebay-oauth-flutter-test',
+                    'width=600,height=700,scrollbars=yes,resizable=yes'
+                );
+                
+                if (popup) {
+                    log('flutter-log', '✅ OAuth popup opened successfully', 'success');
+                    log('flutter-log', '👀 Check the popup window for eBay authentication', 'info');
+                    
+                    // Monitor popup
+                    const checkClosed = setInterval(() => {
+                        if (popup.closed) {
+                            clearInterval(checkClosed);
+                            log('flutter-log', '🔄 Popup was closed', 'info');
+                        }
+                    }, 1000);
+                    
+                } else {
+                    log('flutter-log', '❌ OAuth popup was blocked', 'error');
+                }
+                
+            } catch (error) {
+                log('flutter-log', `❌ Flutter OAuth simulation error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            log('api-log', '🚀 Debug tool loaded. Click buttons to run tests.', 'info');
+        });
+    </script>
+</body>
+</html>

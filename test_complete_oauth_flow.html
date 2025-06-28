@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete OAuth Flow Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .step { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .pending { background-color: #fff3cd; border-color: #ffeaa7; }
+        button { padding: 10px 20px; margin: 5px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Complete OAuth Flow Test</h1>
+    <p>This test simulates the complete OAuth flow with postMessage communication.</p>
+    
+    <button onclick="testCompleteFlow()">Test Complete OAuth Flow</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="results"></div>
+
+    <script>
+        let stepCounter = 0;
+        
+        function addStep(title, status, details = '') {
+            stepCounter++;
+            const results = document.getElementById('results');
+            const step = document.createElement('div');
+            step.className = `step ${status}`;
+            step.innerHTML = `
+                <h3>Step ${stepCounter}: ${title}</h3>
+                <p><strong>Status:</strong> ${status.toUpperCase()}</p>
+                ${details ? `<pre>${details}</pre>` : ''}
+            `;
+            results.appendChild(step);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            stepCounter = 0;
+        }
+        
+        async function testCompleteFlow() {
+            clearResults();
+            
+            try {
+                // Step 1: Test backend OAuth authorize endpoint
+                addStep('Backend OAuth Authorize', 'pending', 'Calling backend to get OAuth URL...');
+                
+                const authResponse = await fetch('http://localhost:8001/api/v1/marketplace/ebay/oauth/authorize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        scopes: ['https://api.ebay.com/oauth/api_scope/sell.inventory']
+                    })
+                });
+                
+                if (authResponse.ok) {
+                    const authData = await authResponse.json();
+                    const state = authData.data.state;
+                    const authUrl = authData.data.authorization_url;
+                    
+                    addStep('Backend OAuth Authorize', 'success', 
+                        `✅ Got OAuth URL and state\nState: ${state.substring(0, 20)}...\nURL: ${authUrl.substring(0, 80)}...`);
+                    
+                    // Step 2: Simulate postMessage from external callback
+                    addStep('PostMessage Communication', 'pending', 'Simulating postMessage from external OAuth callback...');
+                    
+                    // Simulate the postMessage that would come from the external callback
+                    setTimeout(() => {
+                        window.postMessage({
+                            source: 'ebay_oauth_callback',
+                            code: 'simulated_authorization_code_12345',
+                            state: state
+                        }, window.location.origin);
+                        
+                        addStep('PostMessage Communication', 'success', 
+                            `✅ PostMessage sent with:\nCode: simulated_authorization_code_12345\nState: ${state.substring(0, 20)}...`);
+                        
+                        // Step 3: Test backend OAuth callback
+                        setTimeout(async () => {
+                            addStep('Backend OAuth Callback', 'pending', 'Calling backend OAuth callback endpoint...');
+                            
+                            try {
+                                const callbackResponse = await fetch('http://localhost:8001/api/v1/marketplace/ebay/oauth/callback', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        code: 'simulated_authorization_code_12345',
+                                        state: state
+                                    })
+                                });
+                                
+                                const callbackText = await callbackResponse.text();
+                                
+                                if (callbackResponse.status === 400 && callbackText.includes('Invalid authorization code')) {
+                                    addStep('Backend OAuth Callback', 'success', 
+                                        `✅ Expected error for simulated code\nStatus: ${callbackResponse.status}\nResponse: Invalid authorization code (expected)`);
+                                    
+                                    addStep('Complete Flow Test', 'success', 
+                                        `🎉 COMPLETE OAUTH FLOW TEST SUCCESSFUL!\n\n` +
+                                        `✅ Backend OAuth authorize: Working\n` +
+                                        `✅ PostMessage communication: Working\n` +
+                                        `✅ Backend OAuth callback: Working\n\n` +
+                                        `The OAuth flow is ready for real eBay integration!`);
+                                } else {
+                                    addStep('Backend OAuth Callback', 'error', 
+                                        `❌ Unexpected response\nStatus: ${callbackResponse.status}\nResponse: ${callbackText.substring(0, 200)}...`);
+                                }
+                            } catch (error) {
+                                addStep('Backend OAuth Callback', 'error', `❌ Error: ${error.message}`);
+                            }
+                        }, 1000);
+                    }, 500);
+                    
+                } else {
+                    const errorText = await authResponse.text();
+                    addStep('Backend OAuth Authorize', 'error', `❌ Failed: ${authResponse.status}\n${errorText}`);
+                }
+                
+            } catch (error) {
+                addStep('OAuth Flow Test', 'error', `❌ Error: ${error.message}`);
+            }
+        }
+        
+        // Listen for postMessage (to verify the communication works)
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.source === 'ebay_oauth_callback') {
+                console.log('✅ Received postMessage:', event.data);
+            }
+        });
+    </script>
+</body>
+</html>

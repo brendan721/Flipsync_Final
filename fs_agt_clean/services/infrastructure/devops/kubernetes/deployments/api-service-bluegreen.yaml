@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flipsync-api
+  namespace: flipsync-prod
+  labels:
+    app: flipsync
+    tier: api
+spec:
+  selector:
+    app: flipsync
+    tier: api
+    version: blue  # Initially points to blue deployment
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  type: ClusterIP

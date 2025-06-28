@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-ingress
+  namespace: flipsync-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: flipsync
+      tier: api
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: flipsync-ingress
+    - podSelector:
+        matchLabels:
+          app: flipsync-gateway
+    ports:
+    - protocol: TCP
+      port: 8080

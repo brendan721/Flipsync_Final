@@ -1,0 +1,169 @@
+# FlipSync Development Environment - Integrated Docker Setup
+# Optimized for local development with PostgreSQL integration
+
+version: "3.8"
+
+services:
+  # PostgreSQL Database - Development
+  postgres:
+    image: postgres:15-alpine
+    container_name: flipsync-dev-postgres
+    ports:
+      - "5432:5432"  # Standard PostgreSQL port
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=flipsync
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./scripts/init-dev-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql
+      - ./fs_agt_clean/database/init:/docker-entrypoint-initdb.d/02-flipsync-init
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d flipsync"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - flipsync-dev
+
+  # Redis Cache - Development
+  redis:
+    image: redis:7-alpine
+    container_name: flipsync-dev-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_dev_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - flipsync-dev
+
+  # FlipSync API Backend - Development
+  flipsync-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flipsync-dev-api
+    ports:
+      - "8000:8000"
+    environment:
+      # Database Configuration
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/flipsync
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=flipsync
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      
+      # Redis Configuration
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      
+      # Application Configuration
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=debug
+      - SECRET_KEY=dev_secret_key_change_in_production
+      - JWT_SECRET=dev-secret-key-change-in-production
+      
+      # API Configuration
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - API_RELOAD=true
+      
+      # CORS Configuration
+      - CORS_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000"]
+      
+      # Python Configuration
+      - PYTHONPATH=/app
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      
+      # AI Agent Configuration
+      - ENABLE_AI_AGENTS=true
+      - AGENT_COORDINATION_ENABLED=true
+      
+    volumes:
+      # Mount source code for live development
+      - ./fs_agt_clean:/app/fs_agt_clean:rw
+      - ./logs:/app/logs:rw
+      - ./uploads:/app/uploads:rw
+      - ./requirements.txt:/app/requirements.txt:ro
+      - ./.env.postgresql:/app/.env:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - flipsync-dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Database Management UI
+  adminer:
+    image: adminer:latest
+    container_name: flipsync-dev-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+      - ADMINER_DESIGN=pepa-linha
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - flipsync-dev
+
+  # Redis Management UI
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: flipsync-dev-redis-ui
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+      - HTTP_USER=admin
+      - HTTP_PASSWORD=admin
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - flipsync-dev
+
+# Development volumes
+volumes:
+  postgres_dev_data:
+    driver: local
+    labels:
+      - "environment=development"
+      - "service=database"
+  redis_dev_data:
+    driver: local
+    labels:
+      - "environment=development"
+      - "service=cache"
+
+# Development network
+networks:
+  flipsync-dev:
+    driver: bridge
+    name: flipsync-development
+    labels:
+      - "environment=development"

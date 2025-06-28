@@ -1,0 +1,133 @@
+# FlipSync Optimized Dockerfile
+# Optimized for fast rebuilds and reliable code updates
+
+# Base stage with common dependencies
+FROM python:3.12-slim as base
+
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies (rarely change)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    gcc \
+    g++ \
+    curl \
+    ca-certificates \
+    && update-ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Dependencies stage (cached unless requirements change)
+FROM base as dependencies
+
+# Copy ONLY requirements files first (for better caching)
+COPY requirements.txt requirements-minimal.txt ./
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install dependencies (this layer is cached unless requirements change)
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir gunicorn uvicorn[standard] && \
+    find /opt/venv -name "*.pyc" -delete && \
+    find /opt/venv -name "__pycache__" -type d -exec rm -rf {} + || true
+
+# Development stage (for fast code updates)
+FROM dependencies as development
+
+# Copy application code (this layer rebuilds on code changes)
+COPY fs_agt_clean/ ./fs_agt_clean/
+
+# Create app user
+RUN groupadd -r -g 1000 app && \
+    useradd -r -u 1000 -g app -d /app -s /bin/bash app && \
+    mkdir -p /app/logs /app/uploads /app/temp && \
+    chown -R app:app /app
+
+USER app
+
+# Development command (can be overridden)
+CMD ["python", "-m", "uvicorn", "fs_agt_clean.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# Production stage (optimized runtime)
+FROM python:3.12-slim as production
+
+WORKDIR /app
+
+# Production environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PATH="/opt/venv/bin:$PATH" \
+    ENVIRONMENT=production \
+    DEBUG=false \
+    LOG_LEVEL=info \
+    WORKERS=4 \
+    MAX_WORKERS=8 \
+    WORKER_CLASS=uvicorn.workers.UvicornWorker \
+    WORKER_CONNECTIONS=1000 \
+    KEEPALIVE=2 \
+    MAX_REQUESTS=1000 \
+    MAX_REQUESTS_JITTER=100 \
+    PRELOAD_APP=true \
+    TIMEOUT=120 \
+    GRACEFUL_TIMEOUT=30
+
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    ca-certificates \
+    && update-ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
+
+# Copy virtual environment from dependencies stage
+COPY --from=dependencies /opt/venv /opt/venv
+
+# Create app user
+RUN groupadd -r -g 1000 app && \
+    useradd -r -u 1000 -g app -d /app -s /bin/bash app && \
+    mkdir -p /app/logs /app/uploads /app/temp && \
+    chown -R app:app /app
+
+# Copy application code (this layer rebuilds on code changes)
+COPY --chown=app:app fs_agt_clean/ ./fs_agt_clean/
+
+# Copy production configuration files
+COPY --chown=app:app production/gunicorn.conf.py ./
+COPY --chown=app:app production/logging.conf ./
+COPY --chown=app:app production/start.sh ./
+
+# Create production directories
+RUN mkdir -p /app/logs/agents /app/logs/workflows /app/logs/api /app/logs/performance && \
+    mkdir -p /app/temp/uploads /app/temp/processing && \
+    chown -R app:app /app/logs /app/temp && \
+    chmod +x start.sh
+
+USER app
+
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["./start.sh"]
+
+# Labels
+LABEL maintainer="FlipSync Development Team" \
+      version="1.0.0" \
+      description="FlipSync Optimized API with Fast Rebuild Support" \
+      environment="production"

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="flipsync">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>flipsync</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- eBay OAuth Popup Handler -->
+  <script>
+    // Listen for OAuth callback messages from popup windows
+    window.addEventListener('message', function(event) {
+      // Verify the message source
+      if (event.data && event.data.source === 'ebay_oauth_callback') {
+        console.log('🔄 eBay OAuth callback received:', event.data);
+
+        if (event.data.success && event.data.code && event.data.state) {
+          // Handle successful OAuth
+          console.log('✅ eBay OAuth successful, processing...');
+          handleEbayOAuthSuccess(event.data.code, event.data.state);
+        } else if (event.data.error) {
+          // Handle OAuth error
+          console.log('❌ eBay OAuth error:', event.data.error);
+          handleEbayOAuthError(event.data.error);
+        }
+      }
+    });
+
+    async function handleEbayOAuthSuccess(code, state) {
+      try {
+        console.log('🔄 Sending OAuth callback to backend...');
+
+        // Send the authorization code to our backend via Flutter container proxy
+        const response = await fetch('http://localhost:8001/api/v1/marketplace/ebay/oauth/callback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            code: code,
+            state: state
+          })
+        });
+
+        if (response.ok) {
+          console.log('✅ eBay OAuth callback processed successfully');
+          // Notify Flutter app about successful connection
+          if (window.flutter_oauth_callback) {
+            window.flutter_oauth_callback('ebay', true, null);
+          }
+          // Refresh the page to update connection status
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else {
+          console.error('❌ eBay OAuth callback failed:', response.status);
+          const errorText = await response.text();
+          handleEbayOAuthError(`Backend error: ${response.status} - ${errorText}`);
+        }
+      } catch (error) {
+        console.error('❌ eBay OAuth processing error:', error);
+        handleEbayOAuthError(`Processing error: ${error.message}`);
+      }
+    }
+
+    function handleEbayOAuthError(error) {
+      console.error('❌ eBay OAuth error:', error);
+      // Notify Flutter app about error
+      if (window.flutter_oauth_callback) {
+        window.flutter_oauth_callback('ebay', false, error);
+      }
+      alert(`eBay connection failed: ${error}`);
+    }
+
+    // Make functions available globally for Flutter to call
+    window.ebay_oauth_handler = {
+      handleSuccess: handleEbayOAuthSuccess,
+      handleError: handleEbayOAuthError
+    };
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

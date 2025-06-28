@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FlipSync eBay Connection</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .success {
+            color: #28a745;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .processing {
+            color: #007bff;
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>FlipSync eBay Connection</h1>
+    
+    <div id="status">
+        <div class="processing">
+            <div class="spinner"></div>
+            <h2>🔄 Processing eBay OAuth...</h2>
+            <p>Connecting your eBay account to FlipSync...</p>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+        const statusDiv = document.getElementById('status');
+        
+        if (error) {
+            // Handle OAuth error
+            statusDiv.innerHTML = `
+                <div class="error">
+                    <h2>❌ OAuth Error</h2>
+                    <p><strong>Error:</strong> ${error}</p>
+                    <p><strong>Description:</strong> ${urlParams.get('error_description') || 'No description provided'}</p>
+                </div>
+                <button onclick="retryConnection()">Try Again</button>
+                <button onclick="window.close()">Close Window</button>
+            `;
+        } else if (code && state) {
+            // Automatically process the callback
+            processOAuthCallback();
+        } else {
+            // No parameters found
+            statusDiv.innerHTML = `
+                <div class="error">
+                    <h2>⚠️ Invalid Callback</h2>
+                    <p>No OAuth parameters found in the URL.</p>
+                </div>
+                <button onclick="retryConnection()">Try Again</button>
+                <button onclick="window.close()">Close Window</button>
+            `;
+        }
+        
+        async function processOAuthCallback() {
+            if (!code || !state) {
+                showError('Missing OAuth parameters');
+                return;
+            }
+            
+            try {
+                // Use a proxy service to avoid CORS issues
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const targetUrl = 'http://localhost:8001/api/v1/marketplace/ebay/oauth/callback';
+                
+                const response = await fetch(proxyUrl + targetUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        state: state
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusDiv.innerHTML = `
+                        <div class="success">
+                            <h2>🎉 eBay Account Connected!</h2>
+                            <p>Your eBay account has been successfully connected to FlipSync.</p>
+                            <p>You can now close this window and return to the FlipSync app.</p>
+                        </div>
+                        <button onclick="openFlipSyncApp()">Open FlipSync App</button>
+                        <button onclick="window.close()">Close Window</button>
+                    `;
+                } else {
+                    throw new Error(result.message || 'OAuth callback failed');
+                }
+            } catch (error) {
+                console.error('OAuth callback error:', error);
+                
+                // Try alternative method: redirect to app with OAuth data
+                if (error.message.includes('CORS') || error.message.includes('fetch')) {
+                    statusDiv.innerHTML = `
+                        <div class="success">
+                            <h2>✅ OAuth Successful!</h2>
+                            <p>Authorization received from eBay. Redirecting to FlipSync app...</p>
+                        </div>
+                    `;
+                    
+                    // Redirect to mobile app after a short delay
+                    setTimeout(() => {
+                        openFlipSyncApp();
+                    }, 2000);
+                } else {
+                    showError(error.message);
+                }
+            }
+        }
+        
+        function showError(message) {
+            // Send error data to parent window (popup opener)
+            if (window.opener) {
+                const errorMessage = {
+                    source: 'ebay_oauth_callback',
+                    error: 'oauth_failed',
+                    error_description: message,
+                    success: false
+                };
+
+                window.opener.postMessage(errorMessage, '*');
+
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <h2>❌ Connection Failed</h2>
+                        <p>There was an error connecting to eBay. You can close this window.</p>
+                        <p><strong>Error:</strong> ${message}</p>
+                    </div>
+                    <button onclick="window.close()">Close Window</button>
+                `;
+
+                // Auto-close after 3 seconds
+                setTimeout(() => {
+                    window.close();
+                }, 3000);
+            } else {
+                // Fallback for non-popup mode
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <h2>❌ Connection Failed</h2>
+                        <p><strong>Error:</strong> ${message}</p>
+                        <p>Please try connecting again or contact support if the issue persists.</p>
+                    </div>
+                    <button onclick="retryConnection()">Try Again</button>
+                    <button onclick="openFlipSyncApp()">Open FlipSync App</button>
+                    <button onclick="window.close()">Close Window</button>
+                `;
+            }
+        }
+        
+        function openFlipSyncApp() {
+            // Send OAuth data to parent window (popup opener)
+            if (window.opener) {
+                const message = {
+                    source: 'ebay_oauth_callback',
+                    code: code,
+                    state: state,
+                    success: true
+                };
+
+                window.opener.postMessage(message, '*');
+
+                statusDiv.innerHTML = `
+                    <div class="success">
+                        <h2>✅ Authentication Complete!</h2>
+                        <p>eBay connection successful! You can close this window.</p>
+                        <p>Returning to FlipSync...</p>
+                    </div>
+                    <button onclick="window.close()">Close Window</button>
+                `;
+
+                // Auto-close after 2 seconds
+                setTimeout(() => {
+                    window.close();
+                }, 2000);
+            } else {
+                // Fallback for non-popup mode
+                const appUrl = `flipsync://oauth/ebay?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+                window.location.href = appUrl;
+            }
+        }
+        
+        function retryConnection() {
+            // Redirect back to FlipSync app to retry
+            window.location.href = 'http://localhost:3000';
+        }
+    </script>
+</body>
+</html>

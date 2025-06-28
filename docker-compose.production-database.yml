@@ -1,0 +1,230 @@
+# FlipSync Production Database Configuration
+# This file contains production-ready PostgreSQL setup with security, monitoring, and backup
+
+version: '3.8'
+
+services:
+  # Production PostgreSQL Database
+  postgres-production:
+    image: postgres:15-alpine
+    container_name: flipsync-production-postgres
+    restart: unless-stopped
+    
+    # Production Environment Variables
+    environment:
+      # Database Configuration
+      - POSTGRES_DB=${DB_NAME:-flipsync_prod}
+      - POSTGRES_USER=${DB_USER:-flipsync_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      
+      # PostgreSQL Configuration
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8
+      
+      # Performance Tuning
+      - POSTGRES_SHARED_PRELOAD_LIBRARIES=pg_stat_statements,auto_explain
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=1GB
+      - POSTGRES_MAINTENANCE_WORK_MEM=64MB
+      - POSTGRES_CHECKPOINT_COMPLETION_TARGET=0.9
+      - POSTGRES_WAL_BUFFERS=16MB
+      - POSTGRES_DEFAULT_STATISTICS_TARGET=100
+      
+      # Security Settings
+      - POSTGRES_SSL=on
+      - POSTGRES_SSL_CERT_FILE=/etc/ssl/certs/server.crt
+      - POSTGRES_SSL_KEY_FILE=/etc/ssl/private/server.key
+      - POSTGRES_SSL_CA_FILE=/etc/ssl/certs/ca.crt
+      
+      # Logging Configuration
+      - POSTGRES_LOG_STATEMENT=all
+      - POSTGRES_LOG_MIN_DURATION_STATEMENT=1000  # Log queries > 1 second
+      - POSTGRES_LOG_CONNECTIONS=on
+      - POSTGRES_LOG_DISCONNECTIONS=on
+      - POSTGRES_LOG_LOCK_WAITS=on
+      - POSTGRES_LOG_CHECKPOINTS=on
+      
+    # Port Configuration (internal only for security)
+    expose:
+      - "5432"
+    
+    # Volume Mounts
+    volumes:
+      # Data persistence
+      - postgres_production_data:/var/lib/postgresql/data
+      
+      # SSL Certificates
+      - ./ssl/postgres/server.crt:/etc/ssl/certs/server.crt:ro
+      - ./ssl/postgres/server.key:/etc/ssl/private/server.key:ro
+      - ./ssl/postgres/ca.crt:/etc/ssl/certs/ca.crt:ro
+      
+      # Configuration Files
+      - ./config/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./config/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      
+      # Initialization Scripts
+      - ./scripts/production-db-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./scripts/production-db-security.sql:/docker-entrypoint-initdb.d/02-security.sql:ro
+      - ./scripts/production-db-monitoring.sql:/docker-entrypoint-initdb.d/03-monitoring.sql:ro
+      
+      # Backup Directory
+      - postgres_backups:/var/backups/postgresql
+      
+    # Resource Limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '1.0'
+    
+    # Health Check
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-flipsync_user} -d ${DB_NAME:-flipsync_prod}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Security Configuration
+    security_opt:
+      - no-new-privileges:true
+    
+    # User Configuration (non-root)
+    user: "999:999"  # postgres user
+    
+    # Networks
+    networks:
+      - flipsync-production
+      - flipsync-monitoring
+    
+    # Labels for monitoring
+    labels:
+      - "service=database"
+      - "tier=infrastructure"
+      - "environment=production"
+      - "backup.enable=true"
+      - "monitoring.enable=true"
+
+  # PostgreSQL Backup Service
+  postgres-backup:
+    image: postgres:15-alpine
+    container_name: flipsync-postgres-backup
+    restart: unless-stopped
+    
+    environment:
+      - PGHOST=postgres-production
+      - PGPORT=5432
+      - PGUSER=${DB_USER:-flipsync_user}
+      - PGPASSWORD=${DB_PASSWORD}
+      - PGDATABASE=${DB_NAME:-flipsync_prod}
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 2 * * *}  # Daily at 2 AM
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-30}
+      - BACKUP_ENCRYPTION_KEY=${BACKUP_ENCRYPTION_KEY}
+    
+    volumes:
+      - postgres_backups:/var/backups/postgresql
+      - ./scripts/backup-postgres.sh:/usr/local/bin/backup-postgres.sh:ro
+      - ./scripts/restore-postgres.sh:/usr/local/bin/restore-postgres.sh:ro
+    
+    command: >
+      sh -c "
+        echo 'Setting up PostgreSQL backup service...'
+        chmod +x /usr/local/bin/backup-postgres.sh
+        chmod +x /usr/local/bin/restore-postgres.sh
+        
+        # Install cron
+        apk add --no-cache dcron
+        
+        # Setup cron job
+        echo '${BACKUP_SCHEDULE} /usr/local/bin/backup-postgres.sh' > /etc/crontabs/root
+        
+        # Start cron daemon
+        crond -f -d 8
+      "
+    
+    depends_on:
+      postgres-production:
+        condition: service_healthy
+    
+    networks:
+      - flipsync-production
+    
+    labels:
+      - "service=backup"
+      - "tier=infrastructure"
+      - "environment=production"
+
+  # PostgreSQL Monitoring (pgAdmin)
+  postgres-monitor:
+    image: dpage/pgadmin4:latest
+    container_name: flipsync-postgres-monitor
+    restart: unless-stopped
+    
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@flipsync.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+      - PGADMIN_CONFIG_SERVER_MODE=True
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=True
+    
+    ports:
+      - "5050:80"  # pgAdmin web interface
+    
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./config/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    
+    depends_on:
+      postgres-production:
+        condition: service_healthy
+    
+    networks:
+      - flipsync-production
+      - flipsync-monitoring
+    
+    labels:
+      - "service=monitoring"
+      - "tier=infrastructure"
+      - "environment=production"
+
+# Networks
+networks:
+  flipsync-production:
+    driver: bridge
+    name: flipsync-production
+    labels:
+      - "environment=production"
+      - "tier=infrastructure"
+  
+  flipsync-monitoring:
+    driver: bridge
+    name: flipsync-monitoring
+    labels:
+      - "environment=production"
+      - "tier=monitoring"
+
+# Volumes
+volumes:
+  postgres_production_data:
+    driver: local
+    name: flipsync_postgres_production_data
+    labels:
+      - "service=database"
+      - "environment=production"
+      - "backup.enable=true"
+  
+  postgres_backups:
+    driver: local
+    name: flipsync_postgres_backups
+    labels:
+      - "service=backup"
+      - "environment=production"
+  
+  pgadmin_data:
+    driver: local
+    name: flipsync_pgadmin_data
+    labels:
+      - "service=monitoring"
+      - "environment=production"

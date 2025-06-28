@@ -1,0 +1,106 @@
+{
+  "total_tests": 10,
+  "passed_tests": 0,
+  "failed_tests": 10,
+  "test_details": [
+    {
+      "test_name": "authentication_login",
+      "passed": false,
+      "message": "Authentication failed: ",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.586096+00:00"
+    },
+    {
+      "test_name": "agents_agents",
+      "passed": false,
+      "message": "Endpoint /api/v1/agents failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.594858+00:00"
+    },
+    {
+      "test_name": "agents_status",
+      "passed": false,
+      "message": "Endpoint /api/v1/agents/communication/status failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.597753+00:00"
+    },
+    {
+      "test_name": "agents_dashboard",
+      "passed": false,
+      "message": "Endpoint /api/v1/analytics/dashboard failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.605150+00:00"
+    },
+    {
+      "test_name": "analytics_performance",
+      "passed": false,
+      "message": "Analytics performance endpoint failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.611681+00:00"
+    },
+    {
+      "test_name": "marketplace_marketplace",
+      "passed": false,
+      "message": "Marketplace endpoint /api/v1/marketplace failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.618407+00:00"
+    },
+    {
+      "test_name": "marketplace_products",
+      "passed": false,
+      "message": "Marketplace endpoint /api/v1/marketplace/products failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.626151+00:00"
+    },
+    {
+      "test_name": "notifications_push_register",
+      "passed": false,
+      "message": "Push notification registration failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.629184+00:00"
+    },
+    {
+      "test_name": "notifications_get_notifications",
+      "passed": false,
+      "message": "Get notifications endpoint failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.635955+00:00"
+    },
+    {
+      "test_name": "ai_analysis_analyze_product",
+      "passed": false,
+      "message": "AI product analysis failed",
+      "status_code": 0,
+      "timestamp": "2025-06-01T15:27:31.640967+00:00"
+    }
+  ],
+  "integration_components": {
+    "authentication": {
+      "status": "completed",
+      "endpoints": []
+    },
+    "agents": {
+      "status": "completed",
+      "endpoints": []
+    },
+    "analytics": {
+      "status": "completed",
+      "endpoints": []
+    },
+    "marketplace": {
+      "status": "completed",
+      "endpoints": []
+    },
+    "notifications": {
+      "status": "completed",
+      "endpoints": []
+    },
+    "ai_analysis": {
+      "status": "completed",
+      "endpoints": []
+    }
+  },
+  "execution_time": 0.0756063461303711,
+  "success_rate": 0.0,
+  "timestamp": "2025-06-01T15:27:31.645160+00:00"
+}

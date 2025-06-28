@@ -1,0 +1,121 @@
+{
+  "status": "success",
+  "products": [
+    {
+      "id": "real_vintage_camera_1750741177",
+      "title": "Vintage Canon AE-1 35mm Film Camera",
+      "sku": "CAM-AE1-VTG-001",
+      "description": "Professional vintage camera in excellent condition with original leather case",
+      "price": 225.0,
+      "stock": 1,
+      "category": "Cameras & Photo",
+      "condition": "Used",
+      "marketplace": "ebay",
+      "imageUrl": "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800&h=600&fit=crop",
+      "additionalImages": [
+        "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800&h=600&fit=crop"
+      ],
+      "originalShipping": 12.5,
+      "optimizedShipping": 8.75,
+      "savingsPerOrder": 3.75,
+      "created_at": "2025-06-24T04:59:37.142291+00:00",
+      "real_image_processed": true,
+      "ai_generated": false,
+      "image_size_bytes": 81877
+    },
+    {
+      "id": "real_wireless_headphones_1750741177",
+      "title": "Premium Wireless Noise-Cancelling Headphones",
+      "sku": "HP-WL-PREM-002",
+      "description": "High-quality wireless headphones with active noise cancellation and 30-hour battery",
+      "price": 299.99,
+      "stock": 1,
+      "category": "Consumer Electronics",
+      "condition": "Used",
+      "marketplace": "ebay",
+      "imageUrl": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop",
+      "additionalImages": [
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop"
+      ],
+      "originalShipping": 12.5,
+      "optimizedShipping": 8.75,
+      "savingsPerOrder": 3.75,
+      "created_at": "2025-06-24T04:59:37.142413+00:00",
+      "real_image_processed": true,
+      "ai_generated": false,
+      "image_size_bytes": 55889
+    },
+    {
+      "id": "real_smart_watch_1750741177",
+      "title": "Smart Fitness Watch with Heart Rate Monitor",
+      "sku": "SW-FIT-SMART-003",
+      "description": "Advanced smartwatch with comprehensive health tracking and GPS",
+      "price": 349.0,
+      "stock": 1,
+      "category": "Wearable Technology",
+      "condition": "Used",
+      "marketplace": "ebay",
+      "imageUrl": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop",
+      "additionalImages": [
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop"
+      ],
+      "originalShipping": 12.5,
+      "optimizedShipping": 8.75,
+      "savingsPerOrder": 3.75,
+      "created_at": "2025-06-24T04:59:37.142573+00:00",
+      "real_image_processed": true,
+      "ai_generated": false,
+      "image_size_bytes": 22549
+    },
+    {
+      "id": "real_laptop_computer_1750741177",
+      "title": "MacBook Pro 16-inch M2 Laptop Computer",
+      "sku": "LAP-MBP-M2-004",
+      "description": "High-performance laptop for professional use with 16GB RAM and 512GB SSD",
+      "price": 1899.0,
+      "stock": 1,
+      "category": "Computers/Tablets & Networking",
+      "condition": "Used",
+      "marketplace": "ebay",
+      "imageUrl": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&h=600&fit=crop",
+      "additionalImages": [
+        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&h=600&fit=crop"
+      ],
+      "originalShipping": 12.5,
+      "optimizedShipping": 8.75,
+      "savingsPerOrder": 3.75,
+      "created_at": "2025-06-24T04:59:37.142692+00:00",
+      "real_image_processed": true,
+      "ai_generated": false,
+      "image_size_bytes": 47244
+    },
+    {
+      "id": "real_coffee_maker_1750741177",
+      "title": "Automatic Drip Coffee Maker with Timer",
+      "sku": "COF-AUTO-TIMER-005",
+      "description": "Programmable coffee maker with thermal carafe and auto-shutoff",
+      "price": 129.99,
+      "stock": 1,
+      "category": "Small Kitchen Appliances",
+      "condition": "Used",
+      "marketplace": "ebay",
+      "imageUrl": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop",
+      "additionalImages": [
+        "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop"
+      ],
+      "originalShipping": 12.5,
+      "optimizedShipping": 8.75,
+      "savingsPerOrder": 3.75,
+      "created_at": "2025-06-24T04:59:37.142780+00:00",
+      "real_image_processed": true,
+      "ai_generated": false,
+      "image_size_bytes": 77933
+    }
+  ],
+  "total": 5,
+  "real_images": true,
+  "ai_processed": false,
+  "marketplace_agents_active": 5,
+  "agent_system_operational": true,
+  "timestamp": "2025-06-24T04:59:37.143054+00:00"
+}

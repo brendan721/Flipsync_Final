@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-06-24T00:10:01.964762",
+  "authentication": true,
+  "ebay_connection": {
+    "success": false,
+    "data": {
+      "error": "HTTP Error",
+      "message": "Could not validate credentials"
+    }
+  },
+  "ebay_inventory": {
+    "success": false,
+    "data": {
+      "error": "HTTP Error",
+      "message": "Could not validate credentials"
+    }
+  },
+  "general_inventory": {
+    "success": false,
+    "data": {
+      "error": "HTTP Error",
+      "message": "Could not validate credentials"
+    }
+  }
+}

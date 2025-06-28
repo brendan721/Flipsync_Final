@@ -1,0 +1,68 @@
+# Minimal requirements for basic FlipSync API functionality
+# Core web framework
+fastapi>=0.115.0
+uvicorn>=0.34.0
+pydantic>=2.11.0
+
+# Database
+sqlalchemy>=2.0.40
+asyncpg>=0.30.0
+psycopg2-binary>=2.9.0
+
+# Authentication & Security
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+
+# HTTP client
+httpx>=0.28.1
+aiohttp>=3.12.6
+
+# Redis
+redis>=6.2.0
+
+# Configuration
+python-dotenv>=1.1.0
+PyYAML>=6.0.2
+
+# Logging
+structlog>=25.3.0
+
+# Utilities
+python-dateutil>=2.9.0
+
+# Monitoring and metrics
+prometheus-client>=0.22.0
+psutil>=7.0.0
+
+# Vector store
+qdrant-client>=1.14.2
+
+# Additional dependencies for core functionality
+networkx>=3.5
+numpy>=2.2.6
+Pillow>=11.2.1
+
+# Shipping and logistics
+shippo>=3.9.0
+
+# Async utilities and retry logic
+tenacity>=9.1.2
+
+# Email and SMS services
+aiosmtplib>=4.0.1
+jinja2>=3.1.6
+twilio>=9.6.2
+
+# File and database operations
+aiofiles>=24.1.0
+aiosqlite>=0.21.0
+
+# WebSocket and real-time communication
+websockets>=15.0.1
+aioredis>=2.0.1
+
+# AI and language processing - Updated for Docker rebuild
+tiktoken>=0.9.0
+langchain>=0.3.25
+langchain-community>=0.3.24

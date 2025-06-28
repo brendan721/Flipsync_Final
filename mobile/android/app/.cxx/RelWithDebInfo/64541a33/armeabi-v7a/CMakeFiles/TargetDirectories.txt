@@ -1,0 +1,2 @@
+C:/Users/brend/fs_clean/mobile/flutter_app/android/app/.cxx/RelWithDebInfo/64541a33/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/brend/fs_clean/mobile/flutter_app/android/app/.cxx/RelWithDebInfo/64541a33/armeabi-v7a/CMakeFiles/rebuild_cache.dir

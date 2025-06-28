@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlipSync eBay OAuth Callback</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .success {
+            color: #28a745;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .error {
+            color: #721c24;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .processing {
+            color: #004085;
+            background: #cce7ff;
+            border: 1px solid #b3d7ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .close-btn {
+            background: #28a745;
+        }
+        .close-btn:hover {
+            background: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 FlipSync eBay Connection</h1>
+        
+        <div id="status">
+            <div class="processing">
+                <div class="spinner"></div>
+                <h2>Processing your eBay connection...</h2>
+                <p>Please wait while we connect your eBay account to FlipSync.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔄 eBay OAuth callback page loaded');
+        
+        // Get OAuth parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+        const statusDiv = document.getElementById('status');
+
+        console.log('🔍 OAuth parameters:', { 
+            code: code ? `${code.substring(0, 10)}...` : null, 
+            state: state ? `${state.substring(0, 10)}...` : null, 
+            error, 
+            errorDescription 
+        });
+
+        function updateStatus(message, type = 'processing') {
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'processing';
+            statusDiv.innerHTML = `
+                <div class="${className}">
+                    <h2>${message}</h2>
+                    ${type === 'processing' ? '<div class="spinner"></div>' : ''}
+                </div>
+            `;
+        }
+
+        // Process OAuth callback
+        if (error) {
+            console.log('❌ eBay OAuth error:', error, errorDescription);
+            handleOAuthError();
+        } else if (code && state) {
+            console.log('✅ eBay OAuth successful, processing...');
+            setTimeout(() => {
+                handleOAuthSuccess();
+            }, 1500);
+        } else {
+            console.log('❌ Invalid OAuth callback - missing parameters');
+            statusDiv.innerHTML = `
+                <div class="error">
+                    <h2>⚠️ Invalid Request</h2>
+                    <p>No OAuth parameters found.</p>
+                    <button onclick="closeWindow()">Close Window</button>
+                </div>
+            `;
+        }
+        
+        function handleOAuthSuccess() {
+            console.log('🔄 Sending OAuth data to Flutter app via postMessage...');
+            updateStatus('Authorization successful! Connecting to FlipSync...', 'success');
+            
+            if (window.opener) {
+                // Send success data to Flutter app
+                const message = {
+                    source: 'ebay_oauth_callback',
+                    code: code,
+                    state: state,
+                    success: true
+                };
+
+                console.log('📤 Sending postMessage to Flutter app:', message);
+                window.opener.postMessage(message, '*');
+
+                statusDiv.innerHTML = `
+                    <div class="success">
+                        <h2>✅ eBay OAuth Successful!</h2>
+                        <p>Processing your eBay connection...</p>
+                        <p>You can close this window and return to FlipSync.</p>
+                        <button class="close-btn" onclick="window.close()">Close Window</button>
+                    </div>
+                `;
+
+                console.log('✅ Data sent to Flutter app via postMessage');
+                
+                // Auto-close after 3 seconds
+                setTimeout(() => {
+                    window.close();
+                }, 3000);
+            } else {
+                console.log('❌ No opener window found - trying fallback');
+                handleNoOpener();
+            }
+        }
+
+        function handleOAuthError() {
+            console.log('❌ Handling OAuth error:', error, errorDescription);
+            updateStatus(`Error: ${errorDescription || error}`, 'error');
+            
+            if (window.opener) {
+                // Send error data to Flutter app
+                const message = {
+                    source: 'ebay_oauth_callback',
+                    error: error,
+                    error_description: errorDescription,
+                    success: false
+                };
+
+                console.log('📤 Sending error to Flutter app:', message);
+                window.opener.postMessage(message, '*');
+
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <h2>❌ eBay OAuth Failed</h2>
+                        <p>Error: ${errorDescription || error}</p>
+                        <button onclick="window.close()">Close Window</button>
+                    </div>
+                `;
+                
+                // Auto-close after 5 seconds
+                setTimeout(() => {
+                    window.close();
+                }, 5000);
+            } else {
+                console.log('❌ No opener window found for error handling');
+                handleNoOpener();
+            }
+        }
+
+        function handleNoOpener() {
+            // Fallback for mobile or when popup opener is not available
+            console.log('🔄 No opener window - using fallback methods');
+            
+            if (code && state) {
+                // Try to open mobile app with deep link
+                const appUrl = `flipsync://oauth/ebay?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+                console.log('📱 Trying mobile app deep link:', appUrl);
+                window.location.href = appUrl;
+                
+                // Fallback to web app after delay (try HTTPS first)
+                setTimeout(() => {
+                    const httpsUrl = `https://localhost:3000?ebay_oauth_code=${encodeURIComponent(code)}&ebay_oauth_state=${encodeURIComponent(state)}`;
+                    console.log('🌐 Fallback to HTTPS web app:', httpsUrl);
+                    window.location.href = httpsUrl;
+                }, 2000);
+
+                // HTTP fallback after HTTPS
+                setTimeout(() => {
+                    const httpUrl = `http://localhost:3000?ebay_oauth_code=${encodeURIComponent(code)}&ebay_oauth_state=${encodeURIComponent(state)}`;
+                    console.log('🌐 Fallback to HTTP web app:', httpUrl);
+                    window.location.href = httpUrl;
+                }, 5000);
+            } else {
+                // Error case - redirect to app
+                const errorUrl = `http://localhost:3000?ebay_oauth_error=${encodeURIComponent(error || 'unknown')}&ebay_oauth_error_description=${encodeURIComponent(errorDescription || 'Unknown error')}`;
+                console.log('🌐 Redirecting to app with error:', errorUrl);
+                window.location.href = errorUrl;
+            }
+        }
+
+        function closeWindow() {
+            console.log('🔄 Closing window...');
+            window.close();
+        }
+
+        // Listen for messages from parent window (for debugging)
+        window.addEventListener('message', function(event) {
+            console.log('📨 Received message from parent:', event.data);
+        });
+
+        console.log('✅ eBay OAuth callback script initialized');
+    </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+version: '3.8'
+
+# Docker Compose configuration for AI coding agent development services
+# Optimized for FlipSync development workflow
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: flipsync-postgres
+    environment:
+      POSTGRES_DB: flipsync
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./fs_agt_clean/database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: flipsync-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Jupyter Notebook for Data Analysis and AI Development
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    container_name: flipsync-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./fs_agt_clean:/home/jovyan/work/fs_agt_clean
+      - ./notebooks:/home/jovyan/work/notebooks
+      - jupyter_data:/home/jovyan/.jupyter
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_TOKEN: "flipsync-dev"
+      GRANT_SUDO: "yes"
+    user: root
+    command: start-notebook.sh --NotebookApp.token='flipsync-dev' --NotebookApp.password='' --NotebookApp.allow_root=True
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Adminer for Database Management
+  adminer:
+    image: adminer:latest
+    container_name: flipsync-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: "pepa-linha"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Redis Commander for Redis Management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: flipsync-redis-commander
+    ports:
+      - "8081:8081"
+    environment:
+      REDIS_HOSTS: "local:redis:6379"
+      HTTP_USER: admin
+      HTTP_PASSWORD: admin
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Mailhog for Email Testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: flipsync-mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # MinIO for S3-compatible Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: flipsync-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Elasticsearch for Search and Analytics
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: flipsync-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Kibana for Elasticsearch Visualization
+  kibana:
+    image: kibana:8.11.0
+    container_name: flipsync-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Prometheus for Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: flipsync-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+  # Grafana for Metrics Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: flipsync-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: false
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - flipsync-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  jupyter_data:
+    driver: local
+  minio_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  flipsync-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

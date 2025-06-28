@@ -1,0 +1,93 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "passed_tests": 3,
+    "success_rate": 100.0,
+    "total_duration": 56.77312922477722
+  },
+  "test_results": {
+    "real_image_analysis": {
+      "test": "real_image_analysis",
+      "status": "PASSED",
+      "confidence": 0.95,
+      "product_details": {
+        "name": "Chocolate Drip Birthday Cake",
+        "brand": "No Visible Brand Or Bakery Name, Suggesting It Could Be Homemade Or From A Custom Bakery.",
+        "condition": "Excellent",
+        "features": [
+          "Chocolate cake with a drip design.",
+          "Topped with decorative frosting flowers in various shades of brown and beige.",
+          "Includes \"Happy Birthday\" written in chocolate frosting.",
+          "Appears to be in excellent condition, ready for presentation or consumption.",
+          "**Visible Text, Labels, or Markings**: \"Happy Birthday\" written in frosting."
+        ],
+        "category": "**Product Category**: Food & Beverages > Cakes & Pastries > Birthday Cakes",
+        "marketplace": "ebay"
+      },
+      "analysis_length": 3726,
+      "marketplace_suggestions": 9,
+      "duration": 12.288546085357666
+    },
+    "complete_listing_generation": {
+      "test": "complete_listing_generation",
+      "status": "PASSED",
+      "listing": {
+        "title": "**",
+        "description": "---\n---",
+        "category": "**Product Category and Subcategory:** Food & beverages > Bakery > Custom cakes.",
+        "keywords": [
+          "title",
+          "search",
+          "keywords"
+        ],
+        "price_suggestions": {
+          "estimated_value": 70.0,
+          "starting_price": 49.0,
+          "buy_it_now": 84.0,
+          "suggested_retail": 105.0
+        },
+        "condition": "Excellent",
+        "brand": "** No Brand Or Bakery Logo Is Visible.",
+        "features": [
+          "Chocolate layer cake with drip-style icing.",
+          "Decorated with floral frosting in shades of brown, beige, and cream.",
+          "Handwritten \"Happy Birthday\" text in chocolate frosting.",
+          "Condition: Appears fresh and in excellent condition.",
+          "**Visible Text, Labels, or Markings:** \"Happy Birthday.\""
+        ],
+        "marketplace": "ebay",
+        "confidence": 0.95,
+        "seo_optimized": true,
+        "generated_by": "GPT-4o Vision API"
+      },
+      "duration": 10.807484865188599
+    },
+    "production_simulation": {
+      "test": "production_simulation",
+      "status": "PASSED",
+      "products_processed": 3,
+      "total_cost": 0.0,
+      "results": [
+        {
+          "product": "Vintage Camera",
+          "title": "Premium Product - Excellent Condition",
+          "category": "General",
+          "confidence": 0.5
+        },
+        {
+          "product": "Electronics",
+          "title": "",
+          "category": "**Product Category and Subcategory**:",
+          "confidence": 0.95
+        },
+        {
+          "product": "Collectible",
+          "title": "**",
+          "category": "**Product Category and Subcategory:**",
+          "confidence": 0.95
+        }
+      ],
+      "duration": 33.67462968826294
+    }
+  }
+}

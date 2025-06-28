@@ -1,0 +1,402 @@
+version: "3.8"
+
+# FlipSync Unified Docker Compose Configuration
+# AGENT_CONTEXT: All core services run in docker-desktop WSL distro
+# AGENT_PRIORITY: Hybrid architecture with centralized infrastructure services
+# AGENT_PATTERN: Core services (PostgreSQL, Redis, Ollama) + Development tools
+# AGENT_DOCKER_CRITICAL: Runs in docker-desktop WSL distro, accessed from Ubuntu WSL distro
+
+services:
+  # ============================================================================
+  # CORE INFRASTRUCTURE SERVICES (Tier 1 - Critical)
+  # ============================================================================
+
+  # PostgreSQL Database - Primary data store
+  postgres:
+    image: postgres:15-alpine
+    container_name: flipsync-postgres
+    environment:
+      POSTGRES_DB: flipsync
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres # Updated to match auth system
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "1432:5432" # Non-standard port to avoid conflicts
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./fs_agt_clean/database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=infrastructure"
+      - "service=database"
+      - "core-service=true"
+
+  # Redis Cache - Session and caching layer
+  redis:
+    image: redis:7-alpine
+    container_name: flipsync-redis
+    ports:
+      - "1379:6379" # Non-standard port to avoid conflicts
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=infrastructure"
+      - "service=cache"
+      - "core-service=true"
+
+  # Ollama AI Models - CPU optimized for stability
+  ollama:
+    image: ollama/ollama:latest
+    container_name: flipsync-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - fs_main_ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS=*
+      - OLLAMA_KEEP_ALIVE=-1 # Keep models loaded indefinitely
+      - OLLAMA_NUM_PARALLEL=1 # Single request for stability
+      - OLLAMA_MAX_LOADED_MODELS=2 # Limit concurrent models
+      - OLLAMA_FLASH_ATTENTION=false # Disable for stability
+      - OLLAMA_LOAD_TIMEOUT=300 # 5 minutes for model loading
+      - OLLAMA_REQUEST_TIMEOUT=120 # 2 minutes for requests
+      - OLLAMA_CONCURRENT_REQUESTS=1 # Single request at a time
+      - OMP_NUM_THREADS=8 # Match allocated CPU cores
+      - GOMAXPROCS=8 # Limit Go routines
+      - OLLAMA_LLM_LIBRARY=cpu # Force CPU-only mode
+      - OLLAMA_MAX_VRAM=0 # Disable VRAM usage
+      - MALLOC_ARENA_MAX=2 # Reduce memory fragmentation
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    deploy:
+      resources:
+        limits:
+          memory: 20G # Max available RAM
+          cpus: "8.0" # Max CPU cores
+        reservations:
+          memory: 16G # Reserve substantial memory
+          cpus: "6.0" # Reserve most cores
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 120s # Long startup for model loading
+    labels:
+      - "tier=infrastructure"
+      - "service=ai-models"
+      - "core-service=true"
+
+  # ============================================================================
+  # VECTOR DATABASE & SEARCH (Tier 2 - AI/ML Support)
+  # ============================================================================
+
+  # Qdrant Vector Database - For AI embeddings and semantic search
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: flipsync-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=ai-ml"
+      - "service=vector-database"
+
+  # ============================================================================
+  # DEVELOPMENT & MANAGEMENT TOOLS (Tier 3 - Development Support)
+  # ============================================================================
+
+  # Adminer - Database management interface
+  adminer:
+    image: adminer:latest
+    container_name: flipsync-adminer
+    ports:
+      - "1080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: "pepa-linha"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=development"
+      - "service=database-ui"
+
+  # Redis Commander - Redis management interface
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: flipsync-redis-commander
+    ports:
+      - "1081:8081"
+    environment:
+      REDIS_HOSTS: "local:redis:6379"
+      HTTP_USER: admin
+      HTTP_PASSWORD: admin
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=development"
+      - "service=cache-ui"
+
+  # Jupyter Notebook - Data analysis and AI development
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    container_name: flipsync-jupyter
+    ports:
+      - "1888:8888"
+    volumes:
+      - ./fs_agt_clean:/home/jovyan/work/fs_agt_clean
+      - ./notebooks:/home/jovyan/work/notebooks
+      - jupyter_data:/home/jovyan/.jupyter
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_TOKEN: "flipsync-dev"
+      GRANT_SUDO: "yes"
+    user: root
+    command: start-notebook.sh --NotebookApp.token='flipsync-dev' --NotebookApp.password='' --NotebookApp.allow_root=True
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=development"
+      - "service=notebook"
+
+  # Chrome with remote debugging for Kilo Code
+  chrome:
+    image: browserless/chrome:latest
+    container_name: flipsync-chrome
+    ports:
+      - "1222:3000" # Chrome DevTools Protocol
+      - "1223:8080" # Web interface
+    environment:
+      - CHROME_ARGS=--remote-debugging-port=3000 --remote-debugging-address=0.0.0.0 --disable-web-security --disable-features=VizDisplayCompositor --no-sandbox --disable-dev-shm-usage
+      - MAX_CONCURRENT_SESSIONS=5
+      - CONNECTION_TIMEOUT=60000
+      - PREBOOT_CHROME=true
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=development"
+      - "service=browser"
+
+  # ============================================================================
+  # COMMUNICATION & TESTING TOOLS (Tier 4 - Support Services)
+  # ============================================================================
+
+  # MailHog - Email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: flipsync-mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "1825:8025" # Web UI
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=testing"
+      - "service=email"
+
+  # MinIO - S3-compatible object storage
+  minio:
+    image: minio/minio:latest
+    container_name: flipsync-minio
+    ports:
+      - "1900:9000"
+      - "1901:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=storage"
+      - "service=object-storage"
+
+  # ============================================================================
+  # SEARCH & ANALYTICS (Tier 4.5 - Data Processing)
+  # ============================================================================
+
+  # Elasticsearch for Search and Analytics
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: flipsync-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - bootstrap.memory_lock=true
+    ports:
+      - "1920:9200" # Non-conflicting port
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=search-analytics"
+      - "service=elasticsearch"
+
+  # Kibana for Elasticsearch Visualization
+  kibana:
+    image: kibana:8.15.0
+    container_name: flipsync-kibana
+    ports:
+      - "1560:5601" # Non-conflicting port
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      XPACK_SECURITY_ENABLED: false
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=search-analytics"
+      - "service=kibana"
+
+  # ============================================================================
+  # MONITORING & OBSERVABILITY (Tier 5 - Operations)
+  # ============================================================================
+
+  # Prometheus - Metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: flipsync-prometheus
+    ports:
+      - "1090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=monitoring"
+      - "service=metrics"
+
+  # Grafana - Metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: flipsync-grafana
+    ports:
+      - "1300:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: false
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - flipsync-core-network
+    labels:
+      - "tier=monitoring"
+      - "service=visualization"
+
+# ============================================================================
+# PERSISTENT VOLUMES
+# ============================================================================
+volumes:
+  # Core infrastructure data
+  postgres_data:
+    driver: local
+    labels:
+      - "tier=infrastructure"
+      - "backup=critical"
+  redis_data:
+    driver: local
+    labels:
+      - "tier=infrastructure"
+      - "backup=important"
+  fs_main_ollama_data:
+    external: true # Preserve existing Ollama models
+  qdrant_data:
+    driver: local
+    labels:
+      - "tier=ai-ml"
+      - "backup=important"
+
+  # Development and support data
+  jupyter_data:
+    driver: local
+  minio_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+    labels:
+      - "tier=search-analytics"
+      - "backup=important"
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# ============================================================================
+# NETWORKS
+# ============================================================================
+networks:
+  flipsync-core-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+    labels:
+      - "environment=development"
+      - "project=flipsync"

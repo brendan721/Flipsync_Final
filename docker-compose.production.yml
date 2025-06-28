@@ -1,0 +1,344 @@
+# Production Docker Compose Configuration for FlipSync
+# Optimized for production deployment with security hardening
+# FIXED: Proper networking and service discovery for 35+ agent architecture
+
+version: "3.8"
+
+services:
+  # Flutter Web Application
+  flutter-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.flutter
+    container_name: flipsync-flutter-web
+    ports:
+      - "3000:3000"
+      - "3443:3443"  # HTTPS port for eBay OAuth
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - flipsync-production
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=https://api:8443  # HTTPS API URL
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "service=flipsync-production"
+      - "type=frontend"
+      - "framework=flutter"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    container_name: flipsync-production-api
+    ports:
+      - "8001:8000"  # HTTP port
+      - "8443:8443"  # HTTPS port for eBay OAuth
+    environment:
+      - ENVIRONMENT=production
+      - FLIPSYNC_ENV=production
+      - DEBUG=false
+      - LOG_LEVEL=info
+
+      # Database Configuration - Fixed hostnames for service discovery
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-flipsync}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-flipsync}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+
+      # Redis Configuration - Fixed hostnames and authentication
+      # IMPORTANT: Use production Redis container
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-FlipSync_Redis_Prod_2024_Secure_Key_9x7z}@redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-FlipSync_Redis_Prod_2024_Secure_Key_9x7z}
+
+      # Qdrant Configuration - Fixed hostnames
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+
+      # Security Configuration
+      - JWT_SECRET=${JWT_SECRET:-7NaznE9ddVcN/Lq0LVHIFBKa9taUQnVOWZU6IjcV7Ww=}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=15
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - API_SECRET_KEY=${API_SECRET_KEY:-${JWT_SECRET:-7NaznE9ddVcN/Lq0LVHIFBKa9taUQnVOWZU6IjcV7Ww=}}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:8001,https://nashvillegeneral.store}
+
+      # AI Services Configuration - OpenAI Production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_PROJECT_ID=${OPENAI_PROJECT_ID:-proj_Zi0HXTY54mdW7jZuih49FdKW}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - OPENAI_MAX_TOKENS=${OPENAI_MAX_TOKENS:-4000}
+      - OPENAI_TEMPERATURE=${OPENAI_TEMPERATURE:-0.7}
+      - USE_OPENAI_PRIMARY=true
+      - LLM_PROVIDER=openai
+      - DEFAULT_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - FALLBACK_TO_OLLAMA=false
+
+      # Cost Control Configuration
+      - OPENAI_DAILY_BUDGET=${OPENAI_DAILY_BUDGET:-2.00}
+      - OPENAI_MAX_REQUEST_COST=${OPENAI_MAX_REQUEST_COST:-0.05}
+      # eBay Production Configuration
+      - EBAY_CLIENT_ID=${EBAY_APP_ID:-BrendanB-Nashvill-PRD-7f5c11990-62c1c838}
+      - EBAY_CLIENT_SECRET=${EBAY_CERT_ID:-PRD-f5c119904e18-fb68-4e53-9b35-49ef}
+      - EBAY_RUNAME=Brendan_Blomfie-BrendanB-Nashvi-vuwrefym
+      - EBAY_REDIRECT_URI=https://www.nashvillegeneral.store/ebay-oauth
+      - EBAY_ENVIRONMENT=production
+      - EBAY_APP_ID=${EBAY_APP_ID:-BrendanB-Nashvill-PRD-7f5c11990-62c1c838}
+      - EBAY_CERT_ID=${EBAY_CERT_ID:-PRD-f5c119904e18-fb68-4e53-9b35-49ef}
+      - EBAY_DEV_ID=${EBAY_DEV_ID:-e83908d0-476b-4534-a947-3a88227709e4}
+      # Sandbox Credentials
+      - SB_EBAY_APP_ID=${SB_EBAY_APP_ID:-BrendanB-Nashvill-SBX-aabfbb41d-097584ee}
+      - SB_EBAY_CERT_ID=${SB_EBAY_CERT_ID:-SBX-abfbb41d2204-6257-469e-bd9b-3b6b}
+      - SB_EBAY_DEV_ID=${SB_EBAY_DEV_ID:-e83908d0-476b-4534-a947-3a88227709e4}
+
+      # Shippo Configuration
+      - SHIPPO_TOKEN=${SHIPPO_TEST_TOKEN}
+      - SHIPPO_TEST_TOKEN=${SHIPPO_TEST_TOKEN}
+      - SHIPPO_API_URL=https://api.goshippo.com
+      - SHIPPO_RATE_LIMIT_PER_MINUTE=60
+
+      # Agent Configuration
+      - ENABLE_AI_AGENTS=true
+      - AGENT_COORDINATION_ENABLED=true
+      - AGENT_POOL_SIZE=35
+      - WORKFLOW_CONCURRENCY=7
+
+      # API Configuration
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - ALLOW_NO_DB=false
+
+      # Performance Configuration
+      - ENABLE_PERFORMANCE_MONITORING=true
+      - ENABLE_AGENT_METRICS=true
+      - ENABLE_WORKFLOW_METRICS=true
+      - ENABLE_API_METRICS=true
+
+      # SSL/TLS Configuration (Optional - can be handled by nginx)
+      - SSL_ENABLED=${SSL_ENABLED:-false}
+      - SSL_CERT_FILE=/etc/ssl/certs/server.crt
+      - SSL_KEY_FILE=/etc/ssl/private/server.key
+      - SSL_CA_FILE=/etc/ssl/certs/ca.crt
+
+      # Monitoring Configuration
+      - ENABLE_METRICS=true
+      - SENTRY_DSN=${SENTRY_DSN}
+
+      # Python Configuration
+      - PYTHONPATH=/app
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+
+    volumes:
+      # Application data
+      - ./logs:/app/logs:rw
+      - ./uploads:/app/uploads:rw
+      # SSL Certificates for API (optional)
+      - ./ssl/api/server.crt:/etc/ssl/certs/server.crt:ro
+      - ./ssl/api/server.key:/etc/ssl/private/server.key:ro
+      - ./ssl/api/ca.crt:/etc/ssl/certs/ca.crt:ro
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+
+    restart: unless-stopped
+    networks:
+      - flipsync-production
+
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 2G
+          cpus: '1.0'
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    labels:
+      - "service=flipsync-production"
+      - "type=api-backend"
+      - "agents=35+"
+      - "environment=production"
+
+  db:
+    image: postgres:15-alpine
+    container_name: flipsync-production-db
+    environment:
+      - POSTGRES_DB=${DB_NAME:-flipsync}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init/01-create-databases.sql:/docker-entrypoint-initdb.d/01-create-databases.sql:ro
+    restart: unless-stopped
+    networks:
+      - flipsync-production
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-flipsync}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "service=flipsync-production"
+      - "type=database"
+
+  redis:
+    image: redis:7-alpine
+    container_name: flipsync-production-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-FlipSync_Redis_Prod_2024_Secure_Key_9x7z} --appendonly yes --maxmemory 1gb --maxmemory-policy allkeys-lru --save 900 1 --save 300 10 --save 60 10000
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - flipsync-production
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD:-FlipSync_Redis_Prod_2024_Secure_Key_9x7z}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    labels:
+      - "service=flipsync-production"
+      - "type=cache"
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: flipsync-production-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__LOG_LEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - flipsync-production
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '1.0'
+        reservations:
+          memory: 2G
+          cpus: '0.5'
+    labels:
+      - "service=flipsync-production"
+      - "type=vector-database"
+
+  nginx:
+    image: nginx:alpine
+    container_name: flipsync-production-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx:rw
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - flipsync-production
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    labels:
+      - "service=flipsync-production"
+      - "type=reverse-proxy"
+
+# Production volumes with proper labeling and backup policies
+volumes:
+  postgres_data:
+    driver: local
+    labels:
+      - "service=flipsync-production"
+      - "type=database-data"
+      - "backup=critical"
+  redis_data:
+    driver: local
+    labels:
+      - "service=flipsync-production"
+      - "type=cache-data"
+      - "backup=important"
+  qdrant_data:
+    driver: local
+    labels:
+      - "service=flipsync-production"
+      - "type=vector-data"
+      - "backup=important"
+
+# Production network with proper isolation
+networks:
+  flipsync-production:
+    driver: bridge
+    name: flipsync-production
+    labels:
+      - "service=flipsync-production"
+      - "environment=production"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1

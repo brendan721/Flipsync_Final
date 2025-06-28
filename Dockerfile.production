@@ -1,0 +1,120 @@
+# FlipSync Production Dockerfile
+# Multi-stage build for optimized production deployment
+# Supports 35+ agent multi-tier architecture with performance optimizations
+
+# Build stage
+FROM python:3.12-slim as builder
+
+WORKDIR /app
+
+# Set build environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    gcc \
+    g++ \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt requirements-minimal.txt ./
+
+# Create virtual environment and install dependencies
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Python dependencies with optimizations
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir gunicorn uvicorn[standard] && \
+    find /opt/venv -name "*.pyc" -delete && \
+    find /opt/venv -name "__pycache__" -type d -exec rm -rf {} + || true
+
+# Production stage
+FROM python:3.12-slim as production
+
+WORKDIR /app
+
+# Set production environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PATH="/opt/venv/bin:$PATH" \
+    ENVIRONMENT=production \
+    DEBUG=false \
+    LOG_LEVEL=info \
+    WORKERS=4 \
+    MAX_WORKERS=8 \
+    WORKER_CLASS=uvicorn.workers.UvicornWorker \
+    WORKER_CONNECTIONS=1000 \
+    KEEPALIVE=2 \
+    MAX_REQUESTS=1000 \
+    MAX_REQUESTS_JITTER=100 \
+    PRELOAD_APP=true \
+    TIMEOUT=120 \
+    GRACEFUL_TIMEOUT=30
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    ca-certificates \
+    && update-ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Create app user with specific UID/GID for security
+RUN groupadd -r -g 1000 app && \
+    useradd -r -u 1000 -g app -d /app -s /bin/bash app && \
+    mkdir -p /app/logs /app/uploads /app/temp && \
+    chown -R app:app /app
+
+# Copy application code with proper ownership
+COPY --chown=app:app fs_agt_clean/ ./fs_agt_clean/
+
+# Copy production configuration files
+COPY --chown=app:app production/gunicorn.conf.py ./
+COPY --chown=app:app production/logging.conf ./
+
+# Create production directories
+RUN mkdir -p /app/logs/agents /app/logs/workflows /app/logs/api /app/logs/performance && \
+    mkdir -p /app/temp/uploads /app/temp/processing && \
+    chown -R app:app /app/logs /app/temp
+
+# Switch to app user
+USER app
+
+# Expose port
+EXPOSE 8000
+
+# Health check optimized for production
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Production startup script
+COPY --chown=app:app production/start.sh ./
+RUN chmod +x start.sh
+
+# Default command for production
+CMD ["./start.sh"]
+
+# Labels for production deployment
+LABEL maintainer="FlipSync Development Team" \
+      version="1.0.0" \
+      description="FlipSync Production API with 35+ Agent Multi-Tier Architecture" \
+      environment="production" \
+      agents="35+" \
+      workflows="7" \
+      performance.target="<2s API response" \
+      scalability.target="100+ concurrent users"

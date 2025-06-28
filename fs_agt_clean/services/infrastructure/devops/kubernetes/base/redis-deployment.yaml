@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flipsync-redis
+  namespace: flipsync-prod
+  labels:
+    app: flipsync
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flipsync
+      component: redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: flipsync
+        component: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:6.2-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 15
+          periodSeconds: 20
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: flipsync-redis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flipsync-redis
+  namespace: flipsync-prod
+  labels:
+    app: flipsync
+    component: redis
+spec:
+  selector:
+    app: flipsync
+    component: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: flipsync-redis-pvc
+  namespace: flipsync-prod
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard

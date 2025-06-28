@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eBay Debug Console</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .section h3 {
+            color: #495057;
+            margin-top: 0;
+            font-size: 1.3em;
+        }
+        button {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button.danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            box-shadow: 0 4px 15px rgba(220,53,69,0.3);
+        }
+        button.success {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+        }
+        .log {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #4a5568;
+        }
+        .status {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .instructions {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+            margin: 20px 0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 eBay OAuth Debug Console</h1>
+        
+        <div class="instructions">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>Click "Load Debug Script" to inject monitoring code</li>
+                <li>Run diagnostic tests to check system status</li>
+                <li>Test the eBay popup flow</li>
+                <li>Check console logs for detailed debugging information</li>
+            </ol>
+        </div>
+
+        <div class="grid">
+            <div class="section">
+                <h3>🚀 Debug Script Control</h3>
+                <button onclick="loadDebugScript()" class="success">Load Debug Script</button>
+                <button onclick="clearLogs()">Clear Logs</button>
+                <div id="scriptStatus" class="status info">Debug script not loaded</div>
+            </div>
+
+            <div class="section">
+                <h3>🔍 System Diagnostics</h3>
+                <button onclick="runDiagnostics()">Run All Diagnostics</button>
+                <button onclick="testPopupBlocker()">Test Popup Blocker</button>
+                <button onclick="testBackend()">Test Backend</button>
+                <button onclick="testEbayEndpoint()">Test eBay Endpoint</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎯 eBay OAuth Testing</h3>
+            <button onclick="testFullFlow()" class="success">Test Complete OAuth Flow</button>
+            <button onclick="openFlutterApp()">Open Flutter App</button>
+            <button onclick="simulateButtonClick()">Simulate eBay Button Click</button>
+        </div>
+
+        <div class="section">
+            <h3>📊 Test Results</h3>
+            <div id="testResults" class="log">Click "Run All Diagnostics" to see test results...</div>
+        </div>
+
+        <div class="section">
+            <h3>🔍 Console Logs</h3>
+            <div id="consoleLogs" class="log">Console logs will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        let debugScriptLoaded = false;
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('testResults');
+            const className = type === 'error' ? 'color: #ff6b6b' : type === 'success' ? 'color: #51cf66' : 'color: #74c0fc';
+            logElement.innerHTML += `<span style="${className}">[${timestamp}] ${message}</span>\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        async function loadDebugScript() {
+            try {
+                const response = await fetch('/debug_ebay_button.js');
+                const scriptContent = await response.text();
+                
+                // Create and execute the script
+                const script = document.createElement('script');
+                script.textContent = scriptContent;
+                document.head.appendChild(script);
+                
+                debugScriptLoaded = true;
+                updateStatus('scriptStatus', 'Debug script loaded successfully', 'success');
+                log('✅ Debug script loaded and injected', 'success');
+                
+                // Override console to capture logs
+                const originalConsoleLog = console.log;
+                console.log = function(...args) {
+                    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+                    document.getElementById('consoleLogs').innerHTML += message + '\n';
+                    document.getElementById('consoleLogs').scrollTop = document.getElementById('consoleLogs').scrollHeight;
+                    return originalConsoleLog.apply(this, args);
+                };
+                
+            } catch (error) {
+                updateStatus('scriptStatus', 'Failed to load debug script', 'error');
+                log(`❌ Failed to load debug script: ${error.message}`, 'error');
+            }
+        }
+
+        async function runDiagnostics() {
+            if (!debugScriptLoaded) {
+                log('❌ Debug script not loaded. Click "Load Debug Script" first.', 'error');
+                return;
+            }
+
+            log('🚀 Running complete system diagnostics...', 'info');
+            
+            // Test popup blocker
+            const popupAllowed = window.debugEbay.testPopupBlocker();
+            log(`Popup Blocker: ${popupAllowed ? '✅ Allowed' : '❌ Blocked'}`, popupAllowed ? 'success' : 'error');
+            
+            // Test backend
+            const backendOk = await window.debugEbay.testBackendConnectivity();
+            log(`Backend Connectivity: ${backendOk ? '✅ Connected' : '❌ Failed'}`, backendOk ? 'success' : 'error');
+            
+            // Test eBay endpoint
+            const oauthUrl = await window.debugEbay.testEbayOAuthEndpoint();
+            log(`eBay OAuth Endpoint: ${oauthUrl ? '✅ Working' : '❌ Failed'}`, oauthUrl ? 'success' : 'error');
+            
+            log('📊 Diagnostics complete', 'info');
+        }
+
+        function testPopupBlocker() {
+            if (!debugScriptLoaded) {
+                log('❌ Debug script not loaded', 'error');
+                return;
+            }
+            const result = window.debugEbay.testPopupBlocker();
+            log(`Popup test: ${result ? '✅ Allowed' : '❌ Blocked'}`, result ? 'success' : 'error');
+        }
+
+        async function testBackend() {
+            if (!debugScriptLoaded) {
+                log('❌ Debug script not loaded', 'error');
+                return;
+            }
+            const result = await window.debugEbay.testBackendConnectivity();
+            log(`Backend test: ${result ? '✅ Connected' : '❌ Failed'}`, result ? 'success' : 'error');
+        }
+
+        async function testEbayEndpoint() {
+            if (!debugScriptLoaded) {
+                log('❌ Debug script not loaded', 'error');
+                return;
+            }
+            const result = await window.debugEbay.testEbayOAuthEndpoint();
+            log(`eBay endpoint test: ${result ? '✅ Working' : '❌ Failed'}`, result ? 'success' : 'error');
+        }
+
+        async function testFullFlow() {
+            if (!debugScriptLoaded) {
+                log('❌ Debug script not loaded', 'error');
+                return;
+            }
+            log('🚀 Testing complete OAuth flow...', 'info');
+            await window.debugEbay.testFullFlow();
+        }
+
+        function openFlutterApp() {
+            log('🔄 Opening Flutter app in new tab...', 'info');
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        function simulateButtonClick() {
+            log('🔄 Simulating eBay button click...', 'info');
+            // This would need to be implemented based on the actual Flutter app structure
+            log('💡 Go to the Flutter app and click the "Connect to eBay" button while monitoring console', 'info');
+        }
+
+        function clearLogs() {
+            document.getElementById('testResults').innerHTML = 'Logs cleared...\n';
+            document.getElementById('consoleLogs').innerHTML = 'Console logs cleared...\n';
+        }
+
+        // Auto-load debug script on page load
+        window.addEventListener('load', () => {
+            log('🔧 eBay Debug Console loaded', 'info');
+            log('💡 Click "Load Debug Script" to begin debugging', 'info');
+        });
+    </script>
+</body>
+</html>

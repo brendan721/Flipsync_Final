@@ -1,0 +1,23 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting shippo
+  Downloading shippo-3.9.0-py3-none-any.whl.metadata (18 kB)
+Requirement already satisfied: certifi>=2023.7.22 in /usr/local/lib/python3.12/site-packages (from shippo) (2025.6.15)
+Requirement already satisfied: charset-normalizer>=3.2.0 in /usr/local/lib/python3.12/site-packages (from shippo) (3.4.2)
+Requirement already satisfied: dataclasses-json>=0.6.4 in /usr/local/lib/python3.12/site-packages (from shippo) (0.6.7)
+Requirement already satisfied: idna>=3.4 in /usr/local/lib/python3.12/site-packages (from shippo) (3.10)
+Collecting jsonpath-python>=1.0.6 (from shippo)
+  Downloading jsonpath_python-1.0.6-py3-none-any.whl.metadata (12 kB)
+Requirement already satisfied: marshmallow>=3.19.0 in /usr/local/lib/python3.12/site-packages (from shippo) (3.26.1)
+Requirement already satisfied: mypy-extensions>=1.0.0 in /usr/local/lib/python3.12/site-packages (from shippo) (1.1.0)
+Requirement already satisfied: packaging>=23.1 in /usr/local/lib/python3.12/site-packages (from shippo) (24.2)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/site-packages (from shippo) (2.9.0.post0)
+Requirement already satisfied: requests>=2.31.0 in /usr/local/lib/python3.12/site-packages (from shippo) (2.32.4)
+Requirement already satisfied: six>=1.16.0 in /usr/local/lib/python3.12/site-packages (from shippo) (1.17.0)
+Requirement already satisfied: typing-inspect>=0.9.0 in /usr/local/lib/python3.12/site-packages (from shippo) (0.9.0)
+Requirement already satisfied: typing-extensions>=4.7.1 in /usr/local/lib/python3.12/site-packages (from shippo) (4.14.0)
+Requirement already satisfied: urllib3>=1.26.18 in /usr/local/lib/python3.12/site-packages (from shippo) (2.4.0)
+Downloading shippo-3.9.0-py3-none-any.whl (275 kB)
+Downloading jsonpath_python-1.0.6-py3-none-any.whl (7.6 kB)
+Installing collected packages: jsonpath-python, shippo
+
+Successfully installed jsonpath-python-1.0.6 shippo-3.9.0

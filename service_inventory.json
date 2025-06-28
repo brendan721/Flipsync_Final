@@ -1,0 +1,1169 @@
+{
+  "generated_at": "2025-06-18T23:24:21.286622",
+  "total_services": 195,
+  "categories": {
+    "search": {
+      "count": 4,
+      "services": [
+        {
+          "name": "advanced_search.py",
+          "path": "fs_agt_clean/services/search/advanced_search.py",
+          "category": "search"
+        },
+        {
+          "name": "analytics.py",
+          "path": "fs_agt_clean/services/search/analytics.py",
+          "category": "search"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/search/models.py",
+          "category": "search"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/search/service.py",
+          "category": "search"
+        }
+      ]
+    },
+    "authentication": {
+      "count": 1,
+      "services": [
+        {
+          "name": "auth_service.py",
+          "path": "fs_agt_clean/services/authentication/auth_service.py",
+          "category": "authentication"
+        }
+      ]
+    },
+    "webhooks": {
+      "count": 2,
+      "services": [
+        {
+          "name": "ebay_handler.py",
+          "path": "fs_agt_clean/services/webhooks/ebay_handler.py",
+          "category": "webhooks"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/webhooks/service.py",
+          "category": "webhooks"
+        }
+      ]
+    },
+    "inventory_management": {
+      "count": 1,
+      "services": [
+        {
+          "name": "manager.py",
+          "path": "fs_agt_clean/services/inventory_management/manager.py",
+          "category": "inventory_management"
+        }
+      ]
+    },
+    "performance": {
+      "count": 0,
+      "services": []
+    },
+    "qdrant": {
+      "count": 3,
+      "services": [
+        {
+          "name": "metrics_adapter.py",
+          "path": "fs_agt_clean/services/qdrant/metrics_adapter.py",
+          "category": "qdrant"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/qdrant/service.py",
+          "category": "qdrant"
+        },
+        {
+          "name": "simple_service.py",
+          "path": "fs_agt_clean/services/qdrant/simple_service.py",
+          "category": "qdrant"
+        }
+      ]
+    },
+    "vector_store": {
+      "count": 2,
+      "services": [
+        {
+          "name": "client.py",
+          "path": "fs_agt_clean/services/vector_store/client.py",
+          "category": "vector_store"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/vector_store/service.py",
+          "category": "vector_store"
+        }
+      ]
+    },
+    "__pycache__": {
+      "count": 0,
+      "services": []
+    },
+    "data_processing": {
+      "count": 1,
+      "services": [
+        {
+          "name": "validators.py",
+          "path": "fs_agt_clean/services/data_processing/validators.py",
+          "category": "data_processing"
+        }
+      ]
+    },
+    "chatbot": {
+      "count": 3,
+      "services": [
+        {
+          "name": "recommendation_service.py",
+          "path": "fs_agt_clean/services/chatbot/recommendation_service.py",
+          "category": "chatbot"
+        },
+        {
+          "name": "intent_recognition.py",
+          "path": "fs_agt_clean/services/chatbot/intent_recognition.py",
+          "category": "chatbot"
+        },
+        {
+          "name": "agent_connectivity_service.py",
+          "path": "fs_agt_clean/services/chatbot/agent_connectivity_service.py",
+          "category": "chatbot"
+        }
+      ]
+    },
+    "ui": {
+      "count": 0,
+      "services": []
+    },
+    "ai": {
+      "count": 0,
+      "services": []
+    },
+    "workflow": {
+      "count": 1,
+      "services": [
+        {
+          "name": "approval_workflow_service.py",
+          "path": "fs_agt_clean/services/workflow/approval_workflow_service.py",
+          "category": "workflow"
+        }
+      ]
+    },
+    "logistics": {
+      "count": 2,
+      "services": [
+        {
+          "name": "shipping_service.py",
+          "path": "fs_agt_clean/services/logistics/shipping_service.py",
+          "category": "logistics"
+        },
+        {
+          "name": "shippo_service.py",
+          "path": "fs_agt_clean/services/logistics/shippo/shippo_service.py",
+          "category": "logistics"
+        }
+      ]
+    },
+    "conversational": {
+      "count": 1,
+      "services": [
+        {
+          "name": "optimization_service.py",
+          "path": "fs_agt_clean/services/conversational/optimization_service.py",
+          "category": "conversational"
+        }
+      ]
+    },
+    "error": {
+      "count": 0,
+      "services": []
+    },
+    "infrastructure": {
+      "count": 59,
+      "services": [
+        {
+          "name": "metrics_service.py",
+          "path": "fs_agt_clean/services/infrastructure/metrics_service.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "resource_metrics.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/resource_metrics.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "agent_monitor.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/agent_monitor.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "alerts.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "metrics_endpoint.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics_endpoint.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "health.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/health.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "storage.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/storage.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "aggregation.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/aggregation.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "api_metrics.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/api_metrics.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "metrics_collector.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics_collector.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "health_endpoints.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/health_endpoints.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "alert_manager.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alert_manager.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "visualization.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/visualization.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "alert_system.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alert_system.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "metrics.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/models.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "realtime.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/realtime.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "resource_monitor.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/resource_monitor.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "notifications.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/notifications.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "prometheus.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/prometheus.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "database_monitor.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/database_monitor.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "metrics_models.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics_models.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "dashboard.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/dashboard.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "monitoring_service.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/monitoring_service.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "alert_types.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alert_types.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/service.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "log_manager.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/log_manager.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "manager.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/manager.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "pipeline_alerts.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/pipeline_alerts.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "performance_monitor.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/performance_monitor.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "system_monitor.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/system_monitor.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "common_types.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/common_types.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "token_monitor.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/token_monitor.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "metrics_service.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics_service.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "alerting.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerting.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "webhook_monitor.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/webhook_monitor.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "compat.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/compat.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "metric_types.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metric_types.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "types.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/types.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "system_auditor.py",
+          "path": "fs_agt_clean/services/infrastructure/devops/deployment/system_auditor.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "persistence.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/persistence.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "collectors.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/collectors.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "correlation.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/correlation.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/models.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "notification_service.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/notification_service.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "manager.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/manager.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "validation.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/validation.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "prometheus.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/exporters/prometheus.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "business_operations.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/dashboards/business_operations.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "mobile_command.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/dashboards/mobile_command.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "system_health.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/dashboards/system_health.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "agent_network.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/dashboards/agent_network.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "business_metrics.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/dashboards/business_metrics.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "constants.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics/constants.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "collector.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics/collector.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics/models.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/metrics/service.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "sms_service.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/notification_channels/sms_service.py",
+          "category": "infrastructure"
+        },
+        {
+          "name": "email_service.py",
+          "path": "fs_agt_clean/services/infrastructure/monitoring/alerts/notification_channels/email_service.py",
+          "category": "infrastructure"
+        }
+      ]
+    },
+    "analytics_reporting": {
+      "count": 8,
+      "services": [
+        {
+          "name": "influxdb_service.py",
+          "path": "fs_agt_clean/services/analytics_reporting/influxdb_service.py",
+          "category": "analytics_reporting"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/analytics_reporting/models.py",
+          "category": "analytics_reporting"
+        },
+        {
+          "name": "analytics_service.py",
+          "path": "fs_agt_clean/services/analytics_reporting/analytics_service.py",
+          "category": "analytics_reporting"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/analytics_reporting/service.py",
+          "category": "analytics_reporting"
+        },
+        {
+          "name": "inventory_metrics.py",
+          "path": "fs_agt_clean/services/analytics_reporting/inventory_metrics.py",
+          "category": "analytics_reporting"
+        },
+        {
+          "name": "error_handler.py",
+          "path": "fs_agt_clean/services/analytics_reporting/error_handler.py",
+          "category": "analytics_reporting"
+        },
+        {
+          "name": "analytics_engine.py",
+          "path": "fs_agt_clean/services/analytics_reporting/analytics_engine.py",
+          "category": "analytics_reporting"
+        },
+        {
+          "name": "compat.py",
+          "path": "fs_agt_clean/services/analytics_reporting/compat.py",
+          "category": "analytics_reporting"
+        }
+      ]
+    },
+    "data_pipeline": {
+      "count": 5,
+      "services": [
+        {
+          "name": "pipeline.py",
+          "path": "fs_agt_clean/services/data_pipeline/pipeline.py",
+          "category": "data_pipeline"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/data_pipeline/models.py",
+          "category": "data_pipeline"
+        },
+        {
+          "name": "validators.py",
+          "path": "fs_agt_clean/services/data_pipeline/validators.py",
+          "category": "data_pipeline"
+        },
+        {
+          "name": "core.py",
+          "path": "fs_agt_clean/services/data_pipeline/core.py",
+          "category": "data_pipeline"
+        },
+        {
+          "name": "acquisition_agent.py",
+          "path": "fs_agt_clean/services/data_pipeline/acquisition_agent.py",
+          "category": "data_pipeline"
+        }
+      ]
+    },
+    "deployment": {
+      "count": 0,
+      "services": []
+    },
+    "marketplace": {
+      "count": 10,
+      "services": [
+        {
+          "name": "order_service.py",
+          "path": "fs_agt_clean/services/marketplace/order_service.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "ebay_service.py",
+          "path": "fs_agt_clean/services/marketplace/ebay_service.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "ebay_pricing.py",
+          "path": "fs_agt_clean/services/marketplace/ebay_pricing.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "ebay_optimization.py",
+          "path": "fs_agt_clean/services/marketplace/ebay_optimization.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/marketplace/amazon/service.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "protocol.py",
+          "path": "fs_agt_clean/services/marketplace/rate_limiter/protocol.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "config.py",
+          "path": "fs_agt_clean/services/marketplace/rate_limiter/config.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "limiter.py",
+          "path": "fs_agt_clean/services/marketplace/rate_limiter/limiter.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/marketplace/ebay/service.py",
+          "category": "marketplace"
+        },
+        {
+          "name": "compat.py",
+          "path": "fs_agt_clean/services/marketplace/ebay/compat.py",
+          "category": "marketplace"
+        }
+      ]
+    },
+    "analytics": {
+      "count": 2,
+      "services": [
+        {
+          "name": "performance_predictor.py",
+          "path": "fs_agt_clean/services/analytics/performance_predictor.py",
+          "category": "analytics"
+        },
+        {
+          "name": "analytics_service.py",
+          "path": "fs_agt_clean/services/analytics/analytics_service.py",
+          "category": "analytics"
+        }
+      ]
+    },
+    "testing": {
+      "count": 0,
+      "services": []
+    },
+    "approval": {
+      "count": 1,
+      "services": [
+        {
+          "name": "approval_integration_service.py",
+          "path": "fs_agt_clean/services/approval/approval_integration_service.py",
+          "category": "approval"
+        }
+      ]
+    },
+    "advanced_features": {
+      "count": 36,
+      "services": [
+        {
+          "name": "user_action_tracker.py",
+          "path": "fs_agt_clean/services/advanced_features/personalization/user_action_tracker.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "preference_learner.py",
+          "path": "fs_agt_clean/services/advanced_features/personalization/preference_learner.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "ui_adapter.py",
+          "path": "fs_agt_clean/services/advanced_features/personalization/ui/ui_adapter.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "agent_coordinator.py",
+          "path": "fs_agt_clean/services/advanced_features/specialized_integrations/integration/agent_coordinator.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "base_integration_agent.py",
+          "path": "fs_agt_clean/services/advanced_features/specialized_integrations/integration/base_integration_agent.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "data_agent.py",
+          "path": "fs_agt_clean/services/advanced_features/specialized_integrations/integration/data_agent.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "workflow.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/workflow.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "optimization.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/optimization.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "decision.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/decision.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "workflow_engine.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/workflow_engine.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "experience.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/experience.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "serialization.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/serialization.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "brain_manager.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/brain_manager.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "brain_service.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/brain_service.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "decision_engine.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/decision_engine.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "validation.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/validation.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "types.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/types.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "memory_manager.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/memory/memory_manager.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "experience.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/memory/experience.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/strategy/models.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "base.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/patterns/base.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "market_patterns.py",
+          "path": "fs_agt_clean/services/advanced_features/ai_integration/brain/patterns/market_patterns.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "tuning.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/feedback/tuning.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "improvement.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/feedback/improvement.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "metrics.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/feedback/metrics.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "implicit.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/feedback/implicit.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "ui.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/feedback/ui.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "complementary.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/cross_product/complementary.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "categories.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/cross_product/categories.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "upgrades.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/cross_product/upgrades.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "relationships.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/cross_product/relationships.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "bundles.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/cross_product/bundles.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "contextual.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/algorithms/contextual.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "hybrid.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/algorithms/hybrid.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "collaborative.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/algorithms/collaborative.py",
+          "category": "advanced_features"
+        },
+        {
+          "name": "content_based.py",
+          "path": "fs_agt_clean/services/advanced_features/recommendations/algorithms/content_based.py",
+          "category": "advanced_features"
+        }
+      ]
+    },
+    "inventory": {
+      "count": 3,
+      "services": [
+        {
+          "name": "adapter.py",
+          "path": "fs_agt_clean/services/inventory/adapter.py",
+          "category": "inventory"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/inventory/service.py",
+          "category": "inventory"
+        },
+        {
+          "name": "ai_marketing.py",
+          "path": "fs_agt_clean/services/inventory/ai_marketing.py",
+          "category": "inventory"
+        }
+      ]
+    },
+    "content_generation": {
+      "count": 10,
+      "services": [
+        {
+          "name": "listing_generation_agent.py",
+          "path": "fs_agt_clean/services/content_generation/listing_generation_agent.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "price_optimizer.py",
+          "path": "fs_agt_clean/services/content_generation/price_optimizer.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "generation_models.py",
+          "path": "fs_agt_clean/services/content_generation/generation_models.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "async_listing_generator.py",
+          "path": "fs_agt_clean/services/content_generation/async_listing_generator.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/content_generation/models.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "content_generator.py",
+          "path": "fs_agt_clean/services/content_generation/content_generator.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "storytelling_engine.py",
+          "path": "fs_agt_clean/services/content_generation/storytelling_engine.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "content_optimizer.py",
+          "path": "fs_agt_clean/services/content_generation/content_optimizer.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "listing_generator.py",
+          "path": "fs_agt_clean/services/content_generation/listing_generator.py",
+          "category": "content_generation"
+        },
+        {
+          "name": "keyword_optimizer.py",
+          "path": "fs_agt_clean/services/content_generation/keyword_optimizer.py",
+          "category": "content_generation"
+        }
+      ]
+    },
+    "marketplace_integration": {
+      "count": 1,
+      "services": [
+        {
+          "name": "seo_optimizer.py",
+          "path": "fs_agt_clean/services/marketplace_integration/seo_optimizer.py",
+          "category": "marketplace_integration"
+        }
+      ]
+    },
+    "subscription": {
+      "count": 2,
+      "services": [
+        {
+          "name": "usage_analytics_service.py",
+          "path": "fs_agt_clean/services/subscription/usage_analytics_service.py",
+          "category": "subscription"
+        },
+        {
+          "name": "enhanced_subscription_service.py",
+          "path": "fs_agt_clean/services/subscription/enhanced_subscription_service.py",
+          "category": "subscription"
+        }
+      ]
+    },
+    "ai_ml_services": {
+      "count": 1,
+      "services": [
+        {
+          "name": "tuning.py",
+          "path": "fs_agt_clean/services/ai_ml_services/tuning.py",
+          "category": "ai_ml_services"
+        }
+      ]
+    },
+    "monitoring": {
+      "count": 5,
+      "services": [
+        {
+          "name": "production_monitoring_service.py",
+          "path": "fs_agt_clean/services/monitoring/production_monitoring_service.py",
+          "category": "monitoring"
+        },
+        {
+          "name": "enhanced_dashboard.py",
+          "path": "fs_agt_clean/services/monitoring/enhanced_dashboard.py",
+          "category": "monitoring"
+        },
+        {
+          "name": "metrics_collector.py",
+          "path": "fs_agt_clean/services/monitoring/metrics_collector.py",
+          "category": "monitoring"
+        },
+        {
+          "name": "metrics_service.py",
+          "path": "fs_agt_clean/services/monitoring/metrics_service.py",
+          "category": "monitoring"
+        },
+        {
+          "name": "alert_service.py",
+          "path": "fs_agt_clean/services/monitoring/alert_service.py",
+          "category": "monitoring"
+        }
+      ]
+    },
+    "ml": {
+      "count": 1,
+      "services": [
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/ml/service.py",
+          "category": "ml"
+        }
+      ]
+    },
+    "communication": {
+      "count": 9,
+      "services": [
+        {
+          "name": "conversation_context_manager.py",
+          "path": "fs_agt_clean/services/communication/conversation_context_manager.py",
+          "category": "communication"
+        },
+        {
+          "name": "chat_service.py",
+          "path": "fs_agt_clean/services/communication/chat_service.py",
+          "category": "communication"
+        },
+        {
+          "name": "recommendation_service.py",
+          "path": "fs_agt_clean/services/communication/recommendation_service.py",
+          "category": "communication"
+        },
+        {
+          "name": "agent_router.py",
+          "path": "fs_agt_clean/services/communication/agent_router.py",
+          "category": "communication"
+        },
+        {
+          "name": "intent_recognition.py",
+          "path": "fs_agt_clean/services/communication/intent_recognition.py",
+          "category": "communication"
+        },
+        {
+          "name": "intent_recognizer.py",
+          "path": "fs_agt_clean/services/communication/intent_recognizer.py",
+          "category": "communication"
+        },
+        {
+          "name": "context_manager.py",
+          "path": "fs_agt_clean/services/communication/context_manager.py",
+          "category": "communication"
+        },
+        {
+          "name": "conversation_service.py",
+          "path": "fs_agt_clean/services/communication/conversation_service.py",
+          "category": "communication"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/communication/service.py",
+          "category": "communication"
+        }
+      ]
+    },
+    "dashboard": {
+      "count": 1,
+      "services": [
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/dashboard/service.py",
+          "category": "dashboard"
+        }
+      ]
+    },
+    "notifications": {
+      "count": 10,
+      "services": [
+        {
+          "name": "email_service.py",
+          "path": "fs_agt_clean/services/notifications/email_service.py",
+          "category": "notifications"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/notifications/service.py",
+          "category": "notifications"
+        },
+        {
+          "name": "push_service.py",
+          "path": "fs_agt_clean/services/notifications/push_service.py",
+          "category": "notifications"
+        },
+        {
+          "name": "compat.py",
+          "path": "fs_agt_clean/services/notifications/compat.py",
+          "category": "notifications"
+        },
+        {
+          "name": "password_reset_template.py",
+          "path": "fs_agt_clean/services/notifications/templates/password_reset_template.py",
+          "category": "notifications"
+        },
+        {
+          "name": "base_template.py",
+          "path": "fs_agt_clean/services/notifications/templates/base_template.py",
+          "category": "notifications"
+        },
+        {
+          "name": "base.py",
+          "path": "fs_agt_clean/services/notifications/templates/base.py",
+          "category": "notifications"
+        },
+        {
+          "name": "ebay_token_notifications.py",
+          "path": "fs_agt_clean/services/notifications/templates/ebay_token_notifications.py",
+          "category": "notifications"
+        },
+        {
+          "name": "template_registry.py",
+          "path": "fs_agt_clean/services/notifications/templates/template_registry.py",
+          "category": "notifications"
+        },
+        {
+          "name": "ebay_order_notifications.py",
+          "path": "fs_agt_clean/services/notifications/templates/ebay_order_notifications.py",
+          "category": "notifications"
+        }
+      ]
+    },
+    "metrics": {
+      "count": 2,
+      "services": [
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/metrics/service.py",
+          "category": "metrics"
+        },
+        {
+          "name": "inventory_metrics.py",
+          "path": "fs_agt_clean/services/metrics/inventory_metrics.py",
+          "category": "metrics"
+        }
+      ]
+    },
+    "vector": {
+      "count": 1,
+      "services": [
+        {
+          "name": "embedding_service.py",
+          "path": "fs_agt_clean/services/vector/embedding_service.py",
+          "category": "vector"
+        }
+      ]
+    },
+    "payment_processing": {
+      "count": 1,
+      "services": [
+        {
+          "name": "paypal_service.py",
+          "path": "fs_agt_clean/services/payment_processing/paypal_service.py",
+          "category": "payment_processing"
+        }
+      ]
+    },
+    "market_analysis": {
+      "count": 6,
+      "services": [
+        {
+          "name": "advanced_search.py",
+          "path": "fs_agt_clean/services/market_analysis/advanced_search.py",
+          "category": "market_analysis"
+        },
+        {
+          "name": "market_analyzer.py",
+          "path": "fs_agt_clean/services/market_analysis/market_analyzer.py",
+          "category": "market_analysis"
+        },
+        {
+          "name": "analytics.py",
+          "path": "fs_agt_clean/services/market_analysis/analytics.py",
+          "category": "market_analysis"
+        },
+        {
+          "name": "models.py",
+          "path": "fs_agt_clean/services/market_analysis/models.py",
+          "category": "market_analysis"
+        },
+        {
+          "name": "competitor_analyzer.py",
+          "path": "fs_agt_clean/services/market_analysis/competitor_analyzer.py",
+          "category": "market_analysis"
+        },
+        {
+          "name": "service.py",
+          "path": "fs_agt_clean/services/market_analysis/service.py",
+          "category": "market_analysis"
+        }
+      ]
+    }
+  }
+}

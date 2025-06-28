@@ -1,0 +1,169 @@
+# FlipSync Infrastructure Services - Docker-Desktop WSL Distro
+# These services run independently and are shared across multiple projects
+# Deploy to: docker-desktop WSL distro for auto-start and cross-project sharing
+
+version: "3.8"
+
+services:
+  # PostgreSQL Database - Shared Infrastructure
+  postgres:
+    image: postgres:15-alpine
+    container_name: flipsync-infrastructure-postgres
+    ports:
+      - "0.0.0.0:5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_infrastructure_data:/var/lib/postgresql/data
+      - ./scripts/init-infrastructure-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "1.0"
+        reservations:
+          memory: 1G
+          cpus: "0.5"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - flipsync-infrastructure
+
+  # Redis Cache - Shared Infrastructure
+  redis:
+    image: redis:7-alpine
+    container_name: flipsync-infrastructure-redis
+    ports:
+      - "0.0.0.0:6379:6379"
+    command: redis-server --appendonly yes --maxmemory 1gb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_infrastructure_data:/data
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "0.5"
+        reservations:
+          memory: 512M
+          cpus: "0.25"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - flipsync-infrastructure
+
+  # Qdrant Vector Database - Shared Infrastructure
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: flipsync-infrastructure-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_infrastructure_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "1.0"
+        reservations:
+          memory: 1G
+          cpus: "0.5"
+    networks:
+      - flipsync-infrastructure
+
+  # Ollama AI Service - Shared Infrastructure
+  ollama:
+    image: ollama/ollama:latest
+    container_name: flipsync-infrastructure-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - fs_main_ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS=*
+      - OLLAMA_KEEP_ALIVE=-1
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_MAX_LOADED_MODELS=3
+      - OLLAMA_LOAD_TIMEOUT=300
+      - OLLAMA_REQUEST_TIMEOUT=30
+      - OLLAMA_CONCURRENT_REQUESTS=4
+      - OMP_NUM_THREADS=8
+      - GOMAXPROCS=8
+      - OLLAMA_FLASH_ATTENTION=true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 24G
+          cpus: "8.0"
+        reservations:
+          memory: 20G
+          cpus: "6.0"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 120s
+    networks:
+      - flipsync-infrastructure
+
+  # Adminer Database Management - Optional
+  adminer:
+    image: adminer:latest
+    container_name: flipsync-infrastructure-adminer
+    ports:
+      - "0.0.0.0:8081:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - flipsync-infrastructure
+
+  # Redis Commander - Optional
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: flipsync-infrastructure-redis-commander
+    ports:
+      - "8082:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    restart: unless-stopped
+    depends_on:
+      - redis
+    networks:
+      - flipsync-infrastructure
+
+# Persistent volumes for infrastructure data
+volumes:
+  postgres_infrastructure_data:
+    driver: local
+  redis_infrastructure_data:
+    driver: local
+  qdrant_infrastructure_data:
+    driver: local
+  fs_main_ollama_data:
+    external: true
+
+# Infrastructure network for service communication
+networks:
+  flipsync-infrastructure:
+    driver: bridge
+    name: flipsync-infrastructure

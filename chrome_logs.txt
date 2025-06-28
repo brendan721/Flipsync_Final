@@ -1,0 +1,1265 @@
+Loading from existing service worker.
+flutter_bootstrap.js:3 Service worker already active.
+flutter_bootstrap.js:1 Injecting <script> tag. Using callback.
+main.dart.js:28935 TrustedTypes available. Creating policy: gis-dart
+main.dart.js:31574 ✅ EnvironmentConfig initialized for prod
+main.dart.js:31574 ✅ EnvironmentConfig initialized for prod
+main.dart.js:31574 AppConfig initialized with:
+main.dart.js:31574 - Environment: Environment.prod
+main.dart.js:31574 - API Base URL: http://localhost:8001
+main.dart.js:31574 - Logging Enabled: false
+main.dart.js:31574 - Using Mock Data: false
+main.dart.js:31574 ✅ AppConfig initialized with environment-based URLs
+main.dart.js:31574 🔄 Initializing dependency injection...
+main.dart.js:31574 ⚠️ Isar database initialization temporarily disabled
+main.dart.js:31574 ✅ Continuing with alternative storage (SQLite via DatabaseHelper)
+main.dart.js:31574 ⚠️ Isar database initialization temporarily disabled
+main.dart.js:31574 ✅ Continuing with alternative storage (SQLite via DatabaseHelper)
+main.dart.js:31574 🔍 Validating dependency injection...
+main.dart.js:31574 ✅ WebSocketClient: minified:AN
+main.dart.js:31574 ✅ ChatService: minified:xi
+main.dart.js:31574 🔄 ChatBloc: Initialized with ChatLoaded state (empty messages)
+main.dart.js:31574 🔄 ChatBloc: Setting up robust message stream subscription...
+main.dart.js:31574 🔄 ChatService.getMessageStream called for conversation: main
+main.dart.js:31574 🔄 Creating new message controller for conversation: main
+main.dart.js:31574 🔄 Setting up WebSocket connection for conversation: main
+main.dart.js:31574 🔌 SETUP: Starting WebSocket setup for conversation: main
+main.dart.js:31574 🔌 SETUP: Getting authentication token...
+main.dart.js:31574 🔄 Returning message stream for conversation: main
+main.dart.js:31574 🔄 ChatBloc: Got message stream from ChatService
+main.dart.js:31574 🔄 ChatService: Stream listener attached for conversation: main
+main.dart.js:31574 🔄 ChatBloc: Message stream subscription setup complete
+main.dart.js:31574 🔄 ChatBloc: Setting up workflow update subscription...
+main.dart.js:31574 🔄 ChatBloc: Got workflow update stream from ChatService
+main.dart.js:31574 🔄 ChatBloc: Workflow update subscription established successfully
+main.dart.js:31574 🔄 Global ChatBloc reference set with 0 messages
+main.dart.js:31574 ✅ ChatBloc: minified:kM
+main.dart.js:31574 ✅ AuthService: minified:rZ
+main.dart.js:31574 🎉 All critical dependencies validated successfully!
+main.dart.js:31574 🔄 ChatBloc: Workflow update stream completed
+main.dart.js:31574 ✅ FlipSync production app initialized successfully
+main.dart.js:31574 ✅ Dependency injection completed successfully
+main.dart.js:31574 ✅ ChatBloc verification successful: minified:kM
+[Violation] 'setTimeout' handler took 119ms
+[Violation] 'setTimeout' handler took 61ms
+main.dart.js:31574 🔑 Setting authentication token for WebSocket: eyJhbGciOiJIUzI1NiIs...
+main.dart.js:31574 🔌 Attempting WebSocket connection for conversation: main
+main.dart.js:31574 🔌 🚨 ENHANCED DEBUG: WebSocket connecting to: ws://localhost:8001/api/v1/ws/chat/main?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNDIzMTRmZC01ODU4LTRhNjAtODMwNy1mMjMwNDc3Y2Y3YzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyIl0sImV4cCI6MTc1MTEzODc2NywiaWF0IjoxNzUxMTM1MTY3LCJqdGkiOiJkNjY0NjMyMC1lNWUyLTRmZjQtYmRiYS0yNjM3MmI3ZmVlYmYiLCJzY29wZSI6ImFjY2Vzc190b2tlbiJ9.VJHMZeaS_djRmueg0rDbbk_Oag0t_kmV096iQPdklpU
+main.dart.js:31574 🔌 🚨 ENHANCED DEBUG: Conversation ID: main
+main.dart.js:31574 🔌 🚨 ENHANCED DEBUG: Auth token present: true
+main.dart.js:31574 🔌 🚨 ENHANCED DEBUG: Parsed URI: ws://localhost:8001/api/v1/ws/chat/main?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNDIzMTRmZC01ODU4LTRhNjAtODMwNy1mMjMwNDc3Y2Y3YzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyIl0sImV4cCI6MTc1MTEzODc2NywiaWF0IjoxNzUxMTM1MTY3LCJqdGkiOiJkNjY0NjMyMC1lNWUyLTRmZjQtYmRiYS0yNjM3MmI3ZmVlYmYiLCJzY29wZSI6ImFjY2Vzc190b2tlbiJ9.VJHMZeaS_djRmueg0rDbbk_Oag0t_kmV096iQPdklpU
+main.dart.js:31574 🔌 🚨 ENHANCED DEBUG: Creating WebSocket channel...
+main.dart.js:31574 🔌 🚨 ENHANCED DEBUG: WebSocket channel created, waiting for connection...
+main.dart.js:31574 ✅ WebSocket connected successfully
+main.dart.js:31574 🔌 Raw WebSocket data received: {"type": "ping", "timestamp": 1751135248.7433994}
+main.dart.js:31574 🔌 Parsed WebSocket message: {type: ping, timestamp: 1751135248.7433994}
+main.dart.js:31574 🏓 Pong sent successfully with timestamp: 2025-06-28T18:27:28.743Z
+main.dart.js:31574 🔌 Raw WebSocket data received: {"type": "connection_established", "data": {"client_id": "client_b73cbb4e-47f0-41e9-b16a-cb414462930b", "server_time": "2025-06-28T18:27:28.742549+00:00", "heartbeat_interval": 30, "heartbeat_timeout": 120}}
+main.dart.js:31574 🔌 Parsed WebSocket message: {type: connection_established, data: {client_id: client_b73cbb4e-47f0-41e9-b16a-cb414462930b, server_time: 2025-06-28T18:27:28.742549+00:00, heartbeat_interval: 30, heartbeat_timeout: 120}}
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Received data: {type: connection_established, data: {client_id: client_b73cbb4e-47f0-41e9-b16a-cb414462930b, server_time: 2025-06-28T18:27:28.742549+00:00, heartbeat_interval: 30, heartbeat_timeout: 120}}
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Expected conversation ID: main
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Message type: connection_established
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Message conversation ID: null
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Main conversation - accepting any conversation ID: true
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Processing message for conversation: main (original: main, backend: null)
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Unknown message type: connection_established
+main.dart.js:31574 🔄 ChatBloc: Setting up workflow update subscription...
+main.dart.js:31574 🔄 ChatBloc: Got workflow update stream from ChatService
+main.dart.js:31574 🔄 ChatBloc: Workflow update subscription established successfully
+main.dart.js:7371 [Violation] 'requestAnimationFrame' handler took 170ms
+main.dart.js:31574 🔐 AuthGuard: Attempting silent login...
+main.dart.js:31574 ✅ AuthGuard: Silent login successful
+main.dart.js:31574 🌐 [DEBUG] WebSocketClient.send() called with data: {type: subscribe, channel: system_status, filter: agent_monitoring, timestamp: 2025-06-28T18:27:40.555Z}
+main.dart.js:31574 🌐 [DEBUG] WebSocket channel exists, proceeding with send...
+main.dart.js:31574 🌐 [DEBUG] Encoded message: {"type":"subscribe","channel":"system_status","filter":"agent_monitoring","timestamp":"2025-06-28T18:27:40.555Z"}
+main.dart.js:31574 🌐 [DEBUG] About to send via _channel.sink.add()...
+main.dart.js:31574 🌐 [DEBUG] Message sent successfully via WebSocket!
+main.dart.js:31574 🌐 [DEBUG] WebSocketClient.send() called with data: {type: subscribe, channel: agent_status, timestamp: 2025-06-28T18:27:40.556Z}
+main.dart.js:31574 🌐 [DEBUG] WebSocket channel exists, proceeding with send...
+main.dart.js:31574 🌐 [DEBUG] Encoded message: {"type":"subscribe","channel":"agent_status","timestamp":"2025-06-28T18:27:40.556Z"}
+main.dart.js:31574 🌐 [DEBUG] About to send via _channel.sink.add()...
+main.dart.js:31574 🌐 [DEBUG] Message sent successfully via WebSocket!
+main.dart.js:7371 [Violation] 'requestAnimationFrame' handler took 164ms
+main.dart.js:31574 🔌 Raw WebSocket data received: {"type": "subscription_confirmed", "conversation_id": "main", "timestamp": "2025-06-28T18:27:40.613176+00:00", "data": {"channel": "system_status", "filter": "agent_monitoring", "status": "subscribed", "message": "Successfully subscribed to system_status"}}
+main.dart.js:31574 🔌 Parsed WebSocket message: {type: subscription_confirmed, conversation_id: main, timestamp: 2025-06-28T18:27:40.613176+00:00, data: {channel: system_status, filter: agent_monitoring, status: subscribed, message: Successfully subscribed to system_status}}
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Received data: {type: subscription_confirmed, conversation_id: main, timestamp: 2025-06-28T18:27:40.613176+00:00, data: {channel: system_status, filter: agent_monitoring, status: subscribed, message: Successfully subscribed to system_status}}
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Expected conversation ID: main
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Message type: subscription_confirmed
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Message conversation ID: main
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Main conversation - accepting any conversation ID: true
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Processing message for conversation: main (original: main, backend: main)
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Unknown message type: subscription_confirmed
+main.dart.js:31574 🔌 Raw WebSocket data received: {"type": "subscription_confirmed", "conversation_id": "main", "timestamp": "2025-06-28T18:27:40.616169+00:00", "data": {"channel": "agent_status", "filter": "", "status": "subscribed", "message": "Successfully subscribed to agent_status"}}
+main.dart.js:31574 🔌 Parsed WebSocket message: {type: subscription_confirmed, conversation_id: main, timestamp: 2025-06-28T18:27:40.616169+00:00, data: {channel: agent_status, filter: , status: subscribed, message: Successfully subscribed to agent_status}}
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Received data: {type: subscription_confirmed, conversation_id: main, timestamp: 2025-06-28T18:27:40.616169+00:00, data: {channel: agent_status, filter: , status: subscribed, message: Successfully subscribed to agent_status}}
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Expected conversation ID: main
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Message type: subscription_confirmed
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Message conversation ID: main
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Main conversation - accepting any conversation ID: true
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Processing message for conversation: main (original: main, backend: main)
+main.dart.js:31574 🔍 WEBSOCKET DEBUG: Unknown message type: subscription_confirmed
+main.dart.js:7371 [Violation] 'requestAnimationFrame' handler took 156ms
+:3000/#/listings:1 Access to XMLHttpRequest at 'http://localhost:8001/api/v1/marketplace/ebay/status/public' from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.Understand this error
+main.dart.js:48820 
+            
+            
+           GET http://localhost:8001/api/v1/marketplace/ebay/status/public net::ERR_FAILED
+(anonymous) @ main.dart.js:48820
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+axQ @ main.dart.js:48825
+DP @ main.dart.js:48761
+(anonymous) @ main.dart.js:48192
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+$1 @ main.dart.js:41803
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:41792
+p @ main.dart.js:4842
+(anonymous) @ main.dart.js:48299
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+arY @ main.dart.js:48300
+Cw @ main.dart.js:48270
+(anonymous) @ main.dart.js:48186
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+af_ @ main.dart.js:48265
+rg @ main.dart.js:48180
+(anonymous) @ main.dart.js:48373
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+a4k @ main.dart.js:48395
+$2 @ main.dart.js:48367
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:42092
+k6 @ main.dart.js:48409
+kQ @ main.dart.js:48499
+(anonymous) @ main.dart.js:3625
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:42092
+k6 @ main.dart.js:48409
+kQ @ main.dart.js:48466
+(anonymous) @ main.dart.js:3625
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+kn @ main.dart.js:42174
+$0 @ main.dart.js:42025
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+(anonymous) @ main.dart.js:48144
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+axR @ main.dart.js:48179
+DO @ main.dart.js:48130
+(anonymous) @ main.dart.js:48125
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+aDV @ main.dart.js:48129
+FJ @ main.dart.js:48066
+aDU @ main.dart.js:48067
+G8 @ main.dart.js:48061
+(anonymous) @ main.dart.js:50037
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+$1 @ main.dart.js:41803
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+eS @ main.dart.js:5053
+vW @ main.dart.js:87841
+Vz @ main.dart.js:87713
+l8 @ main.dart.js:87810
+zR @ main.dart.js:87793
+YH @ main.dart.js:93827
+br @ main.dart.js:93819
+IJ @ main.dart.js:89048
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+fk @ main.dart.js:89174
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+IJ @ main.dart.js:89014
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+IJ @ main.dart.js:89014
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+IJ @ main.dart.js:89014
+IJ @ main.dart.js:89049
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+IJ @ main.dart.js:89014
+IJ @ main.dart.js:89049
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+yb @ main.dart.js:89207
+ew @ main.dart.js:88783
+a3H @ main.dart.js:88817
+cY @ main.dart.js:89225
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+cY @ main.dart.js:89059
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+cY @ main.dart.js:90399
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+cY @ main.dart.js:89059
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+cY @ main.dart.js:90399
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+cY @ main.dart.js:89059
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+cY @ main.dart.js:89059
+ew @ main.dart.js:88781
+cY @ main.dart.js:89180
+ew @ main.dart.js:88781
+cY @ main.dart.js:89180
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+as0 @ main.dart.js:88700
+ag0 @ main.dart.js:88707
+D6 @ main.dart.js:88735
+aug @ main.dart.js:88736
+MR @ main.dart.js:85302
+aj_ @ main.dart.js:73518
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+Vb @ main.dart.js:81124
+a0W @ main.dart.js:81110
+ai0 @ main.dart.js:81086
+(anonymous) @ main.dart.js:3623
+p9 @ main.dart.js:1145
+$1 @ main.dart.js:35877
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+N2 @ main.dart.js:81057
+ahw @ main.dart.js:85075
+(anonymous) @ main.dart.js:3623
+Q_ @ main.dart.js:88726
+dS @ main.dart.js:88960
+V @ main.dart.js:88665
+ND @ main.dart.js:62991
+(anonymous) @ main.dart.js:3623
+aB @ main.dart.js:57211
+dK @ main.dart.js:100372
+XK @ main.dart.js:63202
+arj @ main.dart.js:63210
+a0T @ main.dart.js:63186
+az8 @ main.dart.js:63188
+(anonymous) @ main.dart.js:3624
+$0 @ main.dart.js:58804
+a1A @ main.dart.js:58625
+dh @ main.dart.js:58630
+a13 @ main.dart.js:58777
+Sc @ main.dart.js:58753
+j3 @ main.dart.js:58741
+apl @ main.dart.js:57573
+$0 @ main.dart.js:57582
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+eS @ main.dart.js:5053
+Ym @ main.dart.js:57566
+auR @ main.dart.js:57542
+kF @ main.dart.js:57629
+awQ @ main.dart.js:57622
+UI @ main.dart.js:57616
+NB @ main.dart.js:57607
+IM @ main.dart.js:57605
+aj3 @ main.dart.js:57593
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+aBV @ main.dart.js:36764
+(anonymous) @ main.dart.js:3625
+r6 @ main.dart.js:36816
+$1 @ main.dart.js:37033
+$1 @ main.dart.js:37022
+$1 @ main.dart.js:36819
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371Understand this error
+:3000/#/listings:1 Access to XMLHttpRequest at 'http://localhost:8001/api/v1/analytics/dashboard' from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.Understand this error
+main.dart.js:48820 
+            
+            
+           GET http://localhost:8001/api/v1/analytics/dashboard net::ERR_FAILED
+(anonymous) @ main.dart.js:48820
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+axQ @ main.dart.js:48825
+DP @ main.dart.js:48761
+(anonymous) @ main.dart.js:48192
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+$1 @ main.dart.js:41803
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:41792
+p @ main.dart.js:4842
+(anonymous) @ main.dart.js:48299
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+arY @ main.dart.js:48300
+Cw @ main.dart.js:48270
+(anonymous) @ main.dart.js:48186
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+af_ @ main.dart.js:48265
+rg @ main.dart.js:48180
+(anonymous) @ main.dart.js:48373
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+a4k @ main.dart.js:48395
+$2 @ main.dart.js:48367
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:42092
+k6 @ main.dart.js:48409
+kQ @ main.dart.js:48499
+(anonymous) @ main.dart.js:3625
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:42092
+k6 @ main.dart.js:48409
+kQ @ main.dart.js:48466
+(anonymous) @ main.dart.js:3625
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+kn @ main.dart.js:42174
+$0 @ main.dart.js:42025
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+(anonymous) @ main.dart.js:48144
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+axR @ main.dart.js:48179
+DO @ main.dart.js:48130
+(anonymous) @ main.dart.js:48125
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+aDV @ main.dart.js:48129
+FJ @ main.dart.js:48066
+aDU @ main.dart.js:48067
+G8 @ main.dart.js:48061
+(anonymous) @ main.dart.js:50037
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+$1 @ main.dart.js:41803
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+oW @ main.dart.js:42189
+fc @ main.dart.js:42094
+fQ @ main.dart.js:42086
+k6 @ main.dart.js:48417
+yK @ main.dart.js:48510
+(anonymous) @ main.dart.js:3636
+(anonymous) @ main.dart.js:48356
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48361
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48350
+P5 @ main.dart.js:42972
+E6 @ main.dart.js:42106
+$0 @ main.dart.js:42263
+Bg @ main.dart.js:5002
+fc @ main.dart.js:42181
+$0 @ main.dart.js:42226
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+oW @ main.dart.js:42189
+fc @ main.dart.js:42094
+fQ @ main.dart.js:42086
+k6 @ main.dart.js:48417
+yK @ main.dart.js:48421
+(anonymous) @ main.dart.js:3636
+(anonymous) @ main.dart.js:48356
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48361
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48350
+P5 @ main.dart.js:42972
+E6 @ main.dart.js:42106
+$0 @ main.dart.js:42263
+Bg @ main.dart.js:5002
+fc @ main.dart.js:42181
+$0 @ main.dart.js:42226
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cQ @ main.dart.js:4902
+aq @ main.dart.js:108846
+bg_ @ main.dart.js:5096
+$1 @ main.dart.js:42401
+$1 @ main.dart.js:108875
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+XMLHttpRequest.send
+(anonymous) @ main.dart.js:48820
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+axQ @ main.dart.js:48825
+DP @ main.dart.js:48761
+(anonymous) @ main.dart.js:48192
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+$1 @ main.dart.js:41803
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:41792
+p @ main.dart.js:4842
+(anonymous) @ main.dart.js:48299
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+arY @ main.dart.js:48300
+Cw @ main.dart.js:48270
+(anonymous) @ main.dart.js:48186
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+af_ @ main.dart.js:48265
+rg @ main.dart.js:48180
+(anonymous) @ main.dart.js:48373
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+a4k @ main.dart.js:48395
+$2 @ main.dart.js:48367
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:42092
+k6 @ main.dart.js:48409
+kQ @ main.dart.js:48499
+(anonymous) @ main.dart.js:3625
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+lW @ main.dart.js:42980
+RR @ main.dart.js:42185
+ip @ main.dart.js:42183
+cb @ main.dart.js:42092
+k6 @ main.dart.js:48409
+kQ @ main.dart.js:48466
+(anonymous) @ main.dart.js:3625
+(anonymous) @ main.dart.js:48314
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+$0 @ main.dart.js:48319
+$0 @ main.dart.js:42022
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+$1 @ main.dart.js:48308
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+kn @ main.dart.js:42174
+$0 @ main.dart.js:42025
+$0 @ main.dart.js:41781
+setTimeout
+abx @ main.dart.js:41766
+bfj @ main.dart.js:4832
+aYP @ main.dart.js:4828
+a_M @ main.dart.js:42981
+cl @ main.dart.js:5108
+ER @ main.dart.js:4896
+(anonymous) @ main.dart.js:48144
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+axR @ main.dart.js:48179
+DO @ main.dart.js:48130
+(anonymous) @ main.dart.js:48125
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+q @ main.dart.js:4838
+aDV @ main.dart.js:48129
+FJ @ main.dart.js:48066
+aDU @ main.dart.js:48067
+G8 @ main.dart.js:48061
+(anonymous) @ main.dart.js:50037
+(anonymous) @ main.dart.js:4852
+$2 @ main.dart.js:41809
+$1 @ main.dart.js:41803
+P5 @ main.dart.js:42972
+$0 @ main.dart.js:42253
+Bg @ main.dart.js:5002
+nj @ main.dart.js:42178
+$0 @ main.dart.js:42223
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+eS @ main.dart.js:5053
+vW @ main.dart.js:87841
+Vz @ main.dart.js:87713
+l8 @ main.dart.js:87810
+zR @ main.dart.js:87793
+YH @ main.dart.js:93827
+br @ main.dart.js:93819
+IJ @ main.dart.js:89048
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+fk @ main.dart.js:89174
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+IJ @ main.dart.js:89014
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+IJ @ main.dart.js:89014
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+IJ @ main.dart.js:89014
+IJ @ main.dart.js:89049
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+ew @ main.dart.js:88783
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+IJ @ main.dart.js:89014
+IJ @ main.dart.js:89049
+fk @ main.dart.js:89013
+yb @ main.dart.js:88886
+yb @ main.dart.js:89207
+ew @ main.dart.js:88783
+a3H @ main.dart.js:88817
+cY @ main.dart.js:89225
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+cY @ main.dart.js:89059
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+cY @ main.dart.js:90399
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+cY @ main.dart.js:89059
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+cY @ main.dart.js:90399
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+cY @ main.dart.js:89059
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+cY @ main.dart.js:89059
+ew @ main.dart.js:88781
+cY @ main.dart.js:89180
+ew @ main.dart.js:88781
+cY @ main.dart.js:89180
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+FE @ main.dart.js:88965
+cY @ main.dart.js:89079
+ew @ main.dart.js:88781
+kS @ main.dart.js:89020
+kS @ main.dart.js:89052
+FE @ main.dart.js:88965
+a2O @ main.dart.js:88966
+as0 @ main.dart.js:88700
+ag0 @ main.dart.js:88707
+D6 @ main.dart.js:88735
+aug @ main.dart.js:88736
+MR @ main.dart.js:85302
+aj_ @ main.dart.js:73518
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+Vb @ main.dart.js:81124
+a0W @ main.dart.js:81110
+ai0 @ main.dart.js:81086
+(anonymous) @ main.dart.js:3623
+p9 @ main.dart.js:1145
+$1 @ main.dart.js:35877
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+uO @ main.dart.js:81040
+arG @ main.dart.js:81200
+(anonymous) @ main.dart.js:3624
+Vc @ main.dart.js:81120
+$2 @ main.dart.js:81161
+af @ main.dart.js:41351
+hJ @ main.dart.js:195
+a0U @ main.dart.js:81096
+ahu @ main.dart.js:81082
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+$1 @ main.dart.js:35874
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371
+requestAnimationFrame
+$0 @ main.dart.js:35863
+lV @ main.dart.js:36506
+lV @ main.dart.js:81065
+N2 @ main.dart.js:81057
+ahw @ main.dart.js:85075
+(anonymous) @ main.dart.js:3623
+Q_ @ main.dart.js:88726
+dS @ main.dart.js:88960
+V @ main.dart.js:88665
+ND @ main.dart.js:62991
+(anonymous) @ main.dart.js:3623
+aB @ main.dart.js:57211
+dK @ main.dart.js:100372
+XK @ main.dart.js:63202
+arj @ main.dart.js:63210
+a0T @ main.dart.js:63186
+az8 @ main.dart.js:63188
+(anonymous) @ main.dart.js:3624
+$0 @ main.dart.js:58804
+a1A @ main.dart.js:58625
+dh @ main.dart.js:58630
+a13 @ main.dart.js:58777
+Sc @ main.dart.js:58753
+j3 @ main.dart.js:58741
+apl @ main.dart.js:57573
+$0 @ main.dart.js:57582
+bhe @ main.dart.js:5034
+bhB @ main.dart.js:5036
+$1 @ main.dart.js:41750
+childList
+$1 @ main.dart.js:41757
+b06 @ main.dart.js:5041
+aNg @ main.dart.js:5136
+eS @ main.dart.js:5053
+Ym @ main.dart.js:57566
+auR @ main.dart.js:57542
+kF @ main.dart.js:57629
+awQ @ main.dart.js:57622
+UI @ main.dart.js:57616
+NB @ main.dart.js:57607
+IM @ main.dart.js:57605
+aj3 @ main.dart.js:57593
+(anonymous) @ main.dart.js:3624
+pa @ main.dart.js:1148
+aBV @ main.dart.js:36764
+(anonymous) @ main.dart.js:3625
+r6 @ main.dart.js:36816
+$1 @ main.dart.js:37033
+$1 @ main.dart.js:37022
+$1 @ main.dart.js:36819
+bfV @ main.dart.js:7385
+(anonymous) @ main.dart.js:7371Understand this error
+main.dart.js:31574 🔌 Raw WebSocket data received: {"type": "ping", "timestamp": 1751135278.6817696}
+main.dart.js:31574 🔌 Parsed WebSocket message: {type: ping, timestamp: 1751135278.6817696}
+main.dart.js:31574 🏓 Pong sent successfully with timestamp: 2025-06-28T18:27:58.682Z
+main.dart.js:31574 🔌 Raw WebSocket data received: {"type": "ping", "timestamp": 1751135308.62672}
+main.dart.js:31574 🔌 Parsed WebSocket message: {type: ping, timestamp: 1751135308.62672}
+main.dart.js:31574 🏓 Pong sent successfully with timestamp: 2025-06-28T18:28:28.627Z

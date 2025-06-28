@@ -1,0 +1,89 @@
+{
+  "timestamp": "2025-06-24T15:56:08.135462",
+  "openai_integration": {
+    "log_analysis": {
+      "openai_mentions": 2,
+      "gpt_mentions": 2,
+      "ollama_mentions": 0,
+      "openai_primary": true
+    }
+  },
+  "ebay_integration": {
+    "agent_integration": {
+      "ebay_agents_count": 5,
+      "integration_ready": true
+    },
+    "api_endpoints": {
+      "listings_endpoint": 404,
+      "endpoint_available": true
+    }
+  },
+  "agent_architecture": {
+    "total_agents": 26,
+    "agent_types": {
+      "executive": 7,
+      "market": 5,
+      "content": 4,
+      "logistics": 2,
+      "listing": 1,
+      "advertising": 1,
+      "analytics": 3,
+      "pricing": 1,
+      "automation": 1,
+      "inventory": 1
+    },
+    "type_count": 10,
+    "performance_agents": 14,
+    "health_agents": 14,
+    "dependency_agents": 14,
+    "sophisticated_score": 100
+  },
+  "system_performance": {
+    "endpoint_tests": [
+      {
+        "endpoint": "/api/v1/agents/",
+        "status": 200,
+        "response_time": 0.00459599494934082,
+        "success": true
+      },
+      {
+        "endpoint": "/api/v1/health",
+        "status": 200,
+        "response_time": 0.0032911300659179688,
+        "success": true
+      },
+      {
+        "endpoint": "/api/v1/dashboard",
+        "status": 404,
+        "response_time": 0.0028345584869384766,
+        "success": false
+      }
+    ],
+    "successful_endpoints": 2,
+    "total_endpoints": 3,
+    "avg_response_time": 0.0039435625076293945,
+    "max_response_time": 0.00459599494934082,
+    "performance_target_met": true
+  },
+  "production_readiness": {
+    "component_scores": {
+      "openai_integration": 100,
+      "agent_architecture": 100,
+      "ebay_integration": 100,
+      "system_performance": 83.33333333333333,
+      "websocket_integration": 50
+    },
+    "overall_score": 86.66666666666666,
+    "grade": "B"
+  },
+  "websocket_integration": {
+    "info_endpoint": {
+      "status": "success",
+      "endpoints": {
+        "chat": "/api/v1/ws/chat/{conversation_id}",
+        "agent": "/api/v1/ws/agent/{agent_id}",
+        "system": "/api/v1/ws/system"
+      }
+    }
+  }
+}

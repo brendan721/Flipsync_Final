@@ -1,0 +1,23 @@
+# Vulture configuration for FlipSync
+# Minimum confidence level (0-100)
+min_confidence = 80
+
+# Paths to analyze
+paths = [
+    "fs_agt_clean/",
+]
+
+# Paths to exclude
+exclude = [
+    "*/test_*",
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "*/alembic/*",
+]
+
+# Whitelist for legitimate unused code
+# (imports that are used by other modules, etc.)
+whitelist_paths = [
+    ".vulture_whitelist.py"
+]

@@ -1,0 +1,53 @@
+FROM python:3.13-slim
+
+# FlipSync Background Worker Container
+# AGENT_CONTEXT: Background task processing and agent coordination
+# AGENT_PRIORITY: Connect to shared infrastructure services
+# AGENT_PATTERN: Worker processes for AI agent tasks
+
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    WORKER_TYPE=background
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    redis-tools \
+    postgresql-client \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements-minimal.txt .
+RUN pip install --no-cache-dir -r requirements-minimal.txt
+
+# Install additional worker dependencies
+RUN pip install --no-cache-dir \
+    celery[redis]==5.3.* \
+    flower==2.0.* \
+    kombu==5.3.* \
+    billiard==4.2.*
+
+# Copy application code
+COPY . .
+
+# Create worker user for security
+RUN useradd --create-home --shell /bin/bash worker && \
+    chown -R worker:worker /app
+USER worker
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import redis; r=redis.Redis(host='shared-redis', port=6379); r.ping()" || exit 1
+
+# Expose worker monitoring port
+EXPOSE 5555
+
+# Run the worker
+CMD ["python", "-m", "celery", "worker", "-A", "fs_agt_clean.app.celery_app", "--loglevel=info", "--concurrency=4"]

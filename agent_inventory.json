@@ -1,0 +1,256 @@
+{
+  "generated_at": "2025-06-19T12:00:00.000000",
+  "total_agents": 27,
+  "categories": {
+    "executive": {
+      "count": 5,
+      "agents": [
+        {
+          "name": "executive_agent.py",
+          "path": "fs_agt_clean/agents/executive/executive_agent.py",
+          "size_lines": 1414,
+          "classes": [],
+          "key_methods": [],
+          "description": "Executive Agent for FlipSync - Strategic Decision Making and Business Guidance =============================================================================  This module implements the Executive Agent that provides strategic business guidance, evaluates investment opportunities, assesses risks, and helps with high-level decision making for e-commerce businesses."
+        },
+        {
+          "name": "resource_agent.py",
+          "path": "fs_agt_clean/agents/executive/resource_agent.py",
+          "size_lines": 161,
+          "classes": [],
+          "key_methods": [],
+          "description": "Resource Agent for FlipSync executive resource management.  This agent provides resource allocation, monitoring, and optimization capabilities for the FlipSync agent ecosystem."
+        },
+        {
+          "name": "strategy_agent.py",
+          "path": "fs_agt_clean/agents/executive/strategy_agent.py",
+          "size_lines": 168,
+          "classes": [],
+          "key_methods": [],
+          "description": "Strategy Agent for FlipSync executive decision making.  This agent provides strategic planning and coordination capabilities, including strategy creation, optimization, and performance tracking."
+        },
+        {
+          "name": "ai_executive_agent.py",
+          "path": "fs_agt_clean/agents/executive/ai_executive_agent.py",
+          "size_lines": 1170,
+          "classes": [],
+          "key_methods": [],
+          "description": "AI-Powered Executive Agent for FlipSync AGENT_CONTEXT: Real AI implementation for strategic decision making and agent coordination AGENT_PRIORITY: Strategic oversight, agent coordination, business intelligence AGENT_PATTERN: Ollama integration, agent communication, strategic analysis"
+        },
+        {
+          "name": "reinforcement_learning_agent.py",
+          "path": "fs_agt_clean/agents/executive/reinforcement_learning_agent.py",
+          "size_lines": 633,
+          "classes": [],
+          "key_methods": [],
+          "description": "Reinforcement Learning Agent for decision-making.  This module provides a reinforcement learning agent that learns optimal decision policies through interaction with the environment."
+        }
+      ]
+    },
+    "market": {
+      "count": 6,
+      "agents": [
+        {
+          "name": "base_market_agent.py",
+          "path": "fs_agt_clean/agents/market/base_market_agent.py",
+          "size_lines": 383,
+          "classes": [],
+          "key_methods": [],
+          "description": "Base market agent module for handling marketplace interactions."
+        },
+        {
+          "name": "market_agent.py",
+          "path": "fs_agt_clean/agents/market/market_agent.py",
+          "size_lines": 750,
+          "classes": [],
+          "key_methods": [],
+          "description": "Market Agent for FlipSync AI System ===================================  This module implements the Market Intelligence Agent that specializes in pricing analysis, inventory management, competitor monitoring, and marketplace optimization."
+        },
+        {
+          "name": "amazon_agent.py",
+          "path": "fs_agt_clean/agents/market/amazon_agent.py",
+          "size_lines": 629,
+          "classes": [],
+          "key_methods": [],
+          "description": "amazon_agent.py - Migrated Version  This is a migrated version of the original file. The migration process was unable to generate valid code, so this is a fallback that preserves the original functionality with improved documentation."
+        },
+        {
+          "name": "inventory_agent.py",
+          "path": "fs_agt_clean/agents/market/inventory_agent.py",
+          "size_lines": 62,
+          "classes": [
+            "InventoryAgent"
+          ],
+          "key_methods": [],
+          "description": "Process inventory tasks"
+        },
+        {
+          "name": "ai_market_agent.py",
+          "path": "fs_agt_clean/agents/market/ai_market_agent.py",
+          "size_lines": 667,
+          "classes": [],
+          "key_methods": [],
+          "description": "AI-Powered Market Agent for FlipSync AGENT_CONTEXT: Real AI implementation replacing mock data AGENT_PRIORITY: Convert market analysis to real AI-powered decision making AGENT_PATTERN: Ollama integration, Qdrant vector search, real marketplace data"
+        },
+        {
+          "name": "ebay_agent.py",
+          "path": "fs_agt_clean/agents/market/ebay_agent.py",
+          "size_lines": 1541,
+          "classes": [],
+          "key_methods": [],
+          "description": "ebay_agent.py - Migrated Version  This is a migrated version of the original file. The migration process was unable to generate valid code, so this is a fallback that preserves the original functionality with improved documentation."
+        }
+      ]
+    },
+    "content": {
+      "count": 6,
+      "agents": [
+        {
+          "name": "base_content_agent.py",
+          "path": "fs_agt_clean/agents/content/base_content_agent.py",
+          "size_lines": 248,
+          "classes": [],
+          "key_methods": [],
+          "description": "Base content agent for FlipSync content generation and optimization."
+        },
+        {
+          "name": "listing_content_agent.py",
+          "path": "fs_agt_clean/agents/content/listing_content_agent.py",
+          "size_lines": 536,
+          "classes": [],
+          "key_methods": [],
+          "description": "Enhanced listing content agent for marketplace-optimized content generation."
+        },
+        {
+          "name": "image_agent.py",
+          "path": "fs_agt_clean/agents/content/image_agent.py",
+          "size_lines": 560,
+          "classes": [],
+          "key_methods": [],
+          "description": "Image processing and optimization agent for marketplace listings."
+        },
+        {
+          "name": "content_agent.py",
+          "path": "fs_agt_clean/agents/content/content_agent.py",
+          "size_lines": 1192,
+          "classes": [],
+          "key_methods": [],
+          "description": "Content Agent for FlipSync - Conversational Content Generation and Optimization  This agent specializes in: - Product listing content generation - SEO optimization and analysis - Marketplace-specific content adaptation - Content quality assessment - Image optimization recommendations"
+        },
+        {
+          "name": "ai_content_agent.py",
+          "path": "fs_agt_clean/agents/content/ai_content_agent.py",
+          "size_lines": 1659,
+          "classes": [],
+          "key_methods": [],
+          "description": "AI-Powered Content Agent for FlipSync AGENT_CONTEXT: Real AI implementation for content generation, SEO optimization, and listing enhancement AGENT_PRIORITY: Content creation, SEO optimization, marketplace adaptation, agent coordination AGENT_PATTERN: Ollama integration, content generation, competitive analysis, strategic coordination"
+        },
+        {
+          "name": "content_agent_service.py",
+          "path": "fs_agt_clean/agents/content/content_agent_service.py",
+          "size_lines": 784,
+          "classes": [],
+          "key_methods": [],
+          "description": "Content agent service for generating and optimizing content."
+        }
+      ]
+    },
+    "logistics": {
+      "count": 5,
+      "agents": [
+        {
+          "name": "logistics_agent.py",
+          "path": "fs_agt_clean/agents/logistics/logistics_agent.py",
+          "size_lines": 822,
+          "classes": [],
+          "key_methods": [],
+          "description": "Logistics Agent for FlipSync - Conversational Logistics Management and Optimization  This agent specializes in: - Shipping and fulfillment optimization - Inventory rebalancing and management - Carrier service coordination - Delivery tracking and logistics planning - Warehouse operations guidance - Supply chain optimization"
+        },
+        {
+          "name": "shipping_agent.py",
+          "path": "fs_agt_clean/agents/logistics/shipping_agent.py",
+          "size_lines": 206,
+          "classes": [
+            "ShippingAgent"
+          ],
+          "key_methods": [],
+          "description": "Agent for managing shipping operations."
+        },
+        {
+          "name": "ai_logistics_agent.py",
+          "path": "fs_agt_clean/agents/logistics/ai_logistics_agent.py",
+          "size_lines": 1276,
+          "classes": [],
+          "key_methods": [],
+          "description": "AI Logistics Agent - Phase 2 Final Agent Implementation AGENT_CONTEXT: Complete Phase 2 with AI-powered logistics and supply chain management AGENT_PRIORITY: Implement final agent for Phase 2 completion (4th of 4 agents) AGENT_PATTERN: AI integration, inventory management, shipping optimization, agent coordination"
+        },
+        {
+          "name": "warehouse_agent.py",
+          "path": "fs_agt_clean/agents/logistics/warehouse_agent.py",
+          "size_lines": 459,
+          "classes": [],
+          "key_methods": [],
+          "description": "Warehouse Agent for FlipSync logistics management.  This agent provides warehouse management capabilities including storage optimization, picking efficiency, and inventory organization as described in AGENTIC_SYSTEM_OVERVIEW.md."
+        },
+        {
+          "name": "sync_agent.py",
+          "path": "fs_agt_clean/agents/logistics/sync_agent.py",
+          "size_lines": 616,
+          "classes": ["SyncAgent"],
+          "key_methods": ["synchronize_data", "resolve_conflict", "get_sync_status"],
+          "description": "Sync Agent for FlipSync - Cross-Platform Synchronization and Data Coordination. This agent specializes in cross-platform data synchronization between marketplaces, conflict resolution, data validation, and real-time sync status reporting."
+        }
+      ]
+    },
+    "automation": {
+      "count": 3,
+      "agents": [
+        {
+          "name": "auto_pricing_agent.py",
+          "path": "fs_agt_clean/agents/automation/auto_pricing_agent.py",
+          "size_lines": 414,
+          "classes": [],
+          "key_methods": [],
+          "description": "Auto Pricing Agent for FlipSync Automated pricing decisions and adjustments based on market conditions."
+        },
+        {
+          "name": "auto_inventory_agent.py",
+          "path": "fs_agt_clean/agents/automation/auto_inventory_agent.py",
+          "size_lines": 440,
+          "classes": [],
+          "key_methods": [],
+          "description": "Auto Inventory Agent for FlipSync Automated inventory management, purchasing, and stock optimization."
+        },
+        {
+          "name": "auto_listing_agent.py",
+          "path": "fs_agt_clean/agents/automation/auto_listing_agent.py",
+          "size_lines": 470,
+          "classes": [],
+          "key_methods": [],
+          "description": "Auto Listing Agent for FlipSync Automated listing creation, optimization, and management."
+        }
+      ]
+    },
+    "conversational": {
+      "count": 2,
+      "agents": [
+        {
+          "name": "service_agent.py",
+          "path": "fs_agt_clean/agents/conversational/service_agent.py",
+          "size_lines": 554,
+          "classes": ["ServiceAgent"],
+          "key_methods": ["handle_customer_inquiry", "create_support_ticket", "route_to_specialist"],
+          "description": "Service Agent for FlipSync - Customer Service Integration and Support Automation. This agent specializes in customer inquiry routing, automated support responses, issue escalation, and multi-channel customer communication."
+        },
+        {
+          "name": "monitoring_agent.py",
+          "path": "fs_agt_clean/agents/conversational/monitoring_agent.py",
+          "size_lines": 660,
+          "classes": ["MonitoringAgent"],
+          "key_methods": ["start_monitoring", "get_system_status", "get_active_alerts"],
+          "description": "Monitoring Agent for FlipSync - Health Monitoring System and Performance Analytics. This agent specializes in system health monitoring, agent performance tracking, resource utilization monitoring, and automated alerting."
+        }
+      ]
+    }
+  }
+}

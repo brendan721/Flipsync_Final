@@ -1,0 +1,18 @@
+{
+  "workflow_name": "Final FlipSync eBay Listing Creation Workflow",
+  "timestamp": "2025-06-22T21:40:56.827349",
+  "authentication": {
+    "success": true,
+    "token_type": "User Access Token",
+    "expires_in": 7200,
+    "scopes": []
+  },
+  "location_setup": {
+    "success": false,
+    "status_code": 400,
+    "error": "{\"errors\":[{\"errorId\":25803,\"domain\":\"API_INVENTORY\",\"category\":\"REQUEST\",\"message\":\"merchantLocationKey already exists.\"}]}"
+  },
+  "listings": [],
+  "summary": {},
+  "success": false
+}

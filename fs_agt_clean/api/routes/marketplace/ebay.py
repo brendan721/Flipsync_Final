@@ -348,9 +348,9 @@ async def get_ebay_oauth_url(
 
         # eBay OAuth parameters - Use PRODUCTION RuName as redirect_uri
         ru_name = "Brendan_Blomfie-BrendanB-Nashvi-vuwrefym"  # Production RuName
-        callback_url = (
-            "https://www.nashvillegeneral.store/ebay-oauth"  # Production callback
-        )
+        callback_url = os.getenv(
+            "EBAY_CALLBACK_URL", "https://www.flipsyncai.com/ebay-oauth"
+        )  # Production callback
         scope = " ".join(oauth_request.scopes)
 
         # Build authorization URL - CRITICAL: Use RuName as redirect_uri for eBay OAuth

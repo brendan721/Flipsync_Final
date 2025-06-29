@@ -99,6 +99,9 @@ services:
     volumes:
       - ./logs:/app/logs:rw
       - ./uploads:/app/uploads:rw
+      # Docker volume caching for dependencies to save space and speed up builds
+      - pip_cache:/root/.cache/pip
+      - python_packages:/opt/venv
 
     depends_on:
       db:
@@ -128,6 +131,11 @@ services:
     environment:
       - NODE_ENV=production
       - API_BASE_URL=https://api.flipsyncai.com
+    volumes:
+      # Docker volume caching for Node.js dependencies
+      - node_modules_cache:/app/node_modules
+      - flutter_cache:/root/.flutter
+      - dart_cache:/root/.pub-cache
     depends_on:
       api:
         condition: service_healthy
@@ -195,6 +203,17 @@ volumes:
   redis_data:
     driver: local
   qdrant_data:
+    driver: local
+  # Docker volume caching for dependencies - saves space and speeds up builds
+  pip_cache:
+    driver: local
+  python_packages:
+    driver: local
+  node_modules_cache:
+    driver: local
+  flutter_cache:
+    driver: local
+  dart_cache:
     driver: local
 
 networks:

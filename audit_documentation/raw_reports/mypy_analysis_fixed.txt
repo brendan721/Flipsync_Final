@@ -1,2 +1,0 @@
-fs_agt_clean/api/routes/frontend_integration.py:795:37: error: '(' was never closed  [syntax]
-Found 1 error in 1 file (errors prevented further checking)

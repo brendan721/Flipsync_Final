@@ -272,7 +272,7 @@ class FailureAnalyzer:
         Get all failure records for a specific agent.
 
         Args:
-            agent_id: UnifiedAgent ID to filter by
+            agent_id: AutonomousAgent ID to filter by
 
         Returns:
             List of failure records

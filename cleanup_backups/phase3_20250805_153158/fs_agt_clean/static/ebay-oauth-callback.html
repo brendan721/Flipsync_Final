@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlipSync - eBay OAuth Callback</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .loading { color: #007bff; }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .close-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .close-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🔄 FlipSync</div>
+        <div id="status" class="status loading">
+            <div class="spinner"></div>
+            Processing eBay authentication...
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 FlipSync eBay OAuth Callback Page Loaded');
+        
+        // Extract URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+        
+        console.log('📋 OAuth Parameters:', { code: code ? 'present' : 'missing', state, error, errorDescription });
+        
+        const statusDiv = document.getElementById('status');
+        
+        if (error) {
+            // Handle OAuth error
+            console.log('❌ OAuth Error:', error, errorDescription);
+            statusDiv.innerHTML = `
+                <div class="error">
+                    <h2>❌ Authentication Failed</h2>
+                    <p>Error: ${error}</p>
+                    ${errorDescription ? `<p>${errorDescription}</p>` : ''}
+                    <button class="close-btn" onclick="window.close()">Close Window</button>
+                </div>
+            `;
+            
+            // Send error to parent window - ENHANCED for Flutter compatibility
+            if (window.opener) {
+                // CRITICAL FIX: Use wildcard origin first for Flutter compatibility
+                try {
+                    window.opener.postMessage({
+                        source: 'ebay_oauth_callback',
+                        error: error,
+                        error_description: errorDescription,
+                        success: false
+                    }, '*');
+                    console.log('✅ Error message sent with wildcard origin (Flutter compatible)');
+                } catch (error) {
+                    console.log('❌ Wildcard error postMessage failed:', error);
+
+                    // Fallback to specific origins
+                    const origins = ['https://flipsyncai.com', 'https://www.flipsyncai.com'];
+                    let messageSent = false;
+
+                    for (const origin of origins) {
+                        try {
+                            window.opener.postMessage({
+                                source: 'ebay_oauth_callback',
+                                error: error,
+                                error_description: errorDescription,
+                                success: false
+                            }, origin);
+                            console.log(`✅ Error message sent to ${origin}`);
+                            messageSent = true;
+                            break;
+                        } catch (error) {
+                            console.log(`❌ Failed to send error to ${origin}:`, error);
+                        }
+                    }
+                }
+            }
+            
+        } else if (code && state) {
+            // Success - process the authorization code
+            console.log('✅ OAuth Success - Processing authorization code...');
+            
+            statusDiv.innerHTML = `
+                <div class="success">
+                    <h2>✅ Authentication Successful!</h2>
+                    <p>Processing your eBay connection...</p>
+                    <div class="spinner"></div>
+                </div>
+            `;
+            
+            // Send success data to parent window - ENHANCED for Flutter compatibility
+            if (window.opener) {
+                console.log('📤 Sending OAuth data to parent window...');
+
+                // CRITICAL FIX: Use wildcard origin first for Flutter compatibility
+                // Flutter web apps often have cross-origin issues with specific origins
+                try {
+                    window.opener.postMessage({
+                        source: 'ebay_oauth_callback',
+                        code: code,
+                        state: state,
+                        success: true
+                    }, '*');
+                    console.log('✅ OAuth message sent with wildcard origin (Flutter compatible)');
+                } catch (error) {
+                    console.log('❌ Wildcard postMessage failed:', error);
+
+                    // Fallback to specific origins
+                    const origins = ['https://flipsyncai.com', 'https://www.flipsyncai.com'];
+                    let messageSent = false;
+
+                    for (const origin of origins) {
+                        try {
+                            window.opener.postMessage({
+                                source: 'ebay_oauth_callback',
+                                code: code,
+                                state: state,
+                                success: true
+                            }, origin);
+                            console.log(`✅ OAuth message sent to ${origin}`);
+                            messageSent = true;
+                            break;
+                        } catch (error) {
+                            console.log(`❌ Failed to send to ${origin}:`, error);
+                        }
+                    }
+                }
+                
+                // Update status
+                statusDiv.innerHTML = `
+                    <div class="success">
+                        <h2>✅ eBay Connected Successfully!</h2>
+                        <p>Your eBay account has been connected to FlipSync.</p>
+                        <p>You can close this window and return to the app.</p>
+                        <button class="close-btn" onclick="window.close()">Close Window</button>
+                    </div>
+                `;
+                
+                // Auto-close after 3 seconds
+                setTimeout(() => {
+                    window.close();
+                }, 3000);
+                
+            } else {
+                console.log('❌ No parent window found');
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <h2>❌ Communication Error</h2>
+                        <p>Unable to communicate with the main application.</p>
+                        <p>Please close this window and try again.</p>
+                        <button class="close-btn" onclick="window.close()">Close Window</button>
+                    </div>
+                `;
+            }
+            
+        } else {
+            // Missing required parameters
+            console.log('❌ Missing OAuth parameters');
+            statusDiv.innerHTML = `
+                <div class="error">
+                    <h2>❌ Invalid Request</h2>
+                    <p>Missing required OAuth parameters.</p>
+                    <button class="close-btn" onclick="window.close()">Close Window</button>
+                </div>
+            `;
+            
+            // Send error to parent window - ENHANCED for Flutter compatibility
+            if (window.opener) {
+                // CRITICAL FIX: Use wildcard origin first for Flutter compatibility
+                try {
+                    window.opener.postMessage({
+                        source: 'ebay_oauth_callback',
+                        error: 'missing_parameters',
+                        error_description: 'Missing required OAuth parameters',
+                        success: false
+                    }, '*');
+                    console.log('✅ Missing params error sent with wildcard origin (Flutter compatible)');
+                } catch (error) {
+                    console.log('❌ Wildcard missing params postMessage failed:', error);
+
+                    // Fallback to specific origins
+                    const origins = ['https://flipsyncai.com', 'https://www.flipsyncai.com'];
+                    let messageSent = false;
+
+                    for (const origin of origins) {
+                        try {
+                            window.opener.postMessage({
+                                source: 'ebay_oauth_callback',
+                                error: 'missing_parameters',
+                                error_description: 'Missing required OAuth parameters',
+                                success: false
+                            }, origin);
+                            console.log(`✅ Missing params error sent to ${origin}`);
+                            messageSent = true;
+                            break;
+                        } catch (error) {
+                            console.log(`❌ Failed to send missing params error to ${origin}:`, error);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Handle messages from parent window
+        window.addEventListener('message', function(event) {
+            console.log('📨 Received message from parent:', event.data);
+            
+            if (event.data.type === 'CLOSE_POPUP') {
+                window.close();
+            }
+        });
+        
+        console.log('✅ OAuth callback processing complete');
+    </script>
+</body>
+</html>

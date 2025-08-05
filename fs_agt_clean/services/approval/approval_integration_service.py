@@ -10,10 +10,12 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
-from fs_agt_clean.agents.base_conversational_agent import UnifiedAgentResponse
+from fs_agt_clean.agents.base_conversational_agent import AutonomousAgentResponse
 from fs_agt_clean.core.coordination.decision.pipeline import StandardDecisionPipeline
-from fs_agt_clean.database.models.unified_agent import UnifiedAgentDecision
-from fs_agt_clean.database.repositories.agent_repository import UnifiedAgentRepository
+from fs_agt_clean.database.models.autonomous_agent import AutonomousAgentDecision
+from fs_agt_clean.database.repositories.autonomous_agent_repository import (
+    AutonomousAgentRepository,
+)
 
 # Import decision pipeline components with error handling
 try:
@@ -41,7 +43,7 @@ class ApprovalIntegrationService:
     for approval workflows.
     """
 
-    def __init__(self, agent_repository: Optional[UnifiedAgentRepository] = None):
+    def __init__(self, agent_repository: Optional[AutonomousAgentRepository] = None):
         """Initialize the approval integration service."""
         self.agent_repository = agent_repository
         self.decision_pipeline = None
@@ -131,7 +133,7 @@ class ApprovalIntegrationService:
 
     async def process_agent_response(
         self,
-        agent_response: UnifiedAgentResponse,
+        agent_response: AutonomousAgentResponse,
         user_id: str,
         conversation_id: str,
         original_message: str,
@@ -193,7 +195,7 @@ class ApprovalIntegrationService:
 
     async def _create_approval_workflow(
         self,
-        agent_response: UnifiedAgentResponse,
+        agent_response: AutonomousAgentResponse,
         user_id: str,
         conversation_id: str,
         original_message: str,
@@ -240,7 +242,7 @@ class ApprovalIntegrationService:
 
         return workflow
 
-    def _determine_decision_type(self, agent_response: UnifiedAgentResponse) -> str:
+    def _determine_decision_type(self, agent_response: AutonomousAgentResponse) -> str:
         """Determine the decision type based on agent response."""
         agent_type = agent_response.agent_type
         metadata = agent_response.metadata
@@ -274,7 +276,7 @@ class ApprovalIntegrationService:
         return f"{agent_type}_decision"
 
     async def _create_pipeline_decision(
-        self, workflow: Dict[str, Any], agent_response: UnifiedAgentResponse
+        self, workflow: Dict[str, Any], agent_response: AutonomousAgentResponse
     ):
         """Create a decision in the decision pipeline."""
         try:
@@ -291,17 +293,17 @@ class ApprovalIntegrationService:
                 {
                     "id": "approve",
                     "action": "approve",
-                    "reasoning": "UnifiedAgent recommendation approved",
+                    "reasoning": "AutonomousAgent recommendation approved",
                 },
                 {
                     "id": "reject",
                     "action": "reject",
-                    "reasoning": "UnifiedAgent recommendation rejected",
+                    "reasoning": "AutonomousAgent recommendation rejected",
                 },
                 {
                     "id": "modify",
                     "action": "modify",
-                    "reasoning": "UnifiedAgent recommendation requires modification",
+                    "reasoning": "AutonomousAgent recommendation requires modification",
                 },
             ]
 
@@ -313,15 +315,15 @@ class ApprovalIntegrationService:
             logger.error(f"Error creating pipeline decision: {e}")
 
     async def _store_approval_decision(
-        self, workflow: Dict[str, Any], agent_response: UnifiedAgentResponse
+        self, workflow: Dict[str, Any], agent_response: AutonomousAgentResponse
     ):
         """Store the approval decision in the database."""
         try:
             if not self.agent_repository:
                 return
 
-            # Create UnifiedAgentDecision record
-            decision_record = UnifiedAgentDecision(
+            # Create AutonomousAgentDecision record
+            decision_record = AutonomousAgentDecision(
                 agent_id=agent_response.metadata.get("agent_id", "unknown"),
                 decision_type=workflow["decision_type"],
                 parameters={
@@ -330,7 +332,7 @@ class ApprovalIntegrationService:
                     "approval_workflow": workflow,
                 },
                 confidence=workflow["confidence"],
-                rationale=f"UnifiedAgent recommendation: {agent_response.content[:200]}...",
+                rationale=f"AutonomousAgent recommendation: {agent_response.content[:200]}...",
                 status="approved" if workflow["auto_approve"] else "pending",
             )
 
@@ -341,7 +343,7 @@ class ApprovalIntegrationService:
             logger.error(f"Error storing approval decision: {e}")
 
     def _create_approval_response(
-        self, workflow: Dict[str, Any], agent_response: UnifiedAgentResponse
+        self, workflow: Dict[str, Any], agent_response: AutonomousAgentResponse
     ) -> str:
         """Create a response message for approval workflows."""
         if workflow["auto_approve"]:

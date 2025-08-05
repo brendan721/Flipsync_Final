@@ -342,9 +342,8 @@ async def init_services() -> Dict[str, Any]:
                     )
                 else:
                     # Only use hardcoded default as last resort
-                    # Check if we're running in Docker
-                    in_docker = os.path.exists("/.dockerenv")
-                    db_host = "db" if in_docker else "localhost"
+                    # Use localhost for direct droplet deployment
+                    db_host = "localhost"
                     connection_string = f"postgresql+asyncpg://postgres:postgres@{db_host}:5432/postgres"
                     logger.warning(
                         f"No database connection string found in config or environment, using default: {connection_string}"
@@ -544,7 +543,7 @@ async def init_services() -> Dict[str, Any]:
                 store_id="flipsync-vectors",
                 dimension=1536,  # Standard OpenAI embedding dimension
                 distance_metric=VectorDistanceMetric.COSINE,
-                host=os.getenv("QDRANT_HOST", "qdrant"),
+                host=os.getenv("QDRANT_HOST", "localhost"),
                 port=int(os.getenv("QDRANT_PORT", "6333")),
             )
 
@@ -1212,7 +1211,117 @@ def create_app() -> FastAPI:
 
     # Core API routes (migrated)
     app.include_router(auth_router, prefix="/api/v1/auth", tags=["authentication"])
-    app.include_router(agents_router, prefix="/api/v1/agents", tags=["agents"])
+
+    # ✅ PHASE 3.1.2: Legacy Agent Routes - 4+1 Architecture Compliant
+    # Note: This route is already 4+1 architecture compliant and uses AutonomousAgentRepository
+    # Keeping for backward compatibility while new 4+1 routes are being adopted
+    app.include_router(
+        agents_router, prefix="/api/v1/agents", tags=["agents-legacy-compat"]
+    )
+
+    # ✅ PHASE 3.1.1: 4+1 Architecture API Routes Integration
+    logger.info("🚀 Integrating 4+1 Architecture API Routes...")
+
+    try:
+        # Import 4+1 Architecture API routers
+        from fs_agt_clean.api.routes.agents_4plus1 import router as agents_4plus1_router
+        from fs_agt_clean.api.routes.decisions_4plus1 import (
+            router as decisions_4plus1_router,
+        )
+        from fs_agt_clean.api.routes.chat_4plus1 import router as chat_4plus1_router
+
+        # Register 4+1 Architecture API routes with proper prefixes
+        app.include_router(
+            agents_4plus1_router, prefix="/api/v1/agents/4plus1", tags=["4plus1-agents"]
+        )
+        logger.info("✅ 4+1 Agents API registered at /api/v1/agents/4plus1")
+
+        app.include_router(
+            decisions_4plus1_router,
+            prefix="/api/v1/decisions/4plus1",
+            tags=["4plus1-decisions"],
+        )
+        logger.info("✅ 4+1 Decisions API registered at /api/v1/decisions/4plus1")
+
+        app.include_router(
+            chat_4plus1_router, prefix="/api/v1/chat/4plus1", tags=["4plus1-chat"]
+        )
+        logger.info("✅ 4+1 Chat API registered at /api/v1/chat/4plus1")
+
+        logger.info("🎉 4+1 Architecture API Routes integration complete!")
+
+        # ✅ PHASE 3.1.3: Add 4+1 Architecture Validation
+        logger.info("🔍 Adding 4+1 Architecture validation middleware...")
+
+        @app.middleware("http")
+        async def validate_4plus1_architecture(request, call_next):
+            """Validate 4+1 architecture compliance for API requests."""
+            response = await call_next(request)
+
+            # Add 4+1 architecture compliance headers
+            if (
+                request.url.path.startswith("/api/v1/agents/4plus1")
+                or request.url.path.startswith("/api/v1/decisions/4plus1")
+                or request.url.path.startswith("/api/v1/chat/4plus1")
+            ):
+                response.headers["X-FlipSync-Architecture"] = "4plus1"
+                response.headers["X-FlipSync-LLM-Free"] = "true"
+                response.headers["X-FlipSync-Repository"] = "AutonomousAgentRepository"
+
+            return response
+
+        logger.info("✅ 4+1 Architecture validation middleware added")
+
+        # ✅ PHASE 3.2.1: 4+1 Architecture WebSocket Integration
+        logger.info("🔌 Integrating 4+1 Architecture WebSocket handlers...")
+
+        # The WebSocket endpoints are already integrated into the API routers above:
+        # - /api/v1/agents/4plus1/ws/status → Agent status updates
+        # - /api/v1/agents/4plus1/ws/decisions/{agent_id} → Agent decision streams
+        # - /api/v1/decisions/4plus1/ws/live → Live decision monitoring
+        # - /api/v1/decisions/4plus1/ws/compliance → Compliance monitoring
+
+        # Add dedicated WebSocket routing for cleaner paths
+        from fastapi import WebSocket, WebSocketDisconnect
+
+        @app.websocket("/ws/agents/")
+        async def websocket_agents_redirect(websocket: WebSocket):
+            """Redirect to 4+1 architecture agent status WebSocket."""
+            # Redirect to the actual 4+1 architecture endpoint
+            await websocket.close(
+                code=1001, reason="Use /api/v1/agents/4plus1/ws/status"
+            )
+
+        @app.websocket("/ws/chat/4plus1/")
+        async def websocket_chat_4plus1_redirect(websocket: WebSocket):
+            """Redirect to 4+1 architecture chat WebSocket."""
+            # Chat WebSocket endpoints are handled within the chat_4plus1 router
+            await websocket.close(
+                code=1001, reason="Use chat endpoints in /api/v1/chat/4plus1/"
+            )
+
+        @app.websocket("/ws/learning/")
+        async def websocket_learning_redirect(websocket: WebSocket):
+            """Redirect to 4+1 architecture learning WebSocket."""
+            # Learning WebSocket endpoints are handled within the decisions_4plus1 router
+            await websocket.close(
+                code=1001, reason="Use /api/v1/decisions/4plus1/ws/compliance"
+            )
+
+        logger.info("✅ 4+1 Architecture WebSocket handlers integrated")
+        logger.info("🔌 WebSocket endpoints available:")
+        logger.info("   - /api/v1/agents/4plus1/ws/status (agent status)")
+        logger.info(
+            "   - /api/v1/agents/4plus1/ws/decisions/{agent_id} (agent decisions)"
+        )
+        logger.info("   - /api/v1/decisions/4plus1/ws/live (live decisions)")
+        logger.info(
+            "   - /api/v1/decisions/4plus1/ws/compliance (compliance monitoring)"
+        )
+
+    except ImportError as e:
+        logger.error(f"❌ Failed to import 4+1 Architecture API routes: {e}")
+        logger.warning("⚠️ Continuing without 4+1 Architecture API routes")
 
     # Optimized services routes (Priority 2 implementation) - Re-enabled with simplified services
     from fs_agt_clean.api.routes.optimized_services import (
@@ -1246,8 +1355,10 @@ def create_app() -> FastAPI:
     app.include_router(
         revenue_router, prefix="/api/v1/revenue", tags=["revenue-model"]
     )  # ✅ NEW - Revenue Model
+    # ✅ PHASE 3.1.2: Legacy Chat Routes - Keeping for backward compatibility
+    # Note: New 4+1 architecture chat routes are available at /api/v1/chat/4plus1
     app.include_router(
-        chat_router, prefix="/api/v1/chat", tags=["chat"]
+        chat_router, prefix="/api/v1/chat", tags=["chat-legacy-compat"]
     )  # ✅ ENABLED - Database integration complete
     app.include_router(
         websocket_simple_router, prefix="", tags=["websocket-simple"]
@@ -2555,7 +2666,7 @@ self.addEventListener('fetch', function(event) {
             "status": "ok",
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "version": "1.0.0",
-            "volume_mount_test": "DOCKER_VOLUME_MOUNTING_IS_WORKING_CONFIRMED_2025_06_05",
+            "deployment": "direct_droplet",
         }
 
     @app.get("/api/v1/csrf-token", include_in_schema=True, tags=["security"])

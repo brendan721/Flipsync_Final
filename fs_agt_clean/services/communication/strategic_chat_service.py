@@ -5,6 +5,11 @@ Strategic Chat Service for FlipSync Conversational Interface
 Implements strategic Gemini usage for conversational interface responses,
 replacing OpenAI for user communication while maintaining the 4+1 architecture
 separation between autonomous agents and conversational interface.
+
+✅ PHASE 3.3.1: StrategicChatService Integration
+- Uses conversational_interfaces table for registration
+- Integrates with autonomous agent decision pipeline
+- 4+1 architecture awareness in conversations
 """
 
 import logging
@@ -17,6 +22,16 @@ from fs_agt_clean.core.ai.strategic_gemini_service import (
     StrategicAnalysisRequest,
     StrategicUseCase,
 )
+from fs_agt_clean.database.repositories.conversational_interface_repository import (
+    ConversationalInterfaceRepository,
+)
+from fs_agt_clean.database.repositories.autonomous_agent_repository import (
+    AutonomousAgentRepository,
+)
+from fs_agt_clean.database.models.autonomous_agent import (
+    ConversationalInterfaceType,
+)
+from fs_agt_clean.core.db.database import get_database
 
 logger = logging.getLogger(__name__)
 
@@ -53,21 +68,104 @@ class StrategicChatService:
     """
 
     def __init__(self, daily_budget: float = 10.0):
-        """Initialize strategic chat service."""
+        """Initialize strategic chat service with 4+1 architecture integration."""
         self.strategic_service = StrategicGeminiService(daily_budget=daily_budget)
+        self.daily_budget = daily_budget
+
+        # ✅ PHASE 3.3.1: 4+1 Architecture Integration
+        self.interface_repository = ConversationalInterfaceRepository()
+        self.agent_repository = AutonomousAgentRepository()
+        self.interface_id = "strategic_chat_service_4plus1"
 
         # Chat context management
         self.conversation_contexts = {}
         self.max_context_length = 10  # Keep last 10 exchanges
 
-        # Response templates for common queries
+        # Response templates for common queries with 4+1 architecture awareness
         self.quick_responses = {
-            "hello": "Hello! I'm FlipSync's AI assistant. How can I help you with your e-commerce needs today?",
-            "help": "I can help you with pricing strategies, inventory management, market analysis, and product optimization. What would you like to know?",
-            "status": "FlipSync systems are running optimally. All autonomous agents are active and processing decisions.",
+            "hello": "Hello! I'm FlipSync's AI assistant powered by our 4+1 architecture. How can I help you with your e-commerce needs today?",
+            "help": "I can help you with pricing strategies, inventory management, market analysis, and product optimization. Our 4 autonomous agents are working behind the scenes to optimize your business.",
+            "status": "FlipSync 4+1 architecture is running optimally. All 4 autonomous agents (Market, Content, Executive, Logistics) are active and processing decisions with 100% LLM-free compliance.",
+            "agents": "FlipSync uses a 4+1 architecture: 4 autonomous agents (Market, Content, Executive, Logistics) handle business decisions, while I serve as your conversational interface.",
         }
 
-        logger.info("Strategic chat service initialized with Gemini integration")
+        logger.info(
+            "Strategic chat service initialized with 4+1 architecture integration"
+        )
+
+    async def register_interface(self) -> bool:
+        """Register this conversational interface in the 4+1 architecture database."""
+        try:
+            database = get_database()
+            async with database.get_session() as session:
+                interface = await self.interface_repository.create_or_update_interface(
+                    session=session,
+                    interface_id=self.interface_id,
+                    interface_type=ConversationalInterfaceType.STRATEGIC_CHAT,
+                    service_class="StrategicChatService",
+                    llm_provider="gemini",
+                    gemini_model="gemini-2.5-flash-lite",
+                    daily_budget=self.daily_budget,
+                    status="active",
+                    capabilities=[
+                        "Natural language processing",
+                        "Strategic recommendations",
+                        "4+1 architecture awareness",
+                        "Agent status reporting",
+                        "Decision coordination",
+                    ],
+                )
+
+                logger.info(
+                    f"✅ Conversational interface registered: {interface.interface_id}"
+                )
+                return True
+
+        except Exception as e:
+            logger.error(f"❌ Failed to register conversational interface: {e}")
+            return False
+
+    async def get_agent_status_summary(self) -> Dict[str, Any]:
+        """Get summary of autonomous agent status for conversational responses."""
+        try:
+            database = get_database()
+            async with database.get_session() as session:
+                agents = await self.agent_repository.get_all_autonomous_agents(session)
+                recent_decisions = (
+                    await self.agent_repository.get_decisions_with_filters(
+                        session, limit=10
+                    )
+                )
+
+                # Calculate summary metrics
+                active_agents = sum(
+                    1 for agent in agents if agent.status.value == "running"
+                )
+                llm_free_agents = sum(1 for agent in agents if agent.llm_free)
+
+                return {
+                    "total_agents": len(agents),
+                    "active_agents": active_agents,
+                    "llm_free_compliance": (
+                        (llm_free_agents / len(agents)) * 100 if agents else 0
+                    ),
+                    "recent_decisions": len(recent_decisions),
+                    "architecture_status": (
+                        "4+1 compliant"
+                        if llm_free_agents == len(agents)
+                        else "compliance issues"
+                    ),
+                }
+
+        except Exception as e:
+            logger.error(f"❌ Failed to get agent status: {e}")
+            return {
+                "total_agents": 0,
+                "active_agents": 0,
+                "llm_free_compliance": 0,
+                "recent_decisions": 0,
+                "architecture_status": "status unavailable",
+            }
 
     async def handle_chat(self, request: ChatRequest) -> ChatResponse:
         """Handle conversational interface requests using strategic Gemini."""

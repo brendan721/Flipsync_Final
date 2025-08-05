@@ -5,6 +5,7 @@ WebSocket Event Handlers for FlipSync Real-time Communication
 This module provides event handlers for processing incoming WebSocket messages
 and coordinating responses with the real AI chat service.
 """
+
 # NOTE: OrchestrationService disabled for 4+1 architecture compliance
 
 
@@ -19,7 +20,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 
 from fs_agt_clean.core.db.database import get_database
 from fs_agt_clean.core.websocket.events import (
-    UnifiedAgentType,
+    AutonomousAgentType,
     EventType,
     SenderType,
     WebSocketMessage,
@@ -28,7 +29,9 @@ from fs_agt_clean.core.websocket.events import (
     create_typing_event,
 )
 from fs_agt_clean.core.websocket.manager import ClientConnection, websocket_manager
-from fs_agt_clean.database.repositories.agent_repository import UnifiedAgentRepository
+from fs_agt_clean.database.repositories.autonomous_agent_repository import (
+    AutonomousAgentRepository,
+)
 from fs_agt_clean.database.repositories.chat_repository import ChatRepository
 from fs_agt_clean.services.communication.chat_service import EnhancedChatService
 
@@ -42,7 +45,7 @@ class WebSocketEventHandler:
         self.database = database or get_database()
         self.app = app  # Store app reference for accessing real agent manager
         self.chat_repository = ChatRepository()
-        self.agent_repository = UnifiedAgentRepository()
+        self.agent_repository = AutonomousAgentRepository()
         # ✅ CRITICAL FIX: Pass app reference to chat service for Real Agent Manager access
         self.chat_service = EnhancedChatService(database=self.database, app=self.app)
         self._database_initialized = False
@@ -643,9 +646,9 @@ class WebSocketEventHandler:
                 conversation_id=db_conversation_id,
                 is_typing=True,
                 agent_type=(
-                    UnifiedAgentType(actual_agent_type)
+                    AutonomousAgentType(actual_agent_type)
                     if actual_agent_type != "assistant"
-                    else UnifiedAgentType.ASSISTANT
+                    else AutonomousAgentType.ASSISTANT
                 ),
             )
             await websocket_manager.send_to_conversation(
@@ -705,9 +708,9 @@ class WebSocketEventHandler:
                 content=ai_response,
                 sender=SenderType.AGENT,
                 agent_type=(
-                    UnifiedAgentType(actual_agent_type)
+                    AutonomousAgentType(actual_agent_type)
                     if actual_agent_type != "assistant"
-                    else UnifiedAgentType.ASSISTANT
+                    else AutonomousAgentType.ASSISTANT
                 ),
             )
 
@@ -757,9 +760,9 @@ class WebSocketEventHandler:
                 conversation_id=db_conversation_id,
                 is_typing=False,
                 agent_type=(
-                    UnifiedAgentType(actual_agent_type)
+                    AutonomousAgentType(actual_agent_type)
                     if actual_agent_type != "assistant"
-                    else UnifiedAgentType.ASSISTANT
+                    else AutonomousAgentType.ASSISTANT
                 ),
             )
             await websocket_manager.send_to_conversation(
@@ -912,7 +915,7 @@ class WebSocketEventHandler:
 
             if not agent_instance:
                 logger.warning(
-                    f"UnifiedAgent {target_agent_id} not available, using executive agent as fallback"
+                    f"AutonomousAgent {target_agent_id} not available, using executive agent as fallback"
                 )
                 agent_instance = real_agent_manager.get_agent_instance(
                     "executive_agent"
@@ -950,8 +953,10 @@ class WebSocketEventHandler:
             logger.info(f"🎯 Generating direct response from {agent_type} agent")
 
             # Get agent from orchestration service
-            
-            target_agent = await {"error": "OrchestrationService disabled for 4+1 architecture"}
+
+            target_agent = await {
+                "error": "OrchestrationService disabled for 4+1 architecture"
+            }
 
             if target_agent:
                 # Use the agent's handle_message method
@@ -967,7 +972,7 @@ class WebSocketEventHandler:
                 )
                 return response.content
             else:
-                logger.warning(f"UnifiedAgent {agent_type} not available")
+                logger.warning(f"AutonomousAgent {agent_type} not available")
                 return f"I apologize, but the {agent_type} agent is not available right now. Please try again later."
 
         except Exception as e:
@@ -1112,7 +1117,7 @@ class WebSocketEventHandler:
             if isinstance(response, str):
                 return response
 
-            # If it's an UnifiedAgentResponse object, extract the content
+            # If it's an AutonomousAgentResponse object, extract the content
             if hasattr(response, "content"):
                 content = response.content
                 # Handle nested content extraction
@@ -1165,11 +1170,13 @@ class WebSocketEventHandler:
     async def _generate_fallback_ai_response(self, user_message: str) -> str:
         """Generate a fallback AI response when real agents are not available."""
         try:
-            # Use HybridLLMAdapter for intelligent routing and OpenAI reduction
-            from fs_agt_clean.core.ai.hybrid_llm_adapter import HybridLLMAdapterFactory
+            # ✅ 4+1 ARCHITECTURE COMPLIANCE: Use StrategicGeminiService for conversational interface
+            from fs_agt_clean.core.ai.strategic_gemini_service import (
+                StrategicGeminiService,
+            )
 
-            client = HybridLLMAdapterFactory.create_fast_client()
-            response = await client.generate_response(
+            client = StrategicGeminiService(daily_budget=10.0)
+            response = await client.generate_strategic_response(
                 prompt=user_message,
                 system_prompt="You are FlipSync Assistant. Help eBay sellers with friendly, practical advice.",
             )
@@ -1267,7 +1274,7 @@ class WebSocketEventHandler:
             logger.info(f"🚀 Triggering workflow: {workflow_intent.workflow_type}")
 
             # Import orchestration service
-            
+
             # Prepare workflow context with both conversation IDs for proper message routing
             workflow_context = {
                 "user_message": user_message,
@@ -1331,7 +1338,7 @@ class WebSocketEventHandler:
             ]
         )
 
-        return f"{base_message}\n\n🤝 **UnifiedAgents involved:** {agents_list}\n⏱️ **Estimated time:** 30-60 seconds\n\nI'll update you as we progress!"
+        return f"{base_message}\n\n🤝 **AutonomousAgents involved:** {agents_list}\n⏱️ **Estimated time:** 30-60 seconds\n\nI'll update you as we progress!"
 
     async def _send_workflow_acknowledgment(self, message: str, conversation_id: str):
         """Send workflow acknowledgment message to user."""
@@ -1357,7 +1364,7 @@ class WebSocketEventHandler:
                 message_id=str(db_message.id),
                 content=message,
                 sender=SenderType.AGENT,
-                agent_type=UnifiedAgentType.EXECUTIVE,
+                agent_type=AutonomousAgentType.EXECUTIVE,
             )
 
             await websocket_manager.send_to_conversation(
@@ -1392,7 +1399,7 @@ class WebSocketEventHandler:
                 message_id=str(db_message.id),
                 content=message,
                 sender=SenderType.AGENT,
-                agent_type=UnifiedAgentType.EXECUTIVE,
+                agent_type=AutonomousAgentType.EXECUTIVE,
             )
 
             await websocket_manager.send_to_conversation(

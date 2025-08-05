@@ -99,10 +99,11 @@ async def test_ai_performance() -> Dict[str, Any]:
     try:
         import time
 
-        from fs_agt_clean.core.ai.hybrid_llm_adapter import HybridLLMAdapterFactory
+        # ✅ 4+1 ARCHITECTURE COMPLIANCE: Use StrategicGeminiService for conversational interface
+        from fs_agt_clean.core.ai.strategic_gemini_service import StrategicGeminiService
 
-        # Create a test client using HybridLLMAdapter for intelligent routing
-        client = HybridLLMAdapterFactory.create_fast_client()
+        # Create a test client using StrategicGeminiService for 4+1 architecture compliance
+        client = StrategicGeminiService(daily_budget=10.0)
 
         # Test prompt
         test_prompt = "Hello, this is a test."

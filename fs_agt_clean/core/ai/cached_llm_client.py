@@ -12,12 +12,10 @@ import time
 from datetime import datetime, timezone
 from typing import Optional, Union
 
+# ✅ 4+1 ARCHITECTURE COMPLIANCE: Removed legacy hybrid_llm imports
+# Using Gemini-exclusive StrategicGeminiService for conversational interface
 from fs_agt_clean.core.ai.llm_types import LLMResponse
-from fs_agt_clean.core.ai.hybrid_llm_client import HybridLLMClient
-from fs_agt_clean.core.ai.hybrid_llm_adapter import (
-    HybridLLMAdapter,
-    HybridLLMAdapterFactory,
-)
+from fs_agt_clean.core.ai.strategic_gemini_service import StrategicGeminiService
 from fs_agt_clean.core.cache.ai_cache import AICacheService
 
 logger = logging.getLogger(__name__)

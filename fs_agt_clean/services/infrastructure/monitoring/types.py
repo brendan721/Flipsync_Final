@@ -72,7 +72,7 @@ class SystemMetrics(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
-class UnifiedAgentHealth(BaseModel):
+class AutonomousAgentHealth(BaseModel):
     """Health status of an agent."""
 
     agent_id: str
@@ -103,7 +103,7 @@ class HealthSnapshot(BaseModel):
 
     status: HealthStatus
     overall_status: HealthStatus
-    agent_health: Dict[str, UnifiedAgentHealth]
+    agent_health: Dict[str, AutonomousAgentHealth]
     system_metrics: SystemMetrics
     active_alerts: List[HealthAlert] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
@@ -286,7 +286,7 @@ __all__ = [
     "HealthStatus",
     "SystemMetrics",
     "ResourceMetrics",
-    "UnifiedAgentHealth",
+    "AutonomousAgentHealth",
     "HealthAlert",
     "HealthSnapshot",
     "MaintenanceWindow",

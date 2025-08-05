@@ -3,7 +3,7 @@ Database models for AI analysis results and related data.
 
 This module contains SQLAlchemy models for:
 - AI analysis results
-- UnifiedAgent coordination logs
+- AutonomousAgent coordination logs
 - Revenue calculations
 - Category optimization results
 - UnifiedUser rewards balance
@@ -62,7 +62,7 @@ class AIAnalysisResult(Base):
         return f"<AIAnalysisResult(id={self.id}, product='{self.product_name}', confidence={self.confidence_score})>"
 
 
-class UnifiedAgentCoordinationLog(Base):
+class AutonomousAgentCoordinationLog(Base):
     """Model for logging agent coordination activities."""
 
     __tablename__ = "agent_coordination_logs"
@@ -86,7 +86,7 @@ class UnifiedAgentCoordinationLog(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     def __repr__(self):
-        return f"<UnifiedAgentCoordinationLog(id={self.id}, type='{self.coordination_type}', status='{self.status}')>"
+        return f"<AutonomousAgentCoordinationLog(id={self.id}, type='{self.coordination_type}', status='{self.status}')>"
 
 
 class ShippingArbitrageCalculation(Base):
@@ -279,7 +279,7 @@ class ProductEmbedding(Base):
 # Export all models
 __all__ = [
     "AIAnalysisResult",
-    "UnifiedAgentCoordinationLog",
+    "AutonomousAgentCoordinationLog",
     "ShippingArbitrageCalculation",
     "CategoryOptimizationResult",
     "UnifiedUserRewardsBalance",

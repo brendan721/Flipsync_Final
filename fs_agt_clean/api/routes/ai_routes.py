@@ -26,16 +26,21 @@ from fastapi import (
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from fs_agt_clean.agents.content.content_agent import ContentUnifiedAgent
+from fs_agt_clean.agents.content.content_agent import ContentAutonomousAgent
 from fs_agt_clean.core.ai.vision_clients import (
     VisionServiceType,
     enhanced_vision_manager,
 )
+
+# ✅ 4+1 ARCHITECTURE COMPLIANCE: Removed legacy hybrid_llm_adapter import
+# Using Gemini-exclusive StrategicGeminiService for conversational interface
+from fs_agt_clean.core.ai.strategic_gemini_service import (
+    StrategicGeminiService,
+    StrategicAnalysisRequest,
+    StrategicUseCase,
+)
 from fs_agt_clean.core.ai.openai_client import (
     TaskComplexity,
-)
-from fs_agt_clean.core.ai.hybrid_llm_adapter import (
-    HybridLLMAdapterFactory,
 )
 from fs_agt_clean.core.auth.auth_factory import AuthenticationFactory
 from fs_agt_clean.database.models.unified_user import UnifiedUserResponse
@@ -47,7 +52,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["ai-analysis"])
 
 # Content agent for enhanced analysis
-content_agent = ContentUnifiedAgent()
+content_agent = ContentAutonomousAgent()
 
 
 class ProductAnalysisRequest(BaseModel):
@@ -484,7 +489,7 @@ async def get_vision_performance_metrics():
         )
 
 
-# UnifiedAgent Coordination Endpoints
+# AutonomousAgent Coordination Endpoints
 @router.post("/coordination/orchestrate")
 async def orchestrate_agents():
     """
@@ -521,7 +526,7 @@ async def get_agent_communication_status(
 
     This endpoint returns:
     - Active workflows and their status
-    - UnifiedAgent availability and health
+    - AutonomousAgent availability and health
     - Recent coordination activities
     - Performance metrics
     """
@@ -754,16 +759,16 @@ async def initiate_agent_handoff(
 # ============================================================================
 
 
-# Helper function for HybridLLMAdapter integration
-async def get_hybrid_llm_client():
-    """Get HybridLLMAdapter client for cost-effective AI processing."""
-    return HybridLLMAdapterFactory.create_business_client()
+# ✅ 4+1 ARCHITECTURE COMPLIANCE: Updated to use StrategicGeminiService
+async def get_strategic_gemini_client():
+    """Get StrategicGeminiService client for 4+1 architecture compliant AI processing."""
+    return StrategicGeminiService(daily_budget=10.0)
 
 
-# Backward compatibility function (migrated to HybridLLMAdapter)
+# Backward compatibility function (migrated to StrategicGeminiService)
 async def get_openai_client():
-    """Get AI client - now uses HybridLLMAdapter for OpenAI dependency reduction."""
-    return get_hybrid_llm_client()
+    """Get AI client - now uses StrategicGeminiService for 4+1 architecture compliance."""
+    return await get_strategic_gemini_client()
 
 
 class ConfidenceAnalysisRequest(BaseModel):
@@ -970,10 +975,10 @@ async def agent_confidence_breakdown(
         Recommendation: {recommendation.get('title', 'Unknown')}
 
         Provide confidence scores for each agent type:
-        - Market UnifiedAgent: Market analysis and pricing
-        - Content UnifiedAgent: Title and description optimization
-        - Logistics UnifiedAgent: Shipping and fulfillment
-        - Executive UnifiedAgent: Overall business impact
+        - Market AutonomousAgent: Market analysis and pricing
+        - Content AutonomousAgent: Title and description optimization
+        - Logistics AutonomousAgent: Shipping and fulfillment
+        - Executive AutonomousAgent: Overall business impact
 
         Include reasoning for each agent's perspective.
         """
@@ -1013,7 +1018,7 @@ async def agent_confidence_breakdown(
         logger.error(f"Error in agent confidence breakdown: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"UnifiedAgent breakdown failed: {str(e)}",
+            detail=f"AutonomousAgent breakdown failed: {str(e)}",
         )
 
 

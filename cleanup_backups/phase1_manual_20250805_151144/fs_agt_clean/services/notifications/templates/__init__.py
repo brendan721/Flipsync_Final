@@ -1,0 +1,1 @@
+# Makes 'templates' a package

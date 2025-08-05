@@ -9,7 +9,8 @@ from .metrics import *
 
 # Import additional models needed by services
 from .notification import *
-from .unified_agent import *
+
+# Legacy unified_agent import removed - using autonomous_agent only
 from .autonomous_agent import *
 
 # Import unified models
@@ -35,7 +36,7 @@ __all__ = [
     "LoginRequest",
     "LoginResponse",
     # Agent models (Legacy)
-    "UnifiedAgent",
+    "AutonomousAgent",
     "AgentDecision",
     "AgentTask",
     "AgentCommunication",
@@ -80,6 +81,6 @@ __all__ = [
     "MetricCategory",
     "MetricDataPoint",
     "SystemMetrics",
-    "UnifiedAgentMetrics",
+    "AutonomousAgentMetrics",
     "MetricThreshold",
 ]

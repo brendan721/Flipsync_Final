@@ -31,7 +31,7 @@ class GeminiModel(Enum):
     """Available Gemini models with cost optimization."""
 
     FLASH_2_5 = "gemini-2.5-flash"  # Most cost-effective for general tasks
-    FLASH_LITE_2_5 = "gemini-2.5-flash-lite-preview-06-17"  # Ultra cost-effective for simple tasks (correct model name)
+    FLASH_LITE_2_5 = "gemini-2.5-flash-lite"  # Ultra cost-effective for simple tasks (updated to current model)
     PRO_2_5 = "gemini-2.5-pro"  # High-quality for complex reasoning
     FLASH_2_0 = "gemini-2.0-flash"  # Balanced performance
 

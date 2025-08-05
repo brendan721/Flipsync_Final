@@ -3,7 +3,7 @@ Repository for AI analysis data operations.
 
 This module provides data access methods for:
 - AI analysis results
-- UnifiedAgent coordination logs
+- AutonomousAgent coordination logs
 - Revenue calculations
 - Category optimization results
 - UnifiedUser rewards balance
@@ -21,7 +21,7 @@ from fs_agt_clean.database.models.ai_analysis import (
     CategoryOptimizationResult,
     FeatureUsageTracking,
     ShippingArbitrageCalculation,
-    UnifiedAgentCoordinationLog,
+    AutonomousAgentCoordinationLog,
     UnifiedUserRewardsBalance,
 )
 
@@ -80,11 +80,11 @@ class AIAnalysisRepository(BaseRepository[AIAnalysisResult]):
         return results[0] if results else None
 
 
-class UnifiedAgentCoordinationRepository(BaseRepository[UnifiedAgentCoordinationLog]):
+class AutonomousAgentCoordinationRepository(BaseRepository[AutonomousAgentCoordinationLog]):
     """Repository for agent coordination logs."""
 
     def __init__(self):
-        super().__init__(UnifiedAgentCoordinationLog, "agent_coordination_logs")
+        super().__init__(AutonomousAgentCoordinationLog, "agent_coordination_logs")
 
     async def log_coordination_activity(
         self,
@@ -94,7 +94,7 @@ class UnifiedAgentCoordinationRepository(BaseRepository[UnifiedAgentCoordination
         result_data: Dict[str, Any],
         processing_time_ms: int,
         workflow_id: Optional[UUID] = None,
-    ) -> UnifiedAgentCoordinationLog:
+    ) -> AutonomousAgentCoordinationLog:
         """Log an agent coordination activity."""
         data = {
             "workflow_id": workflow_id,
@@ -108,7 +108,7 @@ class UnifiedAgentCoordinationRepository(BaseRepository[UnifiedAgentCoordination
 
     async def get_coordination_history(
         self, coordination_type: Optional[str] = None, limit: int = 50
-    ) -> List[UnifiedAgentCoordinationLog]:
+    ) -> List[AutonomousAgentCoordinationLog]:
         """Get coordination history, optionally filtered by type."""
         criteria = {}
         if coordination_type:

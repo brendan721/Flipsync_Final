@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from fs_agt_clean.core.websocket.events import (
-    UnifiedAgentType,
+    AutonomousAgentType,
     SenderType,
     create_agent_status_event,
     create_message_event,
@@ -20,7 +20,9 @@ from fs_agt_clean.core.websocket.events import (
     create_typing_event,
 )
 from fs_agt_clean.core.websocket.manager import websocket_manager
-from fs_agt_clean.database.repositories.agent_repository import UnifiedAgentRepository
+from fs_agt_clean.database.repositories.autonomous_agent_repository import (
+    AutonomousAgentRepository,
+)
 from fs_agt_clean.database.repositories.chat_repository import ChatRepository
 
 logger = logging.getLogger(__name__)
@@ -50,7 +52,7 @@ class RealtimeService:
     def agent_repository(self):
         """Lazy initialization of agent repository."""
         if self._agent_repository is None:
-            self._agent_repository = UnifiedAgentRepository()
+            self._agent_repository = AutonomousAgentRepository()
         return self._agent_repository
 
     @property
@@ -67,7 +69,7 @@ class RealtimeService:
         conversation_id: str,
         content: str,
         sender: SenderType,
-        agent_type: Optional[UnifiedAgentType] = None,
+        agent_type: Optional[AutonomousAgentType] = None,
         user_id: Optional[str] = None,
         thread_id: Optional[str] = None,
         parent_id: Optional[str] = None,
@@ -81,7 +83,7 @@ class RealtimeService:
             conversation_id: Target conversation ID
             content: Message content
             sender: Message sender type
-            agent_type: UnifiedAgent type if sender is agent
+            agent_type: AutonomousAgent type if sender is agent
             user_id: UnifiedUser ID if sender is user
             thread_id: Optional thread ID
             parent_id: Optional parent message ID
@@ -164,7 +166,7 @@ class RealtimeService:
         conversation_id: str,
         is_typing: bool,
         user_id: Optional[str] = None,
-        agent_type: Optional[UnifiedAgentType] = None,
+        agent_type: Optional[AutonomousAgentType] = None,
     ) -> int:
         """
         Send typing indicator to conversation participants.
@@ -173,7 +175,7 @@ class RealtimeService:
             conversation_id: Target conversation ID
             is_typing: Whether user/agent is typing
             user_id: UnifiedUser ID if user is typing
-            agent_type: UnifiedAgent type if agent is typing
+            agent_type: AutonomousAgent type if agent is typing
 
         Returns:
             Number of recipients
@@ -200,7 +202,7 @@ class RealtimeService:
     async def broadcast_agent_status(
         self,
         agent_id: str,
-        agent_type: UnifiedAgentType,
+        agent_type: AutonomousAgentType,
         status: str,
         metrics: Optional[Dict[str, Any]] = None,
         error_message: Optional[str] = None,
@@ -209,7 +211,7 @@ class RealtimeService:
         Broadcast agent status update to all connected clients.
 
         Args:
-            agent_id: UnifiedAgent identifier
+            agent_id: AutonomousAgent identifier
             agent_type: Type of agent
             status: Current status
             metrics: Optional performance metrics
@@ -243,7 +245,7 @@ class RealtimeService:
             recipients = await websocket_manager.broadcast(status_event.dict())
 
             logger.info(
-                f"UnifiedAgent status broadcasted: {agent_id} -> {status} ({recipients} recipients)"
+                f"AutonomousAgent status broadcasted: {agent_id} -> {status} ({recipients} recipients)"
             )
             return recipients
 

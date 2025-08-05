@@ -14,7 +14,9 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List
 
-from fs_agt_clean.core.ai.hybrid_llm_adapter import HybridLLMAdapterFactory
+# ✅ 4+1 ARCHITECTURE COMPLIANCE: Removed legacy hybrid_llm_adapter import
+# Using StrategicGeminiService for conversational interface optimization
+from fs_agt_clean.core.ai.strategic_gemini_service import StrategicGeminiService
 
 logger = logging.getLogger(__name__)
 

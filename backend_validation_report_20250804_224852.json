@@ -1,0 +1,102 @@
+{
+  "timestamp": "2025-08-04T22:48:49.565023",
+  "base_url": "http://174.138.77.110",
+  "tests": {
+    "API_ROOT_ENDPOINT": {
+      "status": "PASS",
+      "details": "Status: 200, Version: 1.0.0",
+      "response_time_ms": 82.13,
+      "timestamp": "2025-08-04T22:48:49.647344"
+    },
+    "API_HEALTH_ENDPOINT": {
+      "status": "PASS",
+      "details": "Status: ok",
+      "response_time_ms": 48.8,
+      "timestamp": "2025-08-04T22:48:49.696287"
+    },
+    "API_DOCS_ENDPOINT": {
+      "status": "PASS",
+      "details": "Documentation accessible",
+      "response_time_ms": 46.17,
+      "timestamp": "2025-08-04T22:48:49.742566"
+    },
+    "DATABASE_CONNECTIVITY": {
+      "status": "PASS",
+      "details": "Connected successfully, 26 tables found",
+      "response_time_ms": 479.57,
+      "timestamp": "2025-08-04T22:48:50.222463"
+    },
+    "TABLE_USERS": {
+      "status": "WARNING",
+      "details": "Table not found",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:48:50.222559"
+    },
+    "TABLE_AGENT_DECISIONS": {
+      "status": "PASS",
+      "details": "Table exists",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:48:50.222576"
+    },
+    "TABLE_AGENT_LEARNING_DATA": {
+      "status": "WARNING",
+      "details": "Table not found",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:48:50.222586"
+    },
+    "TABLE_EBAY_TOKENS": {
+      "status": "WARNING",
+      "details": "Table not found",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:48:50.222593"
+    },
+    "REDIS_CONNECTIVITY": {
+      "status": "PASS",
+      "details": "Redis operations successful",
+      "response_time_ms": 268.95,
+      "timestamp": "2025-08-04T22:48:50.491763"
+    },
+    "ENDPOINT_AGENTS_STATUS": {
+      "status": "PASS",
+      "details": "Status: 200",
+      "response_time_ms": 2631.93,
+      "timestamp": "2025-08-04T22:48:53.123897"
+    },
+    "ENDPOINT_MARKETPLACE_EBAY_STATUS": {
+      "status": "WARNING",
+      "details": "Status: 404",
+      "response_time_ms": 90.98,
+      "timestamp": "2025-08-04T22:48:53.215023"
+    },
+    "ENDPOINT_INVENTORY_STATUS": {
+      "status": "WARNING",
+      "details": "Status: 404",
+      "response_time_ms": 44.84,
+      "timestamp": "2025-08-04T22:48:53.259948"
+    },
+    "ENDPOINT_MOBILE_STATUS": {
+      "status": "WARNING",
+      "details": "Status: 404",
+      "response_time_ms": 39.83,
+      "timestamp": "2025-08-04T22:48:53.299871"
+    },
+    "WEBSOCKET_CONNECTIVITY": {
+      "status": "PASS",
+      "details": "WebSocket connection successful",
+      "response_time_ms": 89.48,
+      "timestamp": "2025-08-04T22:48:53.390273"
+    },
+    "SYSTEM_RESOURCES": {
+      "status": "PASS",
+      "details": "System responding in -0.45s",
+      "response_time_ms": -449.53,
+      "timestamp": "2025-08-04T22:48:52.991169"
+    }
+  },
+  "summary": {
+    "total_tests": 15,
+    "passed": 9,
+    "failed": 0,
+    "warnings": 6
+  }
+}

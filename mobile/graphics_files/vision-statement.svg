@@ -1,0 +1,94 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Definitions for gradients and filters -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A1128;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1A2980;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00C6FF;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#0072FF;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Pattern for background grid -->
+    <pattern id="grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-width="0.1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#bgGradient)"/>
+  <rect width="800" height="400" fill="url(#grid)" opacity="0.1"/>
+
+  <!-- Central geometric element -->
+  <g transform="translate(400, 200)">
+    <!-- Outer ring -->
+    <circle r="120" fill="none" stroke="url(#glowGradient)" stroke-width="2" opacity="0.6">
+      <animate attributeName="r" values="120;125;120" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Inner geometric patterns -->
+    <g opacity="0.8">
+      <path d="M-60,-60 L60,-60 L0,0 Z" fill="none" stroke="#00C6FF" stroke-width="1"/>
+      <path d="M60,-60 L60,60 L0,0 Z" fill="none" stroke="#00C6FF" stroke-width="1"/>
+      <path d="M60,60 L-60,60 L0,0 Z" fill="none" stroke="#00C6FF" stroke-width="1"/>
+      <path d="M-60,60 L-60,-60 L0,0 Z" fill="none" stroke="#00C6FF" stroke-width="1"/>
+    </g>
+
+    <!-- Animated particles -->
+    <circle r="3" fill="#00C6FF">
+      <animateMotion 
+        path="M0,0 A120,120 0 1,1 0,-0.1" 
+        dur="6s" 
+        repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#0072FF">
+      <animateMotion 
+        path="M0,0 A120,120 0 1,0 0,-0.1" 
+        dur="4s" 
+        repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Text elements -->
+  <g transform="translate(400, 200)" text-anchor="middle">
+    <text y="-160" fill="white" font-size="24" font-weight="bold" filter="url(#glow)">
+      FORM MEETS FUNCTION
+    </text>
+    <text y="160" fill="white" font-size="14" opacity="0.9">
+      EMBRACING THE FUTURE OF E-COMMERCE AUTOMATION
+    </text>
+  </g>
+
+  <!-- Connecting lines and nodes -->
+  <g stroke="#00C6FF" stroke-width="1" opacity="0.6">
+    <!-- Left side connections -->
+    <line x1="100" y1="100" x2="280" y2="200"/>
+    <line x1="100" y1="300" x2="280" y2="200"/>
+    <circle cx="100" cy="100" r="4" fill="#00C6FF"/>
+    <circle cx="100" cy="300" r="4" fill="#00C6FF"/>
+    
+    <!-- Right side connections -->
+    <line x1="700" y1="100" x2="520" y2="200"/>
+    <line x1="700" y1="300" x2="520" y2="200"/>
+    <circle cx="700" cy="100" r="4" fill="#00C6FF"/>
+    <circle cx="700" cy="300" r="4" fill="#00C6FF"/>
+  </g>
+
+  <!-- Side text elements -->
+  <g font-size="12" fill="white" opacity="0.8">
+    <text x="90" y="90" text-anchor="end">INTERACTION</text>
+    <text x="90" y="290" text-anchor="end">ANIMATION</text>
+    <text x="710" y="90" text-anchor="start">PURPOSE</text>
+    <text x="710" y="290" text-anchor="start">FUNCTION</text>
+  </g>
+</svg>

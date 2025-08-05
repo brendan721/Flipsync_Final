@@ -1,0 +1,52 @@
+# FlipSync Pre-commit Configuration
+# Maintains code quality while preserving architectural complexity
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+      - id: black
+        language_version: python3
+        args: [--line-length=88]
+        files: ^fs_agt_clean/.*\.py$
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=88]
+        files: ^fs_agt_clean/.*\.py$
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        args: [--max-line-length=88, --extend-ignore=E203,E266,E501,W503]
+        files: ^fs_agt_clean/.*\.py$
+
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, fs_agt_clean/, --skip=B101,B601]
+        files: ^fs_agt_clean/.*\.py$
+
+  - repo: local
+    hooks:
+      - id: architecture-preservation-check
+        name: Architecture Preservation Check
+        entry: python
+        args: [validate_architecture_preservation.py]
+        language: system
+        files: ^fs_agt_clean/.*\.py$
+        pass_filenames: false

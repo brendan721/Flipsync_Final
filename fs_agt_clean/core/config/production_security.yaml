@@ -1,0 +1,169 @@
+# FlipSync Production Security Configuration
+# This file contains production-specific security settings
+
+# Rate Limiting Configuration - Production Hardened
+rate_limiting:
+  # Global rate limits
+  global:
+    requests_per_minute: 1000
+    requests_per_hour: 10000
+    burst_limit: 50
+    window_size: 60
+  
+  # Endpoint-specific rate limits
+  endpoints:
+    auth:
+      requests_per_minute: 500
+      requests_per_hour: 5000
+      burst_limit: 100
+      block_duration_minutes: 15
+    
+    api:
+      requests_per_minute: 100
+      requests_per_hour: 1000
+      burst_limit: 20
+      
+    upload:
+      requests_per_minute: 5
+      requests_per_hour: 50
+      burst_limit: 2
+      
+    ai:
+      requests_per_minute: 20
+      requests_per_hour: 200
+      burst_limit: 5
+      
+    websocket:
+      connections_per_ip: 10
+      messages_per_minute: 100
+
+# Security Headers Configuration
+security_headers:
+  strict_transport_security: "max-age=31536000; includeSubDomains; preload"
+  content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' wss: https:; frame-ancestors 'none'"
+  x_frame_options: "DENY"
+  x_content_type_options: "nosniff"
+  x_xss_protection: "1; mode=block"
+  referrer_policy: "strict-origin-when-cross-origin"
+  permissions_policy: "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+
+# CORS Configuration - Production
+cors:
+  allowed_origins:
+    - "https://app.flipsync.com"
+    - "https://www.flipsync.com"
+    - "https://api.flipsync.com"
+  allowed_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+  allowed_headers:
+    - "Accept"
+    - "Accept-Language"
+    - "Content-Language"
+    - "Content-Type"
+    - "Authorization"
+    - "X-Requested-With"
+    - "X-CSRF-Token"
+  allow_credentials: true
+  max_age: 86400
+
+# Input Validation Configuration
+input_validation:
+  max_request_size: 10485760  # 10MB
+  max_json_depth: 10
+  max_array_length: 1000
+  max_string_length: 10000
+  allowed_content_types:
+    - "application/json"
+    - "application/x-www-form-urlencoded"
+    - "multipart/form-data"
+    - "text/plain"
+
+# Threat Detection Configuration
+threat_detection:
+  enable_ip_blocking: true
+  enable_pattern_detection: true
+  enable_anomaly_detection: true
+  
+  # Suspicious patterns
+  suspicious_patterns:
+    - "(?i)(union|select|insert|delete|drop|create|alter|exec|script)"
+    - "(?i)(<script|javascript:|vbscript:|onload=|onerror=)"
+    - "(?i)(\\.\\.[\\/\\\\]|\\.\\.%2f|\\.\\.%5c)"
+    - "(?i)(cmd\\.exe|powershell|bash|sh|/bin/)"
+  
+  # Threat scoring
+  threat_thresholds:
+    low: 10
+    medium: 25
+    high: 50
+    critical: 75
+  
+  # Auto-blocking rules
+  auto_block:
+    enable: true
+    critical_threshold: 75
+    block_duration_hours: 24
+    max_violations_per_hour: 5
+
+# Monitoring and Alerting
+monitoring:
+  enable_security_logging: true
+  enable_performance_monitoring: true
+  enable_error_tracking: true
+  
+  # Alert thresholds
+  alerts:
+    high_error_rate: 5  # percent
+    slow_response_time: 2000  # milliseconds
+    high_memory_usage: 80  # percent
+    high_cpu_usage: 80  # percent
+    failed_auth_attempts: 10  # per minute
+    
+  # Log retention
+  log_retention:
+    security_logs: 90  # days
+    access_logs: 30  # days
+    error_logs: 60  # days
+    performance_logs: 14  # days
+
+# Encryption Configuration
+encryption:
+  algorithm: "AES-256-GCM"
+  key_rotation_days: 90
+  backup_encryption: true
+  
+  # Password hashing
+  password_hashing:
+    algorithm: "PBKDF2"
+    iterations: 100000
+    salt_length: 32
+    hash_length: 32
+
+# Session Security
+session_security:
+  secure_cookies: true
+  http_only_cookies: true
+  same_site: "strict"
+  session_timeout_minutes: 30
+  max_concurrent_sessions: 5
+  
+# API Security
+api_security:
+  require_api_key: true
+  api_key_rotation_days: 30
+  enable_request_signing: true
+  max_request_age_seconds: 300
+  
+# Database Security
+database_security:
+  require_ssl: true
+  connection_encryption: true
+  query_timeout_seconds: 30
+  max_connections_per_user: 10
+  enable_query_logging: true
+  log_slow_queries: true
+  slow_query_threshold_ms: 1000

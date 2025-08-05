@@ -1,0 +1,24 @@
+targets:
+  $default:
+    builders:
+      injectable_generator:injectable_builder:
+        enabled: true
+        generate_for:
+          - lib/core/di/injection.dart
+        options:
+          auto_register: true
+          # Generate for the main injection file
+          class_name: "GetItInjectableX"
+      json_serializable:
+        enabled: true
+        generate_for:
+          - lib/**/*.dart
+      freezed:
+        enabled: true
+        generate_for:
+          - lib/**/*.dart
+
+global_options:
+  injectable_generator:injectable_builder:
+    auto_register: true
+    class_name: "GetItInjectableX"

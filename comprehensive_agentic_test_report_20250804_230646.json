@@ -1,0 +1,376 @@
+{
+  "timestamp": "2025-08-04T23:06:45.343725",
+  "base_url": "http://174.138.77.110",
+  "test_categories": {
+    "AUTHENTICATION": {
+      "SETUP": {
+        "status": "PASS",
+        "details": "Testing with public endpoints (auth endpoints require user creation)",
+        "response_time_ms": 0,
+        "timestamp": "2025-08-04T23:06:45.343855",
+        "data": null
+      }
+    },
+    "AGENT_SYSTEM": {
+      "INITIALIZATION": {
+        "status": "PASS",
+        "details": "Agents initialized: 5",
+        "response_time_ms": 383.41,
+        "timestamp": "2025-08-04T23:06:45.727397",
+        "data": {
+          "agents": [
+            {
+              "id": "market_autonomous_agent",
+              "agent_id": "market_autonomous_agent",
+              "name": "Market Autonomous Agent",
+              "type": "autonomous",
+              "agent_type": "market",
+              "category": "market",
+              "status": "running",
+              "description": "Autonomous market analysis and pricing optimization agent",
+              "capabilities": [
+                "Market trend analysis",
+                "Competitive pricing",
+                "Demand forecasting",
+                "Price optimization",
+                "Market opportunity detection"
+              ],
+              "current_task": "Analyzing market trends and pricing",
+              "last_activity": "2025-08-05T03:56:02.412349+00:00",
+              "performance_metrics": {
+                "success_rate": 1.0,
+                "avg_response_time": 0.0,
+                "decisions_made": 0,
+                "efficiency_score": 1.0
+              },
+              "health_status": {
+                "status": "healthy",
+                "cpu_usage": 0.0,
+                "memory_usage": 0.0,
+                "last_heartbeat": "2025-08-05T03:56:02.412349+00:00"
+              },
+              "architecture_type": "autonomous",
+              "decision_pipeline": "StandardDecisionPipeline",
+              "llm_free": true,
+              "llm_provider": null,
+              "llm_dependent": false
+            },
+            {
+              "id": "content_autonomous_agent",
+              "agent_id": "content_autonomous_agent",
+              "name": "Content Autonomous Agent",
+              "type": "autonomous",
+              "agent_type": "content",
+              "category": "content",
+              "status": "running",
+              "description": "Autonomous content generation and optimization agent",
+              "capabilities": [
+                "Product description generation",
+                "SEO optimization",
+                "Image processing",
+                "Content quality assurance",
+                "Brand consistency"
+              ],
+              "current_task": "Optimizing product listings and content",
+              "last_activity": "2025-08-05T03:56:03.184300+00:00",
+              "performance_metrics": {
+                "success_rate": 1.0,
+                "avg_response_time": 0.0,
+                "decisions_made": 0,
+                "efficiency_score": 1.0
+              },
+              "health_status": {
+                "status": "healthy",
+                "cpu_usage": 0.0,
+                "memory_usage": 0.0,
+                "last_heartbeat": "2025-08-05T03:56:03.184300+00:00"
+              },
+              "architecture_type": "autonomous",
+              "decision_pipeline": "StandardDecisionPipeline",
+              "llm_free": true,
+              "llm_provider": null,
+              "llm_dependent": false
+            },
+            {
+              "id": "executive_autonomous_agent",
+              "agent_id": "executive_autonomous_agent",
+              "name": "Executive Autonomous Agent",
+              "type": "autonomous",
+              "agent_type": "executive",
+              "category": "executive",
+              "status": "running",
+              "description": "Autonomous strategic planning and coordination agent",
+              "capabilities": [
+                "Strategic planning",
+                "Resource allocation",
+                "Performance monitoring",
+                "Risk assessment",
+                "Cross-agent coordination"
+              ],
+              "current_task": "Coordinating strategic planning",
+              "last_activity": "2025-08-05T03:56:03.867550+00:00",
+              "performance_metrics": {
+                "success_rate": 1.0,
+                "avg_response_time": 0.0,
+                "decisions_made": 0,
+                "efficiency_score": 1.0
+              },
+              "health_status": {
+                "status": "healthy",
+                "cpu_usage": 0.0,
+                "memory_usage": 0.0,
+                "last_heartbeat": "2025-08-05T03:56:03.867550+00:00"
+              },
+              "architecture_type": "autonomous",
+              "decision_pipeline": "StandardDecisionPipeline",
+              "llm_free": true,
+              "llm_provider": null,
+              "llm_dependent": false
+            },
+            {
+              "id": "logistics_autonomous_agent",
+              "agent_id": "logistics_autonomous_agent",
+              "name": "Logistics Autonomous Agent",
+              "type": "autonomous",
+              "agent_type": "logistics",
+              "category": "logistics",
+              "status": "running",
+              "description": "Autonomous inventory and shipping optimization agent",
+              "capabilities": [
+                "Inventory management",
+                "Shipping optimization",
+                "Supplier coordination",
+                "Warehouse efficiency",
+                "Cost optimization"
+              ],
+              "current_task": "Managing inventory and shipping optimization",
+              "last_activity": "2025-08-05T03:56:04.501986+00:00",
+              "performance_metrics": {
+                "success_rate": 1.0,
+                "avg_response_time": 0.0,
+                "decisions_made": 0,
+                "efficiency_score": 1.0
+              },
+              "health_status": {
+                "status": "healthy",
+                "cpu_usage": 0.0,
+                "memory_usage": 0.0,
+                "last_heartbeat": "2025-08-05T03:56:04.501986+00:00"
+              },
+              "architecture_type": "autonomous",
+              "decision_pipeline": "StandardDecisionPipeline",
+              "llm_free": true,
+              "llm_provider": null,
+              "llm_dependent": false
+            },
+            {
+              "id": "strategic_chat_service",
+              "agent_id": "strategic_chat_service",
+              "name": "Strategic Chat Service",
+              "type": "conversational",
+              "agent_type": "strategic_chat",
+              "category": "strategic_chat",
+              "status": "running",
+              "description": "Gemini-powered conversational interface for user interactions",
+              "capabilities": [
+                "Natural language processing",
+                "User query handling",
+                "Strategic recommendations",
+                "Multi-turn conversations",
+                "Context awareness"
+              ],
+              "current_task": "Handling user conversations",
+              "last_activity": "2025-08-05T03:56:04.502063+00:00",
+              "performance_metrics": {
+                "success_rate": 1.0,
+                "avg_response_time": 0.0,
+                "decisions_made": 0,
+                "efficiency_score": 1.0
+              },
+              "health_status": {
+                "status": "healthy",
+                "cpu_usage": 0.0,
+                "memory_usage": 0.0,
+                "last_heartbeat": "2025-08-05T03:56:04.502063+00:00"
+              },
+              "architecture_type": "conversational",
+              "decision_pipeline": null,
+              "llm_free": false,
+              "llm_provider": "Gemini",
+              "llm_dependent": true
+            }
+          ],
+          "total_agents": 5,
+          "autonomous_agents": 4,
+          "conversational_interfaces": 1,
+          "operational_agents": 5,
+          "error_agents": 0,
+          "overall_status": "operational",
+          "architecture": "4+1",
+          "registry_connected": true,
+          "timestamp": "2025-08-05T04:06:45.249022+00:00"
+        }
+      },
+      "AGENT_MARKET AUTONOMOUS AGENT_STATUS": {
+        "status": "WARNING",
+        "details": "Agent Market Autonomous Agent status: running",
+        "response_time_ms": 0,
+        "timestamp": "2025-08-04T23:06:45.727476",
+        "data": null
+      },
+      "AGENT_CONTENT AUTONOMOUS AGENT_STATUS": {
+        "status": "WARNING",
+        "details": "Agent Content Autonomous Agent status: running",
+        "response_time_ms": 0,
+        "timestamp": "2025-08-04T23:06:45.727519",
+        "data": null
+      },
+      "AGENT_EXECUTIVE AUTONOMOUS AGENT_STATUS": {
+        "status": "WARNING",
+        "details": "Agent Executive Autonomous Agent status: running",
+        "response_time_ms": 0,
+        "timestamp": "2025-08-04T23:06:45.727562",
+        "data": null
+      },
+      "AGENT_LOGISTICS AUTONOMOUS AGENT_STATUS": {
+        "status": "WARNING",
+        "details": "Agent Logistics Autonomous Agent status: running",
+        "response_time_ms": 0,
+        "timestamp": "2025-08-04T23:06:45.727595",
+        "data": null
+      },
+      "AGENT_STRATEGIC CHAT SERVICE_STATUS": {
+        "status": "WARNING",
+        "details": "Agent Strategic Chat Service status: running",
+        "response_time_ms": 0,
+        "timestamp": "2025-08-04T23:06:45.727608",
+        "data": null
+      }
+    },
+    "DATABASE": {
+      "AGENT_DECISIONS_COUNT": {
+        "status": "PASS",
+        "details": "Found 0 agent decisions",
+        "response_time_ms": 71.14,
+        "timestamp": "2025-08-04T23:06:46.086980",
+        "data": null
+      },
+      "LEARNING_DATA_COUNT": {
+        "status": "PASS",
+        "details": "Found 0 learning records",
+        "response_time_ms": 71.55,
+        "timestamp": "2025-08-04T23:06:46.158590",
+        "data": null
+      },
+      "EBAY_TOKENS_COUNT": {
+        "status": "PASS",
+        "details": "Found 0 eBay tokens",
+        "response_time_ms": 74.34,
+        "timestamp": "2025-08-04T23:06:46.232989",
+        "data": null
+      }
+    },
+    "PERFORMANCE": {
+      "DECISION_PIPELINE_SPEED": {
+        "status": "FAIL",
+        "details": "Status: 401",
+        "response_time_ms": 45.57,
+        "timestamp": "2025-08-04T23:06:46.315734",
+        "data": null
+      },
+      "CONCURRENT_REQUESTS": {
+        "status": "PASS",
+        "details": "10 concurrent requests in 0.106s",
+        "response_time_ms": 105.52,
+        "timestamp": "2025-08-04T23:06:46.421348",
+        "data": null
+      }
+    },
+    "LEARNING_SYSTEM": {
+      "STORE_LEARNING_DATA": {
+        "status": "FAIL",
+        "details": "Status: 405",
+        "response_time_ms": 44.46,
+        "timestamp": "2025-08-04T23:06:46.465880",
+        "data": null
+      },
+      "RETRIEVE_LEARNING_DATA": {
+        "status": "PASS",
+        "details": "Retrieved 0 learning records",
+        "response_time_ms": 44.23,
+        "timestamp": "2025-08-04T23:06:46.510251",
+        "data": {
+          "format": "json",
+          "data": "[]"
+        }
+      }
+    },
+    "EBAY_INTEGRATION": {
+      "STATUS_CHECK": {
+        "status": "PASS",
+        "details": "eBay integration status: unknown",
+        "response_time_ms": 45.34,
+        "timestamp": "2025-08-04T23:06:46.555722",
+        "data": {
+          "is_initialized": false,
+          "environment": "production",
+          "oauth_token_valid": false,
+          "active_listings": 0,
+          "marketplace_feeds_active": false,
+          "average_api_time_ms": 0.0,
+          "average_listing_time_ms": 0.0
+        }
+      },
+      "MARKETPLACE_DATA": {
+        "status": "PASS",
+        "details": "Marketplace data retrieved",
+        "response_time_ms": 43.18,
+        "timestamp": "2025-08-04T23:06:46.599030",
+        "data": {
+          "success": true,
+          "marketplace_data": [],
+          "data_feed_status": {
+            "active": false,
+            "cached_items": 0,
+            "update_interval_seconds": 300
+          }
+        }
+      }
+    },
+    "WEBSOCKET": {
+      "CONNECTION": {
+        "status": "PASS",
+        "details": "Connected in 0.087s",
+        "response_time_ms": 87.2,
+        "timestamp": "2025-08-04T23:06:46.686327",
+        "data": null
+      },
+      "MESSAGE_EXCHANGE": {
+        "status": "PASS",
+        "details": "Message sent and response received",
+        "response_time_ms": 89.16,
+        "timestamp": "2025-08-04T23:06:46.688292",
+        "data": {
+          "type": "connection_established",
+          "client_id": "client_a364a40e-7ea2-47ec-8ffa-936ef5060b6f",
+          "server_time": "2025-08-05T04:06:46.193124+00:00",
+          "status": "connected",
+          "message": "WebSocket connection established successfully",
+          "capabilities": [
+            "chat_message",
+            "agent_status",
+            "system_notification",
+            "ping_pong"
+          ]
+        }
+      }
+    }
+  },
+  "summary": {
+    "total_tests": 18,
+    "passed": 11,
+    "failed": 2,
+    "warnings": 5,
+    "performance_issues": 0
+  }
+}

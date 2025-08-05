@@ -1,0 +1,54 @@
+buildscript {
+    ext.kotlin_version = '2.1.0'
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.3.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.4.0'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+
+    // Configure namespace for all subprojects to fix AGP 8.x compatibility
+    project.plugins.withId("com.android.library") {
+        project.android {
+            if (project.name == 'isar_flutter_libs') {
+                namespace 'dev.isar.isar_flutter_libs'
+            } else {
+                namespace "com.flipsync.${project.name.replaceAll('[^a-zA-Z0-9_]', '_')}"
+            }
+        }
+    }
+
+    // Also handle any other Android plugins
+    project.plugins.withId("com.android.application") {
+        if (!project.android.hasProperty('namespace') || project.android.namespace == null) {
+            project.android {
+                namespace "com.flipsync.${project.name.replaceAll('[^a-zA-Z0-9_]', '_')}"
+            }
+        }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.layout.buildDirectory
+}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlipSync WebSocket Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        #log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 FlipSync WebSocket End-to-End Test</h1>
+        
+        <div id="connectionStatus" class="status info">
+            Status: Not Connected
+        </div>
+        
+        <div>
+            <button id="connectBtn" onclick="connectWebSocket()">Connect to WebSocket</button>
+            <button id="disconnectBtn" onclick="disconnectWebSocket()" disabled>Disconnect</button>
+            <button id="sendTestBtn" onclick="sendTestMessage()" disabled>Send Test Message</button>
+            <button id="clearLogBtn" onclick="clearLog()">Clear Log</button>
+        </div>
+        
+        <h3>Test Results:</h3>
+        <div id="testResults"></div>
+        
+        <h3>Connection Log:</h3>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        let ws = null;
+        let connectionStartTime = null;
+        let testResults = {
+            connection: false,
+            messageExchange: false,
+            agentCommunication: false,
+            performance: false
+        };
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.textContent = `Status: ${message}`;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('testResults');
+            let html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">';
+            
+            for (const [test, passed] of Object.entries(testResults)) {
+                const status = passed ? '✅ PASS' : '❌ FAIL';
+                const className = passed ? 'success' : 'error';
+                html += `<div class="status ${className}">${test}: ${status}</div>`;
+            }
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+
+        function connectWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                log('WebSocket already connected');
+                return;
+            }
+
+            connectionStartTime = Date.now();
+            log('Attempting to connect to wss://www.flipsyncai.com/ws/flipsync');
+            updateStatus('Connecting...', 'warning');
+
+            ws = new WebSocket('wss://www.flipsyncai.com/ws/flipsync');
+
+            ws.onopen = function(event) {
+                const connectionTime = Date.now() - connectionStartTime;
+                log(`✅ WebSocket connected successfully in ${connectionTime}ms`);
+                updateStatus('Connected', 'success');
+                
+                testResults.connection = true;
+                testResults.performance = connectionTime < 1000; // Under 1 second
+                updateTestResults();
+                
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('disconnectBtn').disabled = false;
+                document.getElementById('sendTestBtn').disabled = false;
+                
+                // Send initial ping to test basic communication
+                setTimeout(() => {
+                    sendPing();
+                }, 1000);
+            };
+
+            ws.onmessage = function(event) {
+                log(`📨 Received: ${event.data}`);
+                
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'pong') {
+                        testResults.messageExchange = true;
+                        log('✅ Basic message exchange test passed');
+                    }
+                    
+                    if (data.type === 'agent_status' || data.agents) {
+                        testResults.agentCommunication = true;
+                        log('✅ Agent communication test passed');
+                    }
+                    
+                    updateTestResults();
+                } catch (e) {
+                    log(`📨 Received non-JSON message: ${event.data}`);
+                    testResults.messageExchange = true; // Still counts as message exchange
+                    updateTestResults();
+                }
+            };
+
+            ws.onerror = function(error) {
+                log(`❌ WebSocket error: ${error}`);
+                updateStatus('Error', 'error');
+            };
+
+            ws.onclose = function(event) {
+                log(`🔌 WebSocket closed: Code ${event.code}, Reason: ${event.reason}`);
+                updateStatus('Disconnected', 'warning');
+                
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+                document.getElementById('sendTestBtn').disabled = true;
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+                log('🔌 Disconnecting WebSocket...');
+            }
+        }
+
+        function sendPing() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const pingMessage = JSON.stringify({
+                    type: 'ping',
+                    timestamp: Date.now(),
+                    test: true
+                });
+                ws.send(pingMessage);
+                log(`📤 Sent ping: ${pingMessage}`);
+            }
+        }
+
+        function sendTestMessage() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const testMessage = JSON.stringify({
+                    type: 'test',
+                    message: 'End-to-end test message',
+                    timestamp: Date.now(),
+                    user_id: 'test_user'
+                });
+                ws.send(testMessage);
+                log(`📤 Sent test message: ${testMessage}`);
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        // Initialize test results display
+        updateTestResults();
+        
+        // Auto-connect on page load for automated testing
+        window.addEventListener('load', function() {
+            log('🚀 FlipSync WebSocket Test initialized');
+            log('Click "Connect to WebSocket" to begin testing');
+        });
+    </script>
+</body>
+</html>

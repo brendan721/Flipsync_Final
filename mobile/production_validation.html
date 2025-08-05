@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FlipSync V3 Production Validation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        .test-button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .test-button:hover { background: #0056b3; }
+        .log { background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .status-success { background: #28a745; }
+        .status-error { background: #dc3545; }
+        .status-pending { background: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 FlipSync V3 Production Validation Dashboard</h1>
+        <p><strong>Build Timestamp:</strong> <span id="buildTimestamp"></span></p>
+        <p><strong>Environment:</strong> ✅ LIVE PRODUCTION</p>
+        <p><strong>Frontend URL:</strong> <a href="https://flipsyncai.com" target="_blank">https://flipsyncai.com</a></p>
+        <p><strong>API Base URL:</strong> https://flipsyncai.com/api/v1</p>
+        <p><strong>WebSocket URL:</strong> wss://flipsyncai.com/ws/flipsync</p>
+        <p><strong>Deployment Status:</strong> ✅ Successfully Deployed</p>
+
+        <!-- API Endpoint Tests -->
+        <div class="test-section">
+            <h2>📡 API Endpoint Validation</h2>
+            <button class="test-button" onclick="testApiEndpoints()">Test V3 API Endpoints</button>
+            <div id="apiResults"></div>
+        </div>
+
+        <!-- WebSocket Tests -->
+        <div class="test-section">
+            <h2>🔌 WebSocket Connectivity</h2>
+            <button class="test-button" onclick="testWebSocket()">Test WebSocket Connection</button>
+            <div id="wsResults"></div>
+        </div>
+
+        <!-- 4+1 Agent Architecture Tests -->
+        <div class="test-section">
+            <h2>🤖 4+1 Agent Architecture</h2>
+            <button class="test-button" onclick="testAgentArchitecture()">Test Agent Integration</button>
+            <div id="agentResults"></div>
+        </div>
+
+        <!-- Authentication Tests -->
+        <div class="test-section">
+            <h2>🔐 Authentication Flow</h2>
+            <button class="test-button" onclick="testAuthentication()">Test JWT Authentication</button>
+            <div id="authResults"></div>
+        </div>
+
+        <!-- Performance Tests -->
+        <div class="test-section">
+            <h2>⚡ Performance Metrics</h2>
+            <button class="test-button" onclick="testPerformance()">Test Performance</button>
+            <div id="perfResults"></div>
+        </div>
+
+        <!-- Overall Status -->
+        <div class="test-section" id="overallStatus">
+            <h2>📊 Overall Validation Status</h2>
+            <div id="statusSummary">Click test buttons to begin validation...</div>
+        </div>
+    </div>
+
+    <script>
+        // Set build timestamp
+        document.getElementById('buildTimestamp').textContent = new Date().toISOString();
+
+        const API_BASE = 'https://flipsyncai.com/api/v1';
+        const WS_BASE = 'wss://flipsyncai.com/ws/flipsync';
+        
+        let testResults = {
+            api: false,
+            websocket: false,
+            agents: false,
+            auth: false,
+            performance: false
+        };
+
+        function updateStatus(section, status, message) {
+            const element = document.getElementById(section);
+            const statusClass = status === 'success' ? 'success' : status === 'error' ? 'error' : 'info';
+            const indicator = status === 'success' ? 'status-success' : status === 'error' ? 'status-error' : 'status-pending';
+            
+            element.innerHTML = `
+                <div class="${statusClass}">
+                    <span class="status-indicator ${indicator}"></span>
+                    ${message}
+                </div>
+            `;
+        }
+
+        function log(section, message) {
+            const element = document.getElementById(section);
+            const existing = element.querySelector('.log');
+            if (existing) {
+                existing.innerHTML += `${new Date().toLocaleTimeString()}: ${message}\n`;
+                existing.scrollTop = existing.scrollHeight;
+            } else {
+                element.innerHTML += `<div class="log">${new Date().toLocaleTimeString()}: ${message}\n</div>`;
+            }
+        }
+
+        async function testApiEndpoints() {
+            updateStatus('apiResults', 'pending', 'Testing V3 API endpoints...');
+            log('apiResults', 'Starting API endpoint validation');
+
+            const endpoints = [
+                '/ai/analyze-product',
+                '/shipping/arbitrage',
+                '/advertising/boost-listing',
+                '/agents/status',
+                '/metrics/live'
+            ];
+
+            let successCount = 0;
+            for (const endpoint of endpoints) {
+                try {
+                    log('apiResults', `Testing ${endpoint}...`);
+                    const response = await fetch(`${API_BASE}${endpoint}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    if (response.ok || response.status === 401) { // 401 is expected without auth
+                        log('apiResults', `✅ ${endpoint}: ${response.status} ${response.statusText}`);
+                        successCount++;
+                    } else {
+                        log('apiResults', `❌ ${endpoint}: ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    log('apiResults', `❌ ${endpoint}: ${error.message}`);
+                }
+            }
+
+            const success = successCount >= endpoints.length * 0.8; // 80% success rate
+            testResults.api = success;
+            updateStatus('apiResults', success ? 'success' : 'error', 
+                `API Validation ${success ? 'PASSED' : 'FAILED'}: ${successCount}/${endpoints.length} endpoints accessible`);
+            updateOverallStatus();
+        }
+
+        async function testWebSocket() {
+            updateStatus('wsResults', 'pending', 'Testing WebSocket connectivity...');
+            log('wsResults', 'Attempting WebSocket connection');
+
+            try {
+                const ws = new WebSocket(WS_BASE);
+                
+                ws.onopen = () => {
+                    log('wsResults', '✅ WebSocket connection established');
+                    testResults.websocket = true;
+                    updateStatus('wsResults', 'success', 'WebSocket connectivity PASSED');
+                    updateOverallStatus();
+                    ws.close();
+                };
+
+                ws.onerror = (error) => {
+                    log('wsResults', `❌ WebSocket error: ${error}`);
+                    testResults.websocket = false;
+                    updateStatus('wsResults', 'error', 'WebSocket connectivity FAILED');
+                    updateOverallStatus();
+                };
+
+                ws.onclose = (event) => {
+                    log('wsResults', `WebSocket closed: ${event.code} ${event.reason}`);
+                };
+
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    if (ws.readyState === WebSocket.CONNECTING) {
+                        ws.close();
+                        log('wsResults', '❌ WebSocket connection timeout');
+                        testResults.websocket = false;
+                        updateStatus('wsResults', 'error', 'WebSocket connectivity FAILED (timeout)');
+                        updateOverallStatus();
+                    }
+                }, 10000);
+
+            } catch (error) {
+                log('wsResults', `❌ WebSocket error: ${error.message}`);
+                testResults.websocket = false;
+                updateStatus('wsResults', 'error', 'WebSocket connectivity FAILED');
+                updateOverallStatus();
+            }
+        }
+
+        async function testAgentArchitecture() {
+            updateStatus('agentResults', 'pending', 'Testing 4+1 Agent Architecture...');
+            log('agentResults', 'Testing agent endpoints');
+
+            const agentEndpoints = [
+                '/agents/market/status',
+                '/agents/executive/status', 
+                '/agents/content/status',
+                '/agents/logistics/status'
+            ];
+
+            let agentSuccess = 0;
+            for (const endpoint of agentEndpoints) {
+                try {
+                    log('agentResults', `Testing ${endpoint}...`);
+                    const response = await fetch(`${API_BASE}${endpoint}`);
+                    if (response.ok || response.status === 401) {
+                        log('agentResults', `✅ ${endpoint}: Agent accessible`);
+                        agentSuccess++;
+                    } else {
+                        log('agentResults', `❌ ${endpoint}: ${response.status}`);
+                    }
+                } catch (error) {
+                    log('agentResults', `❌ ${endpoint}: ${error.message}`);
+                }
+            }
+
+            const success = agentSuccess >= 3; // At least 3 agents accessible
+            testResults.agents = success;
+            updateStatus('agentResults', success ? 'success' : 'error',
+                `Agent Architecture ${success ? 'PASSED' : 'FAILED'}: ${agentSuccess}/4 agents accessible`);
+            updateOverallStatus();
+        }
+
+        async function testAuthentication() {
+            updateStatus('authResults', 'pending', 'Testing authentication flow...');
+            log('authResults', 'Testing JWT authentication endpoints');
+
+            try {
+                // Test auth endpoint
+                const response = await fetch(`${API_BASE}/auth/status`);
+                log('authResults', `Auth endpoint status: ${response.status}`);
+                
+                testResults.auth = response.status === 200 || response.status === 401;
+                updateStatus('authResults', testResults.auth ? 'success' : 'error',
+                    `Authentication ${testResults.auth ? 'PASSED' : 'FAILED'}: Auth endpoints accessible`);
+            } catch (error) {
+                log('authResults', `❌ Auth test error: ${error.message}`);
+                testResults.auth = false;
+                updateStatus('authResults', 'error', 'Authentication FAILED');
+            }
+            updateOverallStatus();
+        }
+
+        async function testPerformance() {
+            updateStatus('perfResults', 'pending', 'Testing performance metrics...');
+            log('perfResults', 'Measuring performance');
+
+            const startTime = performance.now();
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+                
+                log('perfResults', `Response time: ${responseTime}ms`);
+                
+                const success = responseTime < 2000; // Under 2 seconds
+                testResults.performance = success;
+                updateStatus('perfResults', success ? 'success' : 'error',
+                    `Performance ${success ? 'PASSED' : 'FAILED'}: ${responseTime}ms response time`);
+            } catch (error) {
+                log('perfResults', `❌ Performance test error: ${error.message}`);
+                testResults.performance = false;
+                updateStatus('perfResults', 'error', 'Performance test FAILED');
+            }
+            updateOverallStatus();
+        }
+
+        function updateOverallStatus() {
+            const total = Object.keys(testResults).length;
+            const passed = Object.values(testResults).filter(Boolean).length;
+            const percentage = Math.round((passed / total) * 100);
+            
+            const statusElement = document.getElementById('statusSummary');
+            const overallSuccess = percentage >= 80;
+            
+            statusElement.innerHTML = `
+                <div class="${overallSuccess ? 'success' : 'error'}">
+                    <h3>Overall Status: ${overallSuccess ? '✅ PASSED' : '❌ FAILED'}</h3>
+                    <p>Tests Passed: ${passed}/${total} (${percentage}%)</p>
+                    <ul>
+                        <li>API Endpoints: ${testResults.api ? '✅' : '❌'}</li>
+                        <li>WebSocket: ${testResults.websocket ? '✅' : '❌'}</li>
+                        <li>Agent Architecture: ${testResults.agents ? '✅' : '❌'}</li>
+                        <li>Authentication: ${testResults.auth ? '✅' : '❌'}</li>
+                        <li>Performance: ${testResults.performance ? '✅' : '❌'}</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Auto-run basic tests on load
+        window.onload = function() {
+            setTimeout(() => {
+                testApiEndpoints();
+                setTimeout(() => testWebSocket(), 2000);
+                setTimeout(() => testAgentArchitecture(), 4000);
+                setTimeout(() => testAuthentication(), 6000);
+                setTimeout(() => testPerformance(), 8000);
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

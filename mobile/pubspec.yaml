@@ -1,0 +1,134 @@
+name: flipsync
+description: FlipSync - Intelligent e-commerce management solution with AI agents
+version: 1.0.1+2
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  # HTTP client - keeping both http and dio for compatibility during migration
+  http: ^1.4.0
+  # State management - using BLoC as primary
+  provider: ^6.1.5
+  # Storage - keeping shared_preferences for theme settings, using Hive for complex data
+  shared_preferences: ^2.5.3
+  path_provider: ^2.1.5
+  image_picker: ^1.1.2
+  flutter_cache_manager: ^3.4.1
+  photo_view: ^0.15.0
+  uuid: ^4.5.1
+  intl: ^0.20.2
+  flutter_secure_storage: ^9.2.4
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  url_launcher: ^6.3.1
+  flutter_svg: ^2.1.0
+  # Removed unused dependencies: flutter_markdown, cached_network_image
+  flutter_local_notifications: ^19.2.1
+  connectivity_plus: ^6.1.4
+  package_info_plus: ^8.3.0
+  device_info_plus: ^11.5.0
+  # SECURITY FIX: Removed flutter_dotenv to prevent .env file access via web
+  dio: ^5.8.0+1
+  json_annotation: ^4.9.0
+  equatable: ^2.0.7
+  flutter_bloc: ^9.1.1
+  logger: ^2.5.0                     # Logging framework
+  # Removed: rxdart (reactive extensions not used)
+  flutter_spinkit: ^5.2.1             # Used for loading indicators
+  # Removed: shimmer (unused loading animation)
+  fl_chart: ^1.0.0                   # Used for dashboard charts
+  google_fonts: ^6.2.1               # Used for typography
+  timeago: ^3.7.0                    # Used for relative time display
+  # Removed unused UI/animation dependencies:
+  # - animated_text_kit, flutter_staggered_grid_view, flutter_rating_bar
+  # - syncfusion_flutter_gauges, flutter_slidable, flutter_keyboard_visibility
+  # - flutter_animate, share_plus, file_picker, permission_handler, flutter_html
+  # Firebase kept minimal for analytics only
+  firebase_core: ^3.12.1
+  firebase_analytics: ^11.4.4
+  flutter_localizations:
+    sdk: flutter
+  injectable: ^2.5.0
+  get_it: ^8.0.3
+  dartz: ^0.10.1
+  retrofit: ^4.4.2
+  collection: ^1.18.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # Core additional dependencies:
+  freezed_annotation: ^2.4.4
+  web_socket_channel: ^3.0.2
+
+  # V3 Feature dependencies:
+  camera: ^0.11.0+2              # Enhanced photo capture for product creation
+  mobile_scanner: ^5.0.1         # Barcode scanning for product identification (compatible)
+  google_ml_kit: ^0.18.0         # OCR and Google Vision integration
+  image: ^4.2.0                  # Image processing and optimization
+
+  # Additional dependencies:
+  battery_plus: ^6.0.3
+  encrypt: ^5.0.3
+  sentry_flutter: ^9.3.0
+  logging: ^1.2.0
+  crypto: ^3.0.6
+  synchronized: ^3.1.0
+
+  # Isar database - official versions with version constraints
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  build_runner: ^2.5.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_driver:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Code generation dependencies for V3 models
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  source_gen: ^1.5.0
+
+  # Code generators - keeping only actively used ones
+  isar_generator: ^3.1.0+1          # For Isar database models
+  injectable_generator: ^2.6.2      # For dependency injection
+  # Removed unused generators: hive_generator, retrofit_generator
+
+  # Flutter tools
+  flutter_gen_runner: ^5.10.0
+  flutter_gen: ^5.10.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.0
+
+  # Testing
+  test: ^1.25.7
+  bloc_test: ^10.0.0
+  bloc: ^9.0.0
+  mocktail: ^1.0.3
+  dead_code_analyzer: ^1.1.0
+
+# Override conflicting dependencies
+dependency_overrides:
+  analyzer: ^5.13.0  # Compatible with build_runner and freezed
+  build_resolvers: ^2.4.2  # Downgrade for compatibility
+  dart_style: ^2.3.6  # Downgrade for compatibility
+  collection: 1.18.0  # Pin to version required by integration_test
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+    - assets/fonts/
+    # Removed: assets/config/ - migrated to unified environment configuration
+    - graphics_files/
+    # SECURITY FIX: Removed .env from assets - use dart-define instead

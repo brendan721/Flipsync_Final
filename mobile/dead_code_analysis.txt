@@ -1,0 +1,75 @@
+warning • The value of the field '_batteryService' isn't used • lib/core/design/animations/quantum_interface.dart:29:41 • unused_field
+warning • The declaration '_handleKeyPress' isn't referenced • lib/core/design/animations/quantum_interface.dart:66:8 • unused_element
+   info • The value of the local variable 'isRTL' isn't used • lib/core/design/animations/quantum_interface.dart:93:11 • unused_local_variable
+   info • The value of the local variable 'activeTabColor' isn't used • lib/core/design/animations/quantum_interface.dart:96:11 • unused_local_variable
+   info • The value of the local variable 'inactiveTabColor' isn't used • lib/core/design/animations/quantum_interface.dart:99:11 • unused_local_variable
+warning • The value of the field '_maxRetryAttempts' isn't used • lib/core/error/production_error_handler.dart:27:20 • unused_field
+warning • The value of the field '_csrfEndpoint' isn't used • lib/core/network/csrf_interceptor.dart:19:23 • unused_field
+warning • The value of the field '_dio' isn't used • lib/core/network/csrf_interceptor.dart:26:13 • unused_field
+   info • The value of the local variable 'agentName' isn't used • lib/core/services/agent_orchestration_service.dart:248:18 • unused_local_variable
+warning • The value of the field '_analysisService' isn't used • lib/core/services/ai/ai_listing_generation_service.dart:13:34 • unused_field
+warning • The value of the field '_apiService' isn't used • lib/core/services/ai/ai_testing_service.dart:13:20 • unused_field
+warning • The value of the field '_analysisService' isn't used • lib/core/services/ai/ai_testing_service.dart:14:34 • unused_field
+warning • The value of the field '_generationService' isn't used • lib/core/services/ai/ai_testing_service.dart:15:36 • unused_field
+warning • The value of the field '_conversationalService' isn't used • lib/core/services/ai/ai_testing_service.dart:16:45 • unused_field
+warning • The value of the field '_errorHandler' isn't used • lib/core/services/api_test_service.dart:14:22 • unused_field
+   info • The value of the local variable 'accessToken' isn't used • lib/core/services/auth_flow_validator.dart:102:15 • unused_local_variable
+   info • The value of the local variable 'refreshToken' isn't used • lib/core/services/auth_flow_validator.dart:103:15 • unused_local_variable
+warning • The value of the field '_authService' isn't used • lib/core/services/chat/chat_service.dart:15:21 • unused_field
+   info • The value of the local variable 'conversationId' isn't used • lib/core/services/chat/chat_service.dart:918:15 • unused_local_variable
+   info • The value of the local variable 'data' isn't used • lib/core/services/chat/chat_service.dart:1129:13 • unused_local_variable
+   info • The value of the local variable 'progress' isn't used • lib/core/services/chat/chat_service.dart:1164:13 • unused_local_variable
+   info • The value of the local variable 'status' isn't used • lib/core/services/chat/chat_service.dart:1165:13 • unused_local_variable
+warning • The declaration '_hasUserConflict' isn't referenced • lib/core/services/conflict_resolution_service.dart:118:8 • unused_element
+warning • The declaration '_hasListingConflict' isn't referenced • lib/core/services/conflict_resolution_service.dart:127:8 • unused_element
+warning • The declaration '_hasMetricConflict' isn't referenced • lib/core/services/conflict_resolution_service.dart:140:8 • unused_element
+warning • The declaration '_getSentryLevel' isn't referenced • lib/core/services/error/error_tracking_service.dart:130:15 • unused_element
+warning • The value of the field '_localStorage' isn't used • lib/core/services/file_sync_service.dart:17:29 • unused_field
+   info • The value of the local variable 'totalChunks' isn't used • lib/core/services/file_sync_service.dart:38:11 • unused_local_variable
+   info • The value of the local variable 'fileInfo' isn't used • lib/core/services/file_sync_service.dart:213:13 • unused_local_variable
+warning • The value of the field '_performanceCache' isn't used • lib/core/services/performance/real_performance_optimization_service.dart:12:30 • unused_field
+warning • The value of the field '_debounceTimers' isn't used • lib/core/services/performance/real_performance_optimization_service.dart:13:28 • unused_field
+   info • The value of the local variable 'key' isn't used • lib/core/services/response_cache.dart:295:13 • unused_local_variable
+warning • The declaration '_fetchUserProfile' isn't referenced • lib/core/state/auth_state.dart:339:33 • unused_element
+warning • The value of the field '_isar' isn't used • lib/core/storage/database_service.dart:37:14 • unused_field
+warning • The declaration '_isLastSyncedNull' isn't referenced • lib/core/storage/database_service.dart:160:8 • unused_element
+   info • Unused import: 'dart:convert' • lib/core/sync/sync_conflict_resolver.dart:1:8 • unused_import
+   info • The value of the local variable 'response' isn't used • lib/core/utils/debug_utils.dart:51:17 • unused_local_variable
+warning • The declaration '_getMockAgentStatuses' isn't referenced • lib/features/agent_monitoring/bloc/agent_monitoring_bloc.dart:268:32 • unused_element
+   info • Unused import: '../../../core/models/agent_type.dart' • lib/features/agent_monitoring/screens/executive_coordination_screen.dart:8:8 • unused_import
+warning • The declaration '_getAuthHeaders' isn't referenced • lib/features/analytics/analytics_screen.dart:98:31 • unused_element
+   info • Unused import: '../../core/theme/app_theme.dart' • lib/features/auth/create_account_screen.dart:3:8 • unused_import
+warning • The value of the field '_isPasswordVisible' isn't used • lib/features/auth/presentation/views/login_view.dart:30:14 • unused_field
+   info • The value of the local variable 'theme' isn't used • lib/features/auth/presentation/views/login_view.dart:84:11 • unused_local_variable
+   info • The value of the local variable 'size' isn't used • lib/features/auth/presentation/views/login_view.dart:85:11 • unused_local_variable
+   info • Unused import: 'package:flutter/material.dart' • lib/features/chat/models/chat_message.dart:1:8 • unused_import
+   info • Unused import: '../../../../core/models/workflow_models.dart' • lib/features/chat/presentation/screens/chat_screen.dart:7:8 • unused_import
+warning • A value for optional parameter 'key' isn't ever given • lib/features/chat/presentation/screens/chat_screen.dart:83:11 • unused_element_parameter
+   info • Unused import: 'package:flipsync/core/theme/app_colors.dart' • lib/features/chat/widgets/image_attachment.dart:3:8 • unused_import
+   info • Unused import: 'package:flipsync/core/theme/app_text_styles.dart' • lib/features/chat/widgets/image_attachment.dart:4:8 • unused_import
+   info • Unused import: 'package:http/http.dart' • lib/features/chat/widgets/image_attachment.dart:7:8 • unused_import
+warning • The value of the field '_agentService' isn't used • lib/features/dashboard/application/bulk_optimization_bloc.dart:144:22 • unused_field
+   info • Unused import: '../../domain/models/agent_status.dart' • lib/features/dashboard/presentation/components/agent_command_center.dart:6:8 • unused_import
+   info • Unused import: '../../../../core/utils/logger.dart' • lib/features/dashboard/presentation/screens/sales_optimization_dashboard.dart:11:8 • unused_import
+   info • Unused import: 'package:flipsync/core/services/chat/chat_service.dart' • lib/features/dashboard/screens/dashboard_screen.dart:5:8 • unused_import
+   info • The value of the local variable 'totalTasks' isn't used • lib/features/dashboard/screens/dashboard_screen.dart:154:11 • unused_local_variable
+warning • The value of the field '_apiClient' isn't used • lib/features/listings/listing_screen.dart:33:24 • unused_field
+warning • The value of the field '_dio' isn't used • lib/features/listings/listing_screen.dart:35:18 • unused_field
+warning • The declaration '_loadRealProductListings' isn't referenced • lib/features/listings/listing_screen.dart:894:32 • unused_element
+   info • Unused import: '../chat/widgets/floating_chat_button.dart' • lib/features/onboarding/how_flipsync_works_screen.dart:5:8 • unused_import
+   info • Unused import: '../../core/theme/app_theme.dart' • lib/features/onboarding/marketplace_connection_screen.dart:3:8 • unused_import
+   info • Unused import: '../../../core/theme/app_theme.dart' • lib/features/product_creation/screens/content_review_screen.dart:4:8 • unused_import
+   info • Unused import: '../../../core/theme/app_theme.dart' • lib/features/product_creation/screens/streamlined_product_creation_screen.dart:6:8 • unused_import
+   info • Unused import: '../../../core/widgets/loading_indicator.dart' • lib/features/product_creation/screens/streamlined_product_creation_screen.dart:7:8 • unused_import
+warning • The value of the field '_apiService' isn't used • lib/features/product_creation/services/content_review_service.dart:12:20 • unused_field
+   info • The value of the local variable 'listingContent' isn't used • lib/features/product_creation/services/product_creation_service.dart:80:13 • unused_local_variable
+warning • The value of the field '_isEditing' isn't used • lib/features/product_creation/widgets/sku_input_widget.dart:22:8 • unused_field
+   info • Unused import: 'subscription_models.dart' • lib/features/subscription/models/subscription_validation_models.dart:3:8 • unused_import
+   info • Unused import: '../../../core/theme/app_theme.dart' • lib/features/subscription/screens/subscription_management_screen.dart:4:8 • unused_import
+warning • The value of the field '_apiService' isn't used • lib/features/subscription/services/square_payment_service.dart:15:20 • unused_field
+warning • The value of the field '_apiService' isn't used • lib/features/subscription/services/subscription_validation_service.dart:16:20 • unused_field
+warning • The value of the field '_authService' isn't used • lib/features/subscription/services/subscription_validation_service.dart:18:21 • unused_field
+   info • Unused import: 'services/websocket_service_consolidated.dart' • lib/main.dart:9:8 • unused_import
+warning • The value of the field '_heartbeatInterval' isn't used • lib/services/websocket_service_consolidated.dart:53:25 • unused_field
+warning • The value of the field '_reconnectDelay' isn't used • lib/services/websocket_service_consolidated.dart:54:25 • unused_field
+warning • The value of the field '_isConnectionEstablished' isn't used • lib/services/websocket_service_consolidated.dart:57:8 • unused_field

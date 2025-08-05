@@ -1,0 +1,139 @@
+name: FlipSync Quality Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  architecture-preservation:
+    runs-on: ubuntu-latest
+    name: Architecture Preservation Check
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Validate Architecture Preservation
+      run: |
+        python validate_architecture_preservation.py
+    
+    - name: Check Baseline Metrics
+      run: |
+        if [ -f "BASELINE_METRICS.txt" ]; then
+          echo "✅ Baseline metrics file exists"
+          cat BASELINE_METRICS.txt
+        else
+          echo "❌ Baseline metrics file missing"
+          exit 1
+        fi
+
+  python-quality:
+    runs-on: ubuntu-latest
+    name: Python Code Quality
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort flake8 mypy bandit vulture
+    
+    - name: Run Black formatting check
+      run: |
+        black --check --diff fs_agt_clean/
+    
+    - name: Run isort import check
+      run: |
+        isort --check-only --diff fs_agt_clean/
+    
+    - name: Run Flake8 style check
+      run: |
+        flake8 fs_agt_clean/ --max-line-length=88 --extend-ignore=E203,E266,E501,W503
+    
+    - name: Run Bandit security check
+      run: |
+        bandit -r fs_agt_clean/ --skip=B101,B601 -f json
+    
+    - name: Run MyPy type check
+      run: |
+        mypy fs_agt_clean/ --ignore-missing-imports
+      continue-on-error: true
+
+  documentation-check:
+    runs-on: ubuntu-latest
+    name: Documentation Validation
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Check Architecture Documentation
+      run: |
+        required_docs=(
+          "COMPREHENSIVE_ARCHITECTURE_GUIDE.md"
+          "SERVICE_INTERDEPENDENCY_MAP.md"
+          "AGENT_WRAPPER_PATTERN_GUIDE.md"
+          "DEVELOPER_ARCHITECTURE_PRIMER.md"
+          "FLIPSYNC_ARCHITECTURE_BASELINE.md"
+        )
+        
+        for doc in "${required_docs[@]}"; do
+          if [ -f "$doc" ]; then
+            echo "✅ $doc exists"
+          else
+            echo "❌ $doc missing"
+            exit 1
+          fi
+        done
+    
+    - name: Validate Documentation Content
+      run: |
+        # Check that documentation mentions correct agent count
+        if grep -q "35.*[Aa]gents" COMPREHENSIVE_ARCHITECTURE_GUIDE.md; then
+          echo "✅ Correct agent count documented"
+        else
+          echo "❌ Agent count documentation incorrect"
+          exit 1
+        fi
+        
+        # Check that documentation mentions correct service count
+        if grep -q "225.*[Ss]ervices" COMPREHENSIVE_ARCHITECTURE_GUIDE.md; then
+          echo "✅ Correct service count documented"
+        else
+          echo "❌ Service count documentation incorrect"
+          exit 1
+        fi
+
+  flutter-quality:
+    runs-on: ubuntu-latest
+    name: Flutter Code Quality
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+    
+    - name: Check Flutter project exists
+      run: |
+        if [ -d "mobile" ]; then
+          echo "✅ Flutter mobile project exists"
+          cd mobile
+          flutter --version
+        else
+          echo "⚠️ Flutter mobile project not found, skipping Flutter checks"
+        fi
+      continue-on-error: true

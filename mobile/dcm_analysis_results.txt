@@ -1,0 +1,17 @@
+Error parsing arguments: FormatException: Could not find an option named "--exclude".
+Usage: dart bin/dead_code_analyzer.dart [options]
+-p, --project-path              Path to the Flutter project to analyze
+                                (defaults to ".")
+-o, --output-dir                Directory to save the report file (default: Desktop)
+                                (defaults to "")
+    --max-unused                Maximum number of unused entities to display in console
+                                (defaults to "10")
+    --[no-]analyze-functions    Include function usage analysis
+    --clean                     Clean up files containing only dead or commented-out classes
+-h, --help                      Show usage information
+-v, --verbose                   Show detailed output
+    --no-progress               Disable progress indicators
+-V, --version                   Show the version of dead_code_analyzer
+
+Example:
+  dart bin/dead_code_analyzer.dart -p /path/to/flutter/project -o /path/to/save/report --analyze-functions --max-unused 20

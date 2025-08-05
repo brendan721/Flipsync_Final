@@ -1,0 +1,304 @@
+# FlipSync .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment - CRITICAL: These are huge!
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+flipsync_env/
+*/venv/
+*/env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.dockerignore
+
+# Environment variables - COMPREHENSIVE SECURITY EXCLUSIONS
+.env
+.env.*
+*.env
+*.env.*
+# But allow .env.example (safe template)
+!.env.example
+.env.local
+.env.production
+.env.development
+.env.test
+.env.staging
+.env.backup*
+.env.unified
+.env.deployment
+.env.agentic*
+production_env_consolidated.env
+production_deployment_config.env
+config_consolidation_backup/
+**/config/**/production*
+**/*production*.env
+**/*secret*
+**/*key*.env
+**/*credential*
+**/*password*
+
+# Test results
+test_*.json
+*_test_results.json
+*_validation_results.json
+
+# Cache
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Uploads
+uploads/
+
+# Node modules (if any)
+node_modules/
+
+# Flutter - CRITICAL: Build artifacts and large files
+mobile/flutter_app/.dart_tool/
+mobile/flutter_app/.flutter-plugins
+mobile/flutter_app/.flutter-plugins-dependencies
+mobile/flutter_app/.packages
+mobile/flutter_app/.pub-cache/
+mobile/flutter_app/.pub/
+mobile/flutter_app/build/
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
+mobile/ios/build/
+mobile/ios/Pods/
+**/android/.gradle/
+**/build/
+flutter.tar.xz
+flutter.tar
+*.tar.xz
+*.tar.gz
+*.tar
+
+# Secrets and Sensitive Files - COMPREHENSIVE SECURITY
+secrets.json
+*.key
+*.pem
+*.crt
+*secret*
+*credential*
+*password*
+*token*
+*api_key*
+auth_config*
+oauth_config*
+database_config*
+prod_config*
+production_config*
+staging_config*
+*_secrets.*
+*_credentials.*
+*_keys.*
+*_tokens.*
+backup_*
+*_backup.*
+*.backup
+*.bak
+
+# Database dumps and exports
+*.sql
+*.dump
+*.backup.sql
+database_backup*
+db_backup*
+*.db.backup
+
+# Configuration files with potential secrets
+config/production/
+config/staging/
+config/secrets/
+**/production/**/*.json
+**/production/**/*.yaml
+**/production/**/*.yml
+**/secrets/**/*
+**/credentials/**/*
+
+# Log files that might contain sensitive data
+*.log
+logs/
+*.log.*
+debug*.log
+error*.log
+access*.log
+auth*.log
+oauth*.log
+
+# Temporary files that might contain secrets
+*.tmp
+*.temp
+temp/
+tmp/
+.temporary/
+debug_*
+test_*_with_secrets*
+investigate_*
+*_debug_*
+
+# Debug and testing scripts with hardcoded secrets (exclude from git)
+debug_agent_initialization.py
+investigate_oauth_issue.py
+fix_ebay_oauth_properly.py
+refresh_ebay_token.py
+fix_critical_issues.py
+*_debug.py
+*_test_secrets.py
+*_investigation.py
+
+# Files with hardcoded production secrets (SECURITY CRITICAL)
+start_https_backend.py
+start_production_service.sh
+ebay-config.yaml
+ebay_integration_final_verification.py
+COMPREHENSIVE_DEPLOYMENT_GUIDE.md
+PRODUCTION_DEPLOYMENT_GUIDE.md
+PRODUCTION_DEPLOYMENT_STATUS_REPORT.md
+FLIPSYNC_4+1_ARCHITECTURE_MASTER_DOCUMENTATION.md
+EBAY_OAUTH_HTTPS_REQUIREMENTS.md
+INTEGRATION_SUCCESS_FINAL_REPORT.md
+V3_COMPREHENSIVE_COMPLETION_PLAN.md
+frontend_logs.md
+test_actual_frontend.py
+update_redis_compatibility.py
+
+# Scripts with hardcoded credentials
+scripts/flipsync_bashrc_integration.sh
+scripts/test-production-security.py
+
+# Documentation files with secrets (exclude from git)
+audit_documentation/07_integration_analysis/phase6_integration_external_dependencies.md
+audit_documentation/raw_reports/bandit_analysis_fixed.txt
+
+# Core files with eBay credentials (exclude from git)
+fs_agt_clean/core/ebay/live_ebay_integration_system.py
+fs_agt_clean/services/marketplace/ebay_oauth_factory.py
+
+# All documentation files that may contain secrets
+CLEAN_DEPLOYMENT_INSTRUCTIONS.md
+COMPREHENSIVE_BACKEND_TESTING_REPORT.md
+COMPREHENSIVE_VALIDATION_REPORT.md
+FLIPSYNC_BACKEND_AUDIT_SUMMARY.md
+FLIPSYNC_BACKEND_INTEGRATION_AUDIT_REPORT.md
+FLIPSYNC_COMPREHENSIVE_TECHNICAL_AUDIT_REPORT.md
+FLIPSYNC_PRODUCTION_AUDIT_REPORT.md
+FLIPSYNC_PRODUCTION_AUDIT_REPORT_2025_08_03.md
+FLIPSYNC_PRODUCTION_DEPLOYMENT_SUCCESS_REPORT.md
+FLIPSYNC_PRODUCTION_READINESS_FINAL_STATUS_REPORT.md
+FLIPSYNC_V3_BACKEND_ENDPOINT_VERIFICATION_REPORT.md
+FLIPSYNC_V3_DAY3_SERVICE_INTEGRATION_COMPLETION_REPORT.md
+FLIPSYNC_V3_FRONTEND_TECHNICAL_AUDIT_COMPREHENSIVE.md
+FLIPSYNC_V3_PHASE2_FEATURE_INTEGRATION_COMPLETION_REPORT.md
+FLIPSYNC_V3_PHASE3_COMPLETION_REPORT.md
+FLUTTER_DEPLOYMENT_GUIDE.md
+FLUTTER_ERROR_RESOLUTION_COMPLETION_REPORT.md
+FLUTTER_FRONTEND_COMPREHENSIVE_ASSESSMENT.md
+FLUTTER_FRONTEND_TECHNICAL_AUDIT_REPORT.md
+FLUTTER_PRODUCTION_DEPLOYMENT_REPORT.md
+PRODUCTION_DEPLOYMENT_SUCCESS_REPORT.md
+PRODUCTION_DOMAIN_CONFIGURATION.md
+WEEK1_CRITICAL_FUNCTIONALITY_VALIDATION_REPORT.md
+WEEK1_PRODUCTION_DEPLOYMENT_REPORT.md
+WEEK2_CONFIGURATION_CLEANUP_COMPLETION_REPORT.md
+WEEK3_MONITORING_OPTIMIZATION_COMPLETION_REPORT.md
+V3_DEPLOYMENT_GUIDE.md
+V3_FLUTTER_FRONTEND_TECHNICAL_AUDIT_REPORT.md
+V3_TRANSFORMATION_COMPLETE_DOCUMENTATION.md
+/home/brend/Flipsync_Final/audit_documentation/raw_reports
+
+# All audit documentation (may contain secrets)
+audit_documentation/
+
+# Exclude ALL documentation files to prevent any secrets
+*.md
+!README.md
+!mobile/README.md
+
+# Exclude all analysis and report files
+*analysis*
+*report*
+*audit*
+*validation*
+*test_results*
+*.json
+*.txt
+*.log
+
+# Only include essential application files
+!fs_agt_clean/
+!mobile/
+!requirements.txt
+!pyproject.toml
+!.env.example
+!Dockerfile*
+!nginx/
+!scripts/
+!venv_agentic/
+
+# Any file with production credentials in the name
+*production*
+*deployment*
+*secrets*
+*credentials*

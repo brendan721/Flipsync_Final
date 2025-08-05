@@ -1,0 +1,135 @@
+{
+  "session_id": "test_session_1754324485",
+  "start_time": "2025-08-04T16:21:25.437627+00:00",
+  "phases_completed": [
+    "validation"
+  ],
+  "overall_success": false,
+  "summary": {},
+  "validation_results": {
+    "overall_success": false,
+    "readiness_score": 71.42857142857143,
+    "validation_summary": {
+      "total_validations": 7,
+      "successful_validations": 5,
+      "failed_validations": 2
+    },
+    "validation_details": {
+      "database_connectivity": {
+        "success": false,
+        "details": {
+          "success": false,
+          "error": "object Database can't be used in 'await' expression",
+          "database_connected": false
+        },
+        "execution_time_ms": 1683.7481269994896
+      },
+      "redis_connectivity": {
+        "success": false,
+        "details": {
+          "success": false,
+          "error": "Authentication required.",
+          "redis_connected": false
+        },
+        "execution_time_ms": 2521.813571000166
+      },
+      "ebay_authentication": {
+        "success": true,
+        "details": {
+          "success": true,
+          "credentials_valid": true,
+          "api_functional": true,
+          "ready_for_live_testing": true
+        },
+        "execution_time_ms": 3681.270512000083
+      },
+      "agent_initialization": {
+        "success": true,
+        "details": {
+          "success": true,
+          "agent_results": {
+            "market": {
+              "initialized": true,
+              "decision_functional": true,
+              "decision_time_ms": 71.73884599978919,
+              "performance_target_met": true
+            },
+            "content": {
+              "initialized": true,
+              "decision_functional": true,
+              "decision_time_ms": 97.51826200044889,
+              "performance_target_met": true
+            },
+            "executive": {
+              "initialized": true,
+              "decision_functional": true,
+              "decision_time_ms": 67.15054300002521,
+              "performance_target_met": true
+            },
+            "logistics": {
+              "initialized": true,
+              "decision_functional": true,
+              "decision_time_ms": 67.9634439993606,
+              "performance_target_met": true
+            }
+          },
+          "all_agents_initialized": true,
+          "performance_targets_met": true
+        },
+        "execution_time_ms": 309.66619800074113
+      },
+      "websocket_system": {
+        "success": true,
+        "details": {
+          "success": true,
+          "websocket_manager_ready": true,
+          "max_connections": 100,
+          "current_connections": 0,
+          "capacity_available": true
+        },
+        "execution_time_ms": 1.215301000229374
+      },
+      "performance_targets": {
+        "success": true,
+        "details": {
+          "success": true,
+          "performance_targets": {
+            "agent_decision_timeout_ms": 1000,
+            "api_response_target_ms": 2000,
+            "concurrent_users_target": 100,
+            "agent_response_timeout_ms": 10000
+          },
+          "system_latency_ms": 1.1902000005648006,
+          "targets_achievable": true,
+          "ready_for_load": true
+        },
+        "execution_time_ms": 1.1938999996345956
+      },
+      "existing_data": {
+        "success": true,
+        "details": {
+          "success": true,
+          "test_data_available": {
+            "sample_products": true,
+            "market_data": true,
+            "pricing_history": true,
+            "optimization_templates": true
+          },
+          "ready_for_testing": true
+        },
+        "execution_time_ms": 0.00270000055024866
+      }
+    },
+    "recommendations": [
+      "Fix database_connectivity: object Database can't be used in 'await' expression",
+      "Fix redis_connectivity: Authentication required.",
+      "Address all validation failures before proceeding with live testing"
+    ],
+    "next_steps": [
+      "\u274c Critical issues detected - do not proceed with live testing",
+      "\ud83d\udd27 Fix all validation failures first",
+      "\ud83e\uddea Re-run validation after fixes",
+      "\ud83d\udccb Review system configuration and dependencies"
+    ]
+  }
+}

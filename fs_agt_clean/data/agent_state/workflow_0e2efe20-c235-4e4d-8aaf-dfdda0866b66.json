@@ -1,0 +1,62 @@
+{
+  "agent_id": "workflow_0e2efe20-c235-4e4d-8aaf-dfdda0866b66",
+  "timestamp": "2025-06-19T19:57:22.350741",
+  "state": {
+    "workflow": {
+      "workflow_id": "0e2efe20-c235-4e4d-8aaf-dfdda0866b66",
+      "workflow_type": "market_research",
+      "participating_agents": [
+        "executive",
+        "content",
+        "market"
+      ],
+      "status": "pending",
+      "context": {
+        "research_topic": "electronics market trends",
+        "timeframe": "last_30_days"
+      },
+      "results": {},
+      "start_time": null,
+      "end_time": null,
+      "error_message": null,
+      "current_step_index": 0,
+      "progress": 0.0,
+      "metrics": {
+        "total_steps": 3,
+        "completed_steps": 0,
+        "failed_steps": 0,
+        "skipped_steps": 0,
+        "retry_count": 0,
+        "error_rate": 0.0
+      },
+      "steps": [
+        {
+          "step_id": "market_trends",
+          "name": "Market Trends Analysis",
+          "status": "pending",
+          "agent_type": "market",
+          "retry_count": 0,
+          "error_message": null
+        },
+        {
+          "step_id": "content_trends",
+          "name": "Content Trends Analysis",
+          "status": "pending",
+          "agent_type": "content",
+          "retry_count": 0,
+          "error_message": null
+        },
+        {
+          "step_id": "research_synthesis",
+          "name": "Research Synthesis",
+          "status": "pending",
+          "agent_type": "executive",
+          "retry_count": 0,
+          "error_message": null
+        }
+      ]
+    },
+    "checkpoint": {},
+    "timestamp": "2025-06-19T19:57:22.350694+00:00"
+  }
+}

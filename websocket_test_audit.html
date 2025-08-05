@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FlipSync WebSocket Test</title>
+</head>
+<body>
+    <h1>FlipSync WebSocket Connection Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+        
+        function log(message) {
+            const timestamp = new Date().toISOString();
+            messagesDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+            console.log(message);
+        }
+
+        try {
+            const ws = new WebSocket('ws://174.138.77.110/ws/flipsync');
+            
+            ws.onopen = function(event) {
+                statusDiv.innerHTML = '✅ CONNECTED';
+                statusDiv.style.color = 'green';
+                log('WebSocket connection opened successfully');
+                
+                // Send a test message
+                ws.send(JSON.stringify({
+                    type: 'ping',
+                    data: 'test_connection',
+                    timestamp: new Date().toISOString()
+                }));
+                log('Sent ping message');
+            };
+
+            ws.onmessage = function(event) {
+                log(`Received message: ${event.data}`);
+                try {
+                    const data = JSON.parse(event.data);
+                    log(`Parsed message type: ${data.type}`);
+                } catch (e) {
+                    log(`Failed to parse message as JSON: ${e.message}`);
+                }
+            };
+
+            ws.onerror = function(error) {
+                statusDiv.innerHTML = '❌ ERROR';
+                statusDiv.style.color = 'red';
+                log(`WebSocket error: ${error}`);
+            };
+
+            ws.onclose = function(event) {
+                statusDiv.innerHTML = '🔌 CLOSED';
+                statusDiv.style.color = 'orange';
+                log(`WebSocket closed. Code: ${event.code}, Reason: ${event.reason}`);
+            };
+
+            // Close connection after 5 seconds for testing
+            setTimeout(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.close();
+                    log('Closed connection after 5 seconds');
+                }
+            }, 5000);
+
+        } catch (error) {
+            statusDiv.innerHTML = '❌ FAILED TO CONNECT';
+            statusDiv.style.color = 'red';
+            log(`Failed to create WebSocket connection: ${error.message}`);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+# FlipSync Python Linting Configuration for WSL/Remote VSCode
+# AGENT_CONTEXT: Comprehensive Python code quality enforcement
+# AGENT_PRIORITY: Catch issues early, maintain code standards
+# AGENT_PATTERN: WSL-optimized linting for AI agent development
+
+[flake8]
+# Maximum line length
+max-line-length = 88
+
+# Error codes to ignore
+extend-ignore = 
+    # Black compatibility
+    E203,  # whitespace before ':'
+    W503,  # line break before binary operator
+    E501,  # line too long (handled by black)
+    
+    # Common in AI/ML code
+    F401,  # imported but unused (common in __init__.py)
+    F841,  # local variable assigned but never used
+    
+    # Docstring related (can be strict)
+    D100,  # Missing docstring in public module
+    D101,  # Missing docstring in public class
+    D102,  # Missing docstring in public method
+    D103,  # Missing docstring in public function
+    D104,  # Missing docstring in public package
+    D105,  # Missing docstring in magic method
+
+# Directories to exclude
+exclude = 
+    .git,
+    __pycache__,
+    build,
+    dist,
+    .venv,
+    venv,
+    .env,
+    .tox,
+    .pytest_cache,
+    .mypy_cache,
+    node_modules,
+    migrations,
+    .dart_tool,
+    android,
+    ios,
+    web/build,
+    mobile/flutter_app/android,
+    mobile/flutter_app/ios,
+    mobile/flutter_app/build,
+    fs_agt_clean/fs_agt_clean.egg-info
+
+# File patterns to exclude
+per-file-ignores =
+    # __init__.py files can have unused imports
+    __init__.py:F401,F403
+    # Test files can have longer lines and unused imports
+    test_*.py:E501,F401,F841
+    # Migration files (if any)
+    *migrations*.py:E501,F401
+    # Configuration files
+    config/*.py:E501
+    # Setup files
+    setup.py:E501,F401
+
+# Enable specific error codes
+select = 
+    E,  # pycodestyle errors
+    W,  # pycodestyle warnings
+    F,  # pyflakes
+    C,  # mccabe complexity
+    B,  # flake8-bugbear
+    I,  # isort
+
+# Maximum complexity
+max-complexity = 12
+
+# Import order style
+import-order-style = google
+
+# Show source code for errors
+show-source = True
+
+# Show pep8 violation statistics
+statistics = True
+
+# Count errors and warnings
+count = True
+
+# Format for error messages
+format = %(path)s:%(row)d:%(col)d: %(code)s %(text)s

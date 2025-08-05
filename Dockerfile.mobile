@@ -1,0 +1,53 @@
+FROM python:3.13-slim
+
+# FlipSync Mobile API Gateway Container
+# AGENT_CONTEXT: Mobile-specific API endpoints and optimizations
+# AGENT_PRIORITY: Connect to shared infrastructure and main API
+# AGENT_PATTERN: Mobile gateway with offline sync capabilities
+
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    API_TYPE=mobile
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    redis-tools \
+    postgresql-client \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements-minimal.txt .
+RUN pip install --no-cache-dir -r requirements-minimal.txt
+
+# Install additional mobile API dependencies
+RUN pip install --no-cache-dir \
+    fastapi-limiter==0.1.* \
+    python-multipart==0.0.* \
+    websockets==12.0.* \
+    httpx==0.25.*
+
+# Copy application code
+COPY . .
+
+# Create mobile API user for security
+RUN useradd --create-home --shell /bin/bash mobileapi && \
+    chown -R mobileapi:mobileapi /app
+USER mobileapi
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8001/health || exit 1
+
+# Expose mobile API port
+EXPOSE 8001
+
+# Run the mobile API gateway
+CMD ["uvicorn", "fs_agt_clean.mobile.api.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]

@@ -1,0 +1,114 @@
+{
+  "timestamp": "2025-08-04T22:56:42.625350",
+  "base_url": "http://174.138.77.110",
+  "tests": {
+    "API_ROOT_ENDPOINT": {
+      "status": "PASS",
+      "details": "Status: 200, Version: 1.0.0",
+      "response_time_ms": 85.42,
+      "timestamp": "2025-08-04T22:56:42.710949"
+    },
+    "API_HEALTH_ENDPOINT": {
+      "status": "PASS",
+      "details": "Status: ok",
+      "response_time_ms": 43.47,
+      "timestamp": "2025-08-04T22:56:42.754571"
+    },
+    "API_DOCS_ENDPOINT": {
+      "status": "PASS",
+      "details": "Documentation accessible",
+      "response_time_ms": 39.73,
+      "timestamp": "2025-08-04T22:56:42.794419"
+    },
+    "DATABASE_CONNECTIVITY": {
+      "status": "PASS",
+      "details": "Connected successfully, 29 tables found",
+      "response_time_ms": 557.01,
+      "timestamp": "2025-08-04T22:56:43.351743"
+    },
+    "TABLE_UNIFIED_USERS": {
+      "status": "PASS",
+      "details": "Table exists",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:56:43.351814"
+    },
+    "TABLE_AGENT_DECISIONS": {
+      "status": "PASS",
+      "details": "Table exists",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:56:43.351827"
+    },
+    "TABLE_AGENT_LEARNING_DATA": {
+      "status": "PASS",
+      "details": "Table exists",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:56:43.351832"
+    },
+    "TABLE_EBAY_OAUTH_TOKENS": {
+      "status": "PASS",
+      "details": "Table exists",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:56:43.351837"
+    },
+    "VIEW_USERS": {
+      "status": "PASS",
+      "details": "Users view exists",
+      "response_time_ms": 0,
+      "timestamp": "2025-08-04T22:56:43.351841"
+    },
+    "REDIS_CONNECTIVITY": {
+      "status": "PASS",
+      "details": "Redis operations successful",
+      "response_time_ms": 271.17,
+      "timestamp": "2025-08-04T22:56:43.623120"
+    },
+    "ENDPOINT_AGENTS_STATUS": {
+      "status": "PASS",
+      "details": "Status: 200",
+      "response_time_ms": 2809.74,
+      "timestamp": "2025-08-04T22:56:46.433070"
+    },
+    "ENDPOINT_EBAY_STATUS": {
+      "status": "PASS",
+      "details": "Status: 200",
+      "response_time_ms": 46.77,
+      "timestamp": "2025-08-04T22:56:46.479947"
+    },
+    "ENDPOINT_INVENTORY_": {
+      "status": "PASS",
+      "details": "Status: 200",
+      "response_time_ms": 41.38,
+      "timestamp": "2025-08-04T22:56:46.521402"
+    },
+    "ENDPOINT_MOBILE": {
+      "status": "PASS",
+      "details": "Status: 200",
+      "response_time_ms": 39.61,
+      "timestamp": "2025-08-04T22:56:46.561100"
+    },
+    "ENDPOINT_MARKETPLACE_STATUS": {
+      "status": "PASS",
+      "details": "Status: 200",
+      "response_time_ms": 41.22,
+      "timestamp": "2025-08-04T22:56:46.602405"
+    },
+    "WEBSOCKET_CONNECTIVITY": {
+      "status": "PASS",
+      "details": "WebSocket connection successful",
+      "response_time_ms": 92.96,
+      "timestamp": "2025-08-04T22:56:46.696139"
+    },
+    "SYSTEM_RESOURCES": {
+      "status": "PASS",
+      "details": "System responding in 0.09s",
+      "response_time_ms": 91.68,
+      "timestamp": "2025-08-04T22:56:46.830031"
+    }
+  },
+  "summary": {
+    "total_tests": 17,
+    "passed": 17,
+    "failed": 0,
+    "warnings": 0
+  }
+}

@@ -1,0 +1,11 @@
+# FlipSync Agent Context Marker
+# AGENT_CONTEXT: Directory-level context for AI agent awareness
+# AGENT_PRIORITY: Maintain established patterns and architecture
+# AGENT_PATTERN: database component patterns
+
+DIRECTORY: fs_agt_clean/database
+LAST_UPDATED: 2025-06-08T11:53:21-05:00
+CONTEXT_LEVEL: directory
+PATTERNS: database-specific
+ARCHITECTURE: FlipSync multi-agent e-commerce platform
+STATUS: context-injected

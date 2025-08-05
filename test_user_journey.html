@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FlipSync User Journey Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; }
+        .error { background-color: #f8d7da; }
+        .loading { background-color: #fff3cd; }
+        button { margin: 5px; padding: 10px; }
+        #results { margin-top: 20px; }
+        .log { font-family: monospace; font-size: 12px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>FlipSync User Journey Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Configuration</h2>
+        <label>Frontend URL: <input type="text" id="frontendUrl" value="http://174.138.77.110:3000" style="width: 300px;"></label><br><br>
+        <label>Backend URL: <input type="text" id="backendUrl" value="http://174.138.77.110:8000" style="width: 300px;"></label><br><br>
+        <button onclick="testFullJourney()">Test Complete User Journey</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        let testResults = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString();
+            const logEntry = `[${timestamp}] ${message}`;
+            testResults.push({message: logEntry, type});
+            updateResults();
+            console.log(logEntry);
+        }
+
+        function updateResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = testResults.map(result => 
+                `<div class="log ${result.type}">${result.message}</div>`
+            ).join('');
+        }
+
+        function clearResults() {
+            testResults = [];
+            updateResults();
+        }
+
+        async function testAPI(endpoint, description) {
+            try {
+                log(`Testing ${description}: ${endpoint}`, 'loading');
+                const response = await fetch(endpoint);
+                const data = await response.text();
+                
+                if (response.ok) {
+                    log(`✅ ${description} - Status: ${response.status}`, 'success');
+                    if (data.length > 100) {
+                        log(`   Response: ${data.substring(0, 100)}...`, 'info');
+                    } else {
+                        log(`   Response: ${data}`, 'info');
+                    }
+                    return true;
+                } else {
+                    log(`❌ ${description} - Status: ${response.status}`, 'error');
+                    log(`   Error: ${data}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ ${description} - Network Error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testLogin() {
+            const backendUrl = document.getElementById('backendUrl').value;
+            try {
+                log('Testing login with test credentials...', 'loading');
+                const response = await fetch(`${backendUrl}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'SecurePassword!'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.access_token) {
+                    log('✅ Login successful', 'success');
+                    log(`   User: ${data.user.email}`, 'info');
+                    log(`   Token: ${data.access_token.substring(0, 50)}...`, 'info');
+                    return data.access_token;
+                } else {
+                    log('❌ Login failed', 'error');
+                    log(`   Error: ${JSON.stringify(data)}`, 'error');
+                    return null;
+                }
+            } catch (error) {
+                log(`❌ Login error: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        async function testProtectedEndpoint(token) {
+            const backendUrl = document.getElementById('backendUrl').value;
+            try {
+                log('Testing protected endpoint with token...', 'loading');
+                const response = await fetch(`${backendUrl}/api/v1/agents`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('✅ Protected endpoint accessible', 'success');
+                    log(`   Agents: ${data.total_agents}`, 'info');
+                    return true;
+                } else {
+                    log('❌ Protected endpoint failed', 'error');
+                    log(`   Error: ${JSON.stringify(data)}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Protected endpoint error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testFullJourney() {
+            clearResults();
+            log('🚀 Starting FlipSync User Journey Test', 'info');
+            
+            const frontendUrl = document.getElementById('frontendUrl').value;
+            const backendUrl = document.getElementById('backendUrl').value;
+
+            // Test 1: Frontend accessibility
+            log('=== Phase 1: Frontend Accessibility ===', 'info');
+            await testAPI(frontendUrl, 'Frontend Root');
+            await testAPI(`${frontendUrl}/login`, 'Login Route');
+            await testAPI(`${frontendUrl}/partnership-setup`, 'Partnership Setup Route');
+            await testAPI(`${frontendUrl}/dashboard`, 'Dashboard Route');
+
+            // Test 2: Backend API
+            log('=== Phase 2: Backend API ===', 'info');
+            await testAPI(`${backendUrl}/api/v1/health`, 'Health Check');
+            await testAPI(`${backendUrl}/api/v1/auth/status`, 'Auth Status');
+
+            // Test 3: Authentication Flow
+            log('=== Phase 3: Authentication Flow ===', 'info');
+            const token = await testLogin();
+            
+            if (token) {
+                await testProtectedEndpoint(token);
+            }
+
+            // Test 4: Static Assets
+            log('=== Phase 4: Static Assets ===', 'info');
+            await testAPI(`${frontendUrl}/main.dart.js`, 'Main Dart JS');
+            await testAPI(`${frontendUrl}/flutter.js`, 'Flutter JS');
+
+            log('🏁 User Journey Test Complete', 'info');
+        }
+    </script>
+</body>
+</html>

@@ -36,6 +36,7 @@ Architecture Compliance:
 import asyncio
 import json
 import logging
+import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
@@ -358,8 +359,17 @@ class StrategicChatService4Plus1:
             logger.error(f"Error storing conversation in 4+1 database: {e}")
 
 
-# Global service instance
-strategic_chat_4plus1 = StrategicChatService4Plus1()
+# 🔧 CRITICAL FIX: Lazy initialization to prevent resource leaks
+# Global service instance - initialized on first use to prevent resource leaks during import
+_strategic_chat_4plus1: Optional[StrategicChatService4Plus1] = None
+
+
+def get_strategic_chat_service() -> StrategicChatService4Plus1:
+    """Get the global StrategicChatService4Plus1 instance with lazy initialization."""
+    global _strategic_chat_4plus1
+    if _strategic_chat_4plus1 is None:
+        _strategic_chat_4plus1 = StrategicChatService4Plus1()
+    return _strategic_chat_4plus1
 
 
 @router.post("/conversations", response_model=Dict[str, Any])
@@ -443,7 +453,9 @@ async def send_message_4plus1(
         user_id = current_user.id if current_user else "anonymous"
 
         # Handle chat with agent context
-        response_data = await strategic_chat_4plus1.handle_chat_with_agent_context(
+        strategic_chat = get_strategic_chat_service()
+        _ensure_agent_commands_initialized()  # Initialize commands only when needed
+        response_data = await strategic_chat.handle_chat_with_agent_context(
             message=message_request.text,
             conversation_id=conversation_id,
             user_id=user_id,
@@ -865,21 +877,197 @@ async def _handle_performance_command(
 async def _handle_trigger_command(
     command_request: AgentCommand4Plus1Request,
 ) -> Dict[str, Any]:
-    """Handle trigger command for agents."""
-    # Note: This is a placeholder for future agent triggering functionality
-    # In a full implementation, this would interface with the agent orchestration system
-    return {
-        "message": "Agent triggering not yet implemented",
-        "agent_id": command_request.agent_id,
-        "command": "trigger",
-        "note": "This feature will be implemented in future phases",
+    """Handle trigger command for agents - trigger real agent decision-making."""
+    try:
+        agent_id = command_request.agent_id
+        parameters = command_request.parameters or {}
+
+        # Get the showcase system to access real agent instances
+        from fs_agt_clean.core.realtime.agent_showcase_system import (
+            get_agent_showcase_system,
+        )
+
+        showcase_system = get_agent_showcase_system()
+
+        # Initialize showcase system if not already done
+        if showcase_system.agent_manager is None:
+            logger.info(f"Initializing showcase system for agent trigger: {agent_id}")
+            success = await showcase_system.initialize()
+            if not success:
+                return {
+                    "success": False,
+                    "error": "Failed to initialize agent system",
+                    "agent_id": agent_id,
+                }
+
+        # Get the agent manager
+        agent_manager = showcase_system.agent_manager
+
+        # Map agent IDs to agent manager keys
+        agent_key_mapping = {
+            "market_autonomous_agent": "market_agent",
+            "content_autonomous_agent": "content_agent",
+            "executive_autonomous_agent": "executive_agent",
+            "logistics_autonomous_agent": "logistics_agent",
+        }
+
+        agent_key = agent_key_mapping.get(agent_id)
+        if not agent_key:
+            return {
+                "success": False,
+                "error": f"Unknown agent ID: {agent_id}",
+                "agent_id": agent_id,
+            }
+
+        # Get the real agent instance
+        agent_instance = None
+        if hasattr(agent_manager, "autonomous_agents"):
+            agent_info = agent_manager.autonomous_agents.get(agent_key)
+            if agent_info:
+                agent_instance = agent_info.get("instance")
+
+        if not agent_instance:
+            return {
+                "success": False,
+                "error": f"Agent instance not found for {agent_key}",
+                "agent_id": agent_id,
+            }
+
+        # Create a decision context based on agent type (extract type from agent_key)
+        agent_type = agent_key.replace("_agent", "")  # "market_agent" -> "market"
+        decision_context = await _create_decision_context(agent_type, parameters)
+
+        # Trigger the agent decision
+        start_time = time.perf_counter()
+
+        if hasattr(agent_instance, "make_decision"):
+            decision_result = await agent_instance.make_decision(
+                decision_type=decision_context["decision_type"],
+                context=decision_context["context"],
+            )
+        else:
+            # Fallback to make_autonomous_decision if available
+            decision_result = await agent_instance.make_autonomous_decision(
+                decision_context["context"]
+            )
+
+        execution_time = (time.perf_counter() - start_time) * 1000
+
+        logger.info(f"✅ Agent {agent_id} decision completed in {execution_time:.2f}ms")
+
+        return {
+            "success": True,
+            "message": f"Agent {agent_id} decision triggered successfully",
+            "agent_id": agent_id,
+            "decision_result": decision_result,
+            "execution_time_ms": execution_time,
+            "decision_type": decision_context["decision_type"],
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to trigger agent {command_request.agent_id}: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "agent_id": command_request.agent_id,
+        }
+
+
+async def _create_decision_context(
+    agent_type: str, parameters: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Create appropriate decision context for different agent types."""
+
+    # Default context templates for each agent type
+    context_templates = {
+        "market": {
+            "decision_type": "pricing_optimization",
+            "context": {
+                "product_id": parameters.get("product_id", "TRIGGER_PRODUCT_001"),
+                "current_price": parameters.get("current_price", 29.99),
+                "competitor_prices": parameters.get(
+                    "competitor_prices", [27.99, 31.99, 28.49]
+                ),
+                "market_conditions": parameters.get("market_conditions", "competitive"),
+                "inventory_level": parameters.get("inventory_level", "medium"),
+                "trigger_source": "manual_trigger",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+        },
+        "content": {
+            "decision_type": "content_optimization",
+            "context": {
+                "product_title": parameters.get(
+                    "product_title", "iPhone 13 Pro Max 256GB"
+                ),
+                "category": parameters.get("category", "Electronics"),
+                "target_keywords": parameters.get(
+                    "target_keywords", ["iPhone", "smartphone", "Apple"]
+                ),
+                "optimization_type": parameters.get(
+                    "optimization_type", "seo_enhancement"
+                ),
+                "trigger_source": "manual_trigger",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+        },
+        "executive": {
+            "decision_type": "strategic_planning",
+            "context": {
+                "planning_horizon": parameters.get("planning_horizon", "quarterly"),
+                "focus_area": parameters.get("focus_area", "inventory_optimization"),
+                "market_data": parameters.get(
+                    "market_data", {"trend": "growth", "competition": "high"}
+                ),
+                "resource_constraints": parameters.get(
+                    "resource_constraints", {"budget": 10000, "time": "30_days"}
+                ),
+                "trigger_source": "manual_trigger",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+        },
+        "logistics": {
+            "decision_type": "shipping_optimization",
+            "context": {
+                "shipment_count": parameters.get("shipment_count", 12),
+                "destination_zones": parameters.get(
+                    "destination_zones", ["Zone1", "Zone3", "Zone5"]
+                ),
+                "package_weights": parameters.get("package_weights", [1.2, 2.5, 0.8]),
+                "delivery_priority": parameters.get("delivery_priority", "standard"),
+                "cost_optimization": parameters.get("cost_optimization", True),
+                "trigger_source": "manual_trigger",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+        },
     }
 
+    return context_templates.get(
+        agent_type,
+        {
+            "decision_type": "general_decision",
+            "context": {
+                "task": parameters.get("task", "general_processing"),
+                "trigger_source": "manual_trigger",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+        },
+    )
 
-# Update the agent_commands mapping after functions are defined
-strategic_chat_4plus1.agent_commands = {
-    "status": _handle_status_command,
-    "decisions": _handle_decisions_command,
-    "performance": _handle_performance_command,
-    "trigger": _handle_trigger_command,
-}
+
+# 🔧 CRITICAL FIX: Initialize agent commands lazily to prevent resource leaks
+_agent_commands_initialized = False
+
+
+def _ensure_agent_commands_initialized():
+    """Ensure agent commands are initialized only when needed."""
+    global _agent_commands_initialized
+    if not _agent_commands_initialized:
+        strategic_chat = get_strategic_chat_service()
+        strategic_chat.agent_commands = {
+            "status": _handle_status_command,
+            "decisions": _handle_decisions_command,
+            "performance": _handle_performance_command,
+            "trigger": _handle_trigger_command,
+        }
+        _agent_commands_initialized = True

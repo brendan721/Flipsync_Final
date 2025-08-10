@@ -849,7 +849,7 @@ class ExecutiveAutonomousAgent(BaseAutonomousAgent):
             qdrant_config = VectorStoreConfig(
                 store_id=f"executive-{self.agent_id}",
                 dimension=1536,  # Standard OpenAI embedding dimension
-                host=os.getenv("QDRANT_HOST", "174.138.77.110"),
+                host=os.getenv("QDRANT_HOST", "localhost"),
                 port=int(os.getenv("QDRANT_PORT", "6333")),
                 distance_metric=VectorDistanceMetric.COSINE,
             )
@@ -3336,7 +3336,27 @@ Our AI system is being optimized for faster, more accurate responses. How can I 
         try:
             action = decision.action
 
-            if action == "strategic_planning_analysis":
+            # Handle actions from decision pipeline
+            if action == "aggressive_expansion":
+                return await self._execute_aggressive_expansion(decision, context)
+            elif action == "balanced_expansion":
+                return await self._execute_balanced_expansion(decision, context)
+            elif action == "conservative_expansion":
+                return await self._execute_conservative_expansion(decision, context)
+            elif action == "invest_technology":
+                return await self._execute_technology_investment(decision, context)
+            elif action == "invest_marketing":
+                return await self._execute_marketing_investment(decision, context)
+            elif action == "invest_operations":
+                return await self._execute_operations_investment(decision, context)
+            elif action == "proceed":
+                return await self._execute_proceed_decision(decision, context)
+            elif action == "proceed_cautiously":
+                return await self._execute_cautious_proceed(decision, context)
+            elif action == "defer":
+                return await self._execute_defer_decision(decision, context)
+            # Legacy actions for backward compatibility
+            elif action == "strategic_planning_analysis":
                 return await self._execute_strategic_planning(decision, context)
             elif action == "resource_allocation_optimization":
                 return await self._execute_resource_allocation(decision, context)
@@ -3345,6 +3365,9 @@ Our AI system is being optimized for faster, more accurate responses. How can I 
             elif action == "provide_general_response":
                 return await self._execute_general_executive_response(decision, context)
             else:
+                logger.warning(
+                    f"Unknown action '{action}' for Executive Agent, using fallback"
+                )
                 return await self._execute_fallback_executive_response(
                     decision, context
                 )
@@ -3462,6 +3485,293 @@ Our AI system is being optimized for faster, more accurate responses. How can I 
 
         except Exception as e:
             logger.error(f"Error in general executive response: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_aggressive_expansion(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute aggressive expansion strategy."""
+        try:
+            budget = context.get("budget", 100000)
+            timeline = context.get("timeline", "3-6 months")
+
+            strategy_result = {
+                "strategy": "aggressive_expansion",
+                "budget_allocation": budget * 0.8,
+                "timeline": timeline,
+                "risk_level": "high",
+                "expected_growth": "40-60%",
+                "key_initiatives": [
+                    "Rapid market penetration",
+                    "Aggressive marketing campaigns",
+                    "Quick product launches",
+                    "Strategic acquisitions",
+                ],
+                "success_probability": 0.65,
+            }
+
+            return {
+                "success": True,
+                "action": "aggressive_expansion",
+                "data": strategy_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in aggressive expansion: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_balanced_expansion(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute balanced expansion strategy."""
+        try:
+            budget = context.get("budget", 100000)
+            timeline = context.get("timeline", "6-12 months")
+
+            strategy_result = {
+                "strategy": "balanced_expansion",
+                "budget_allocation": budget * 0.5,
+                "timeline": timeline,
+                "risk_level": "medium",
+                "expected_growth": "20-30%",
+                "key_initiatives": [
+                    "Steady market growth",
+                    "Balanced investment approach",
+                    "Measured product development",
+                    "Strategic partnerships",
+                ],
+                "success_probability": 0.75,
+            }
+
+            return {
+                "success": True,
+                "action": "balanced_expansion",
+                "data": strategy_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in balanced expansion: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_conservative_expansion(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute conservative expansion strategy."""
+        try:
+            budget = context.get("budget", 100000)
+            timeline = context.get("timeline", "12+ months")
+
+            strategy_result = {
+                "strategy": "conservative_expansion",
+                "budget_allocation": budget * 0.3,
+                "timeline": timeline,
+                "risk_level": "low",
+                "expected_growth": "10-15%",
+                "key_initiatives": [
+                    "Cautious market testing",
+                    "Risk-minimized investments",
+                    "Gradual product rollouts",
+                    "Organic growth focus",
+                ],
+                "success_probability": 0.85,
+            }
+
+            return {
+                "success": True,
+                "action": "conservative_expansion",
+                "data": strategy_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in conservative expansion: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_technology_investment(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute technology-focused investment strategy."""
+        try:
+            budget = context.get("budget", 100000)
+
+            investment_result = {
+                "investment_focus": "technology",
+                "allocation": {"technology": 0.6, "marketing": 0.2, "operations": 0.2},
+                "budget_amount": budget,
+                "key_areas": [
+                    "AI and automation systems",
+                    "Cloud infrastructure",
+                    "Data analytics platforms",
+                    "Development tools",
+                ],
+                "expected_roi": "25-35%",
+                "implementation_timeline": "6-9 months",
+            }
+
+            return {
+                "success": True,
+                "action": "invest_technology",
+                "data": investment_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in technology investment: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_marketing_investment(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute marketing-focused investment strategy."""
+        try:
+            budget = context.get("budget", 100000)
+
+            investment_result = {
+                "investment_focus": "marketing",
+                "allocation": {"technology": 0.2, "marketing": 0.6, "operations": 0.2},
+                "budget_amount": budget,
+                "key_areas": [
+                    "Digital advertising campaigns",
+                    "Brand building initiatives",
+                    "Customer acquisition programs",
+                    "Content marketing",
+                ],
+                "expected_roi": "20-30%",
+                "implementation_timeline": "3-6 months",
+            }
+
+            return {
+                "success": True,
+                "action": "invest_marketing",
+                "data": investment_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in marketing investment: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_operations_investment(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute operations-focused investment strategy."""
+        try:
+            budget = context.get("budget", 100000)
+
+            investment_result = {
+                "investment_focus": "operations",
+                "allocation": {"technology": 0.2, "marketing": 0.2, "operations": 0.6},
+                "budget_amount": budget,
+                "key_areas": [
+                    "Supply chain optimization",
+                    "Fulfillment center expansion",
+                    "Quality control systems",
+                    "Process automation",
+                ],
+                "expected_roi": "15-25%",
+                "implementation_timeline": "9-12 months",
+            }
+
+            return {
+                "success": True,
+                "action": "invest_operations",
+                "data": investment_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in operations investment: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_proceed_decision(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute proceed with full commitment decision."""
+        try:
+            decision_result = {
+                "decision": "proceed",
+                "commitment_level": "full",
+                "implementation_approach": "immediate",
+                "resource_allocation": "100%",
+                "monitoring_frequency": "weekly",
+                "success_criteria": [
+                    "Meet all project milestones",
+                    "Achieve target ROI",
+                    "Maintain quality standards",
+                ],
+            }
+
+            return {
+                "success": True,
+                "action": "proceed",
+                "data": decision_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in proceed decision: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_cautious_proceed(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute proceed with caution decision."""
+        try:
+            decision_result = {
+                "decision": "proceed_cautiously",
+                "commitment_level": "partial",
+                "implementation_approach": "phased",
+                "resource_allocation": "50%",
+                "monitoring_frequency": "daily",
+                "risk_mitigation": [
+                    "Pilot testing phase",
+                    "Regular checkpoint reviews",
+                    "Contingency planning",
+                    "Performance monitoring",
+                ],
+            }
+
+            return {
+                "success": True,
+                "action": "proceed_cautiously",
+                "data": decision_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in cautious proceed: {e}")
+            return await self._execute_fallback_executive_response(decision, context)
+
+    async def _execute_defer_decision(
+        self, decision: Decision, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute defer decision."""
+        try:
+            decision_result = {
+                "decision": "defer",
+                "commitment_level": "none",
+                "deferral_period": "30-60 days",
+                "information_needed": [
+                    "Additional market research",
+                    "Competitive analysis",
+                    "Financial projections",
+                    "Risk assessment",
+                ],
+                "review_schedule": "monthly",
+                "next_evaluation_date": "2025-09-07",
+            }
+
+            return {
+                "success": True,
+                "action": "defer",
+                "data": decision_result,
+                "confidence": decision.confidence,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        except Exception as e:
+            logger.error(f"Error in defer decision: {e}")
             return await self._execute_fallback_executive_response(decision, context)
 
     async def _execute_fallback_executive_response(

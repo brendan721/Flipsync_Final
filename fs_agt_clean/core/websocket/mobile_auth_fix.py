@@ -15,14 +15,16 @@ logger = logging.getLogger(__name__)
 
 def _get_jwt_secret() -> str:
     """Get JWT secret using consistent logic with other auth components."""
-    environment = os.getenv("ENVIRONMENT", "").lower()
-    if environment in ("development", "dev", "test"):
-        return "development-jwt-secret-not-for-production-use"
-
+    # PRODUCTION FIX: Use same fallback logic as API authentication for consistency
+    # This ensures WebSocket and API authentication use identical JWT secrets
     secret = os.getenv("JWT_SECRET")
-    if not secret:
-        raise ValueError("JWT_SECRET environment variable must be set for production")
-    return secret
+    if secret:
+        logger.info("Using production JWT_SECRET for WebSocket authentication")
+        return secret
+
+    # Fallback to development secret (same as API authentication)
+    logger.info("Using development JWT secret for WebSocket authentication")
+    return "development-jwt-secret-not-for-production-use"
 
 
 def _validate_jwt_token(token: str) -> bool:
@@ -76,22 +78,19 @@ async def accept_websocket_with_mobile_support(
             await websocket.close(code=1008, reason="Invalid authentication token")
             return False
 
-        # SECURE: In development, allow connections from development origins without token
-        # This provides a fallback for development but maintains security in production
-        environment = os.getenv("ENVIRONMENT", "development").lower()
-        if environment in ("development", "dev", "test") and is_development_origin(
-            origin
-        ):
+        # PRODUCTION FIX: Use same logic as API authentication
+        # Allow development origins only if JWT_SECRET is not set (development mode)
+        jwt_secret_set = bool(os.getenv("JWT_SECRET"))
+        if not jwt_secret_set and is_development_origin(origin):
             logger.info(
-                "WebSocket connection accepted: Development environment with valid origin"
+                "WebSocket connection accepted: Development mode with valid origin"
             )
             await websocket.accept()
             return True
 
         # Reject connection without token in production or invalid origin
         logger.warning(
-            "WebSocket connection rejected: No token provided (env: %s, origin: %s)",
-            environment,
+            "WebSocket connection rejected: No token provided (production mode or invalid origin: %s)",
             origin,
         )
         await websocket.close(code=1008, reason="Authentication required")

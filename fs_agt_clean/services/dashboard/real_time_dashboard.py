@@ -119,7 +119,7 @@ class RealTimeDashboardService:
         agent_manager: AutonomousAgentManager,
         pipeline_controller: PipelineController,
         state_manager: StateManager,
-        orchestration_service: AutonomousAgentOrchestrationService,
+        orchestration_service: Optional[Any] = None,  # Disabled for 4+1 architecture
     ):
         self.agent_manager = agent_manager
         self.pipeline_controller = pipeline_controller
@@ -646,7 +646,7 @@ async def get_dashboard_service(
     agent_manager: AutonomousAgentManager,
     pipeline_controller: PipelineController,
     state_manager: StateManager,
-    orchestration_service: AutonomousAgentOrchestrationService,
+    orchestration_service: Optional[Any] = None,  # Disabled for 4+1 architecture
 ) -> RealTimeDashboardService:
     """Get or create the global dashboard service instance."""
     global _dashboard_service

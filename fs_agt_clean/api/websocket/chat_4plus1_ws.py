@@ -43,9 +43,14 @@ from fastapi.routing import APIRouter
 
 # Import 4+1 architecture components
 from fs_agt_clean.core.db.database import get_database
-from fs_agt_clean.database.repositories.autonomous_agent_repository import AutonomousAgentRepository
+from fs_agt_clean.database.repositories.autonomous_agent_repository import (
+    AutonomousAgentRepository,
+)
 from fs_agt_clean.database.repositories.chat_repository import ChatRepository
-from fs_agt_clean.core.architecture.boundaries import ArchitecturalBoundaries, ArchitecturalLayer
+from fs_agt_clean.core.architecture.boundaries import (
+    ArchitecturalBoundaries,
+    ArchitecturalLayer,
+)
 
 # Import StrategicChatService components
 from fs_agt_clean.services.communication.strategic_chat_service import (
@@ -82,10 +87,10 @@ chat_connection_metadata: Dict[WebSocket, Dict[str, Any]] = {}
 class ChatWebSocketManager:
     """
     WebSocket connection manager for 4+1 architecture chat integration.
-    
+
     Coordinates between StrategicChatService and autonomous agent WebSocket endpoints.
     """
-    
+
     def __init__(self):
         self.connections: Dict[str, Set[WebSocket]] = {
             "chat_4plus1": set(),
@@ -95,74 +100,83 @@ class ChatWebSocketManager:
         self.connection_metadata: Dict[WebSocket, Dict[str, Any]] = {}
         self.background_tasks: Set[asyncio.Task] = set()
         self.strategic_chat = StrategicChatService(daily_budget=10.0)
-        
+
         # Integration with agent WebSocket manager
         self.agent_ws_manager = agent_ws_manager
-    
-    async def connect(self, websocket: WebSocket, connection_type: str, metadata: Optional[Dict[str, Any]] = None):
+
+    async def connect(
+        self,
+        websocket: WebSocket,
+        connection_type: str,
+        metadata: Optional[Dict[str, Any]] = None,
+    ):
         """Connect a WebSocket to a specific chat channel."""
         await websocket.accept()
-        
+
         if connection_type not in self.connections:
             raise ValueError(f"Invalid chat connection type: {connection_type}")
-        
+
         self.connections[connection_type].add(websocket)
         self.connection_metadata[websocket] = {
             "connection_type": connection_type,
             "connected_at": datetime.now(timezone.utc),
             "metadata": metadata or {},
         }
-        
-        logger.info(f"🔌 Chat WebSocket connected to {connection_type} channel. Total connections: {len(self.connections[connection_type])}")
-    
+
+        logger.info(
+            f"🔌 Chat WebSocket connected to {connection_type} channel. Total connections: {len(self.connections[connection_type])}"
+        )
+
     async def disconnect(self, websocket: WebSocket):
         """Disconnect a WebSocket from all chat channels."""
         for connection_type, connections in self.connections.items():
             if websocket in connections:
                 connections.remove(websocket)
-                logger.info(f"🔌 Chat WebSocket disconnected from {connection_type} channel. Remaining: {len(connections)}")
-        
+                logger.info(
+                    f"🔌 Chat WebSocket disconnected from {connection_type} channel. Remaining: {len(connections)}"
+                )
+
         if websocket in self.connection_metadata:
             del self.connection_metadata[websocket]
-    
+
     async def broadcast_to_channel(self, connection_type: str, message: Dict[str, Any]):
         """Broadcast a message to all connections in a specific chat channel."""
         if connection_type not in self.connections:
             return
-        
+
         connections = self.connections[connection_type].copy()
         if not connections:
             return
-        
+
         message_json = json.dumps(message)
         disconnected_connections = []
-        
+
         for websocket in connections:
             try:
                 await websocket.send_text(message_json)
             except Exception as e:
                 logger.warning(f"Failed to send chat message to WebSocket: {e}")
                 disconnected_connections.append(websocket)
-        
+
         # Clean up disconnected connections
         for websocket in disconnected_connections:
             await self.disconnect(websocket)
-    
+
     async def handle_chat_message(
-        self, 
-        websocket: WebSocket, 
-        message: str, 
+        self,
+        websocket: WebSocket,
+        message: str,
         conversation_id: str,
-        user_id: str = "anonymous"
+        user_id: str = "anonymous",
     ) -> Dict[str, Any]:
         """Handle chat message with agent context integration."""
         try:
             # Analyze user intent
             intent_analysis = await self.strategic_chat.analyze_user_intent(message)
-            
+
             # Get relevant agent data based on intent
             agent_data = await self._get_agent_data_for_chat(intent_analysis)
-            
+
             # Create chat request with agent context
             chat_request = ChatRequest(
                 message=message,
@@ -174,15 +188,17 @@ class ChatWebSocketManager:
                     "websocket_connection": True,
                     "architecture_layer": ArchitecturalLayer.CONVERSATIONAL.value,
                 },
-                priority="normal"
+                priority="normal",
             )
-            
+
             # Get strategic chat response
             chat_response = await self.strategic_chat.handle_chat(chat_request)
-            
+
             # Store conversation in database
-            await self._store_chat_message(conversation_id, user_id, message, chat_response, agent_data)
-            
+            await self._store_chat_message(
+                conversation_id, user_id, message, chat_response, agent_data
+            )
+
             # Prepare response with agent data
             response_data = {
                 "type": "chat_response",
@@ -210,9 +226,9 @@ class ChatWebSocketManager:
                 },
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
-            
+
             return response_data
-            
+
         except Exception as e:
             logger.error(f"Error handling chat message: {e}")
             return {
@@ -220,72 +236,110 @@ class ChatWebSocketManager:
                 "message": f"Failed to process chat message: {str(e)}",
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
-    
-    async def _get_agent_data_for_chat(self, intent_analysis: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def _get_agent_data_for_chat(
+        self, intent_analysis: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Get relevant agent data for chat context."""
         try:
             async with database.get_session() as session:
                 # Get agents based on intent
                 suggested_agent = intent_analysis.get("suggested_agent", "")
-                
+
                 if suggested_agent and suggested_agent != "conversational_interface":
                     # Get specific agent
-                    agents = await autonomous_agent_repository.get_all_autonomous_agents(session)
-                    relevant_agents = [a for a in agents if suggested_agent.lower() in a.agent_id.lower()]
+                    agents = (
+                        await autonomous_agent_repository.get_all_autonomous_agents(
+                            session
+                        )
+                    )
+                    relevant_agents = [
+                        a
+                        for a in agents
+                        if suggested_agent.lower() in a.agent_id.lower()
+                    ]
                 else:
                     # Get all agents for general queries
-                    agents = await autonomous_agent_repository.get_all_autonomous_agents(session)
+                    agents = (
+                        await autonomous_agent_repository.get_all_autonomous_agents(
+                            session
+                        )
+                    )
                     relevant_agents = agents[:3]  # Limit for performance
-                
+
                 agent_data = {}
                 for agent in relevant_agents:
                     # Get recent decisions
-                    recent_decisions = await autonomous_agent_repository.get_agent_decisions(
-                        session, agent.agent_id, limit=3
+                    recent_decisions = (
+                        await autonomous_agent_repository.get_agent_decisions(
+                            session, agent.agent_id, limit=3
+                        )
                     )
-                    
+
                     agent_data[agent.agent_id] = {
                         "agent_type": agent.agent_type,
                         "status": agent.status,
                         "llm_free": agent.llm_free,
-                        "last_heartbeat": agent.last_heartbeat.isoformat() if agent.last_heartbeat else None,
+                        "last_heartbeat": (
+                            agent.last_heartbeat.isoformat()
+                            if agent.last_heartbeat
+                            else None
+                        ),
                         "recent_decisions_count": len(recent_decisions),
                         "performance_summary": {
-                            "avg_execution_time": sum(d.execution_time_ms for d in recent_decisions if d.execution_time_ms) / len(recent_decisions) if recent_decisions else 0,
-                            "llm_free_rate": sum(1 for d in recent_decisions if not d.used_llm) / len(recent_decisions) if recent_decisions else 1.0,
+                            "avg_execution_time": (
+                                sum(
+                                    d.execution_time_ms
+                                    for d in recent_decisions
+                                    if d.execution_time_ms
+                                )
+                                / len(recent_decisions)
+                                if recent_decisions
+                                else 0
+                            ),
+                            "llm_free_rate": (
+                                sum(1 for d in recent_decisions if not d.used_llm)
+                                / len(recent_decisions)
+                                if recent_decisions
+                                else 1.0
+                            ),
                         },
                     }
-                
+
                 return {
                     "agents_available": len(relevant_agents),
                     "agents": agent_data,
                     "query_timestamp": datetime.now(timezone.utc).isoformat(),
                 }
-                
+
         except Exception as e:
             logger.error(f"Error getting agent data for chat: {e}")
             return {"error": f"Failed to get agent data: {str(e)}"}
-    
+
     async def _store_chat_message(
         self,
         conversation_id: str,
         user_id: str,
         user_message: str,
         chat_response: ChatResponse,
-        agent_data: Dict[str, Any]
+        agent_data: Dict[str, Any],
     ):
         """Store chat message in 4+1 architecture database."""
         try:
             async with database.get_session() as session:
                 # Create or get conversation
                 try:
-                    conversation = await chat_repository.get_conversation(session, conversation_id)
+                    conversation = await chat_repository.get_conversation(
+                        session, conversation_id
+                    )
                 except:
                     conversation = await chat_repository.create_conversation(
-                        session, user_id, f"4+1 Chat - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+                        session,
+                        user_id,
+                        f"4+1 Chat - {datetime.now().strftime('%Y-%m-%d %H:%M')}",
                     )
                     conversation_id = str(conversation.id)
-                
+
                 # Store user message
                 await chat_repository.create_message(
                     session,
@@ -296,9 +350,9 @@ class ChatWebSocketManager:
                         "websocket_connection": True,
                         "agent_data_included": agent_data is not None,
                         "architecture_layer": ArchitecturalLayer.CONVERSATIONAL.value,
-                    }
+                    },
                 )
-                
+
                 # Store assistant response
                 await chat_repository.create_message(
                     session,
@@ -318,9 +372,9 @@ class ChatWebSocketManager:
                             "separation_maintained": True,
                         },
                         **chat_response.metadata,
-                    }
+                    },
                 )
-                
+
         except Exception as e:
             logger.error(f"Error storing chat message: {e}")
 
@@ -329,76 +383,127 @@ class ChatWebSocketManager:
 chat_ws_manager = ChatWebSocketManager()
 
 
+async def authenticate_chat_websocket(websocket: WebSocket) -> bool:
+    """Authenticate chat WebSocket connection using consistent JWT validation."""
+    try:
+        # Check for token in query parameters
+        token = websocket.query_params.get("token")
+
+        # Check for token in headers if not in query params
+        if not token:
+            token = websocket.headers.get("Authorization")
+            if token and token.startswith("Bearer "):
+                token = token[7:]  # Remove "Bearer " prefix
+
+        if not token:
+            logger.warning("🔒 Chat WebSocket authentication failed: No token provided")
+            return False
+
+        # PRODUCTION FIX: Use proper JWT validation with consistent secret logic
+        from fs_agt_clean.core.websocket.mobile_auth_fix import _validate_jwt_token
+
+        if _validate_jwt_token(token):
+            logger.info("🔒 Chat WebSocket authentication successful with valid JWT")
+            return True
+        else:
+            logger.warning("🔒 Chat WebSocket authentication failed: Invalid JWT token")
+            return False
+
+    except Exception as e:
+        logger.error(f"🔒 Chat WebSocket authentication error: {e}")
+        return False
+
+
 @router.websocket("/4plus1/{conversation_id}")
 async def websocket_chat_4plus1(websocket: WebSocket, conversation_id: str):
     """
     WebSocket endpoint for real-time chat with 4+1 architecture agent context.
-    
+
     Provides real-time chat capabilities with autonomous agent data integration
     while maintaining strict separation between conversational and autonomous layers.
     """
-    await chat_ws_manager.connect(websocket, "chat_4plus1", {"conversation_id": conversation_id})
-    
+    # PRODUCTION FIX: Add authentication to chat WebSocket
+    if not await authenticate_chat_websocket(websocket):
+        await websocket.close(code=1008, reason="Authentication required")
+        return
+
+    await chat_ws_manager.connect(
+        websocket, "chat_4plus1", {"conversation_id": conversation_id}
+    )
+
     try:
         # Send initial connection confirmation
-        await websocket.send_text(json.dumps({
-            "type": "connection_established",
-            "conversation_id": conversation_id,
-            "message": "Connected to 4+1 Architecture Chat",
-            "capabilities": [
-                "Real-time chat with agent context",
-                "Autonomous agent status integration",
-                "Decision monitoring through chat",
-                "Agent command routing",
-            ],
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        }))
-        
+        await websocket.send_text(
+            json.dumps(
+                {
+                    "type": "connection_established",
+                    "conversation_id": conversation_id,
+                    "message": "Connected to 4+1 Architecture Chat",
+                    "capabilities": [
+                        "Real-time chat with agent context",
+                        "Autonomous agent status integration",
+                        "Decision monitoring through chat",
+                        "Agent command routing",
+                    ],
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+        )
+
         # Keep connection alive and handle messages
         while True:
             try:
                 # Wait for client messages
                 message = await asyncio.wait_for(websocket.receive_text(), timeout=30.0)
-                
+
                 try:
                     message_data = json.loads(message)
                     user_message = message_data.get("message", "")
                     user_id = message_data.get("user_id", "anonymous")
-                    
+
                     if user_message:
                         # Handle chat message with agent context
                         response_data = await chat_ws_manager.handle_chat_message(
                             websocket, user_message, conversation_id, user_id
                         )
-                        
+
                         # Send response back to client
                         await websocket.send_text(json.dumps(response_data))
-                        
+
                         # Broadcast to other connections in the same conversation
-                        await chat_ws_manager.broadcast_to_channel("chat_4plus1", {
-                            "type": "conversation_update",
-                            "conversation_id": conversation_id,
-                            "latest_message": response_data.get("message"),
-                            "timestamp": datetime.now(timezone.utc).isoformat(),
-                        })
-                    
+                        await chat_ws_manager.broadcast_to_channel(
+                            "chat_4plus1",
+                            {
+                                "type": "conversation_update",
+                                "conversation_id": conversation_id,
+                                "latest_message": response_data.get("message"),
+                                "timestamp": datetime.now(timezone.utc).isoformat(),
+                            },
+                        )
+
                 except json.JSONDecodeError:
                     # Handle plain text messages
                     response_data = await chat_ws_manager.handle_chat_message(
                         websocket, message, conversation_id, "anonymous"
                     )
                     await websocket.send_text(json.dumps(response_data))
-                
+
             except asyncio.TimeoutError:
                 # Send ping to keep connection alive
-                await websocket.send_text(json.dumps({
-                    "type": "ping",
-                    "conversation_id": conversation_id,
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                }))
-            
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "type": "ping",
+                            "conversation_id": conversation_id,
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
+                        }
+                    )
+                )
+
     except WebSocketDisconnect:
-        logger.info(f"🔌 Chat 4+1 WebSocket disconnected for conversation {conversation_id}")
+        logger.info(
+            f"🔌 Chat 4+1 WebSocket disconnected for conversation {conversation_id}"
+        )
     except Exception as e:
         logger.error(f"❌ Chat 4+1 WebSocket error: {e}")
     finally:

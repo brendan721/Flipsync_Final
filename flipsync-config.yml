@@ -1,0 +1,15 @@
+tunnel: eafc3d89-8b6b-4459-8e46-0c5186c22e1a
+credentials-file: /etc/cloudflared/eafc3d89-8b6b-4459-8e46-0c5186c22e1a.json
+
+ingress:
+  - hostname: flipsyncai.com
+    service: http://192.168.1.201:80
+  - hostname: www.flipsyncai.com
+    service: http://192.168.1.201:80
+  - hostname: api.flipsyncai.com
+    service: http://192.168.1.201:8000
+  - hostname: ws.flipsyncai.com
+    service: http://192.168.1.201:8000
+    originRequest:
+      noTLSVerify: true
+  - service: http_status:404

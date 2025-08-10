@@ -84,11 +84,11 @@ def get_unified_redis_config() -> UnifiedRedisConfig:
         logger.info("Detected Docker environment - using Redis service name")
 
     elif is_production_server:
-        # Production server (DigitalOcean droplet) - Redis with authentication
-        default_host = "174.138.77.110"
-        default_password = "FlipSync2024SecureRedis!"  # Production Redis password
+        # Production server - Redis with authentication from environment
+        default_host = os.getenv("REDIS_HOST", "localhost")
+        default_password = os.getenv("REDIS_PASSWORD")  # Must be set in environment
         logger.info(
-            "Detected production server environment - using authenticated Redis"
+            "Detected production server environment - using Redis from environment variables"
         )
 
     else:

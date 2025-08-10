@@ -28,14 +28,14 @@ class TestEnvironmentConfig {
   static bool useRealBackend = false;
 
   /// The URL of the backend API when using the real backend.
-  /// This should be the development server when running locally.
-  static const String backendUrl = 'https://localhost';
+  /// This should point to the production server.
+  static const String backendUrl = 'https://flipsyncai.com';
 
   /// The type of test being run
   static TestTypes testType = TestTypes.unit;
 
-  // Docker backend URL - update this to match your Docker setup
-  static const String backendBaseUrl = 'https://localhost';
+  // Production backend URL - updated to match production deployment
+  static const String backendBaseUrl = 'https://flipsyncai.com';
 
   // Which test types should use the real backend (when useRealBackend is true)
   static const bool useRealBackendForUnitTests = true; // Changed to true

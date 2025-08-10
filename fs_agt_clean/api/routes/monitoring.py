@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import platform
@@ -6,7 +7,14 @@ import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Request,
+    WebSocket,
+    WebSocketDisconnect,
+)
 
 # get_request import removed - not used
 from fs_agt_clean.database.models.unified_user import UnifiedUserResponse
@@ -1010,3 +1018,139 @@ async def get_ai_validation_metrics(
             "error": str(e),
             "status": "error",
         }
+
+
+# Global list to track active monitoring WebSocket connections
+active_monitoring_connections = []
+
+
+@router.websocket("/ws")
+async def websocket_monitoring_endpoint(websocket: WebSocket):
+    """
+    WebSocket endpoint for real-time monitoring updates.
+
+    This endpoint provides the /ws/monitoring path that the Flutter app expects.
+    Streams real-time system status, metrics, and health updates.
+    """
+    try:
+        await websocket.accept()
+        active_monitoring_connections.append(websocket)
+
+        logger.info(
+            f"🔌 Monitoring WebSocket connected. Active connections: {len(active_monitoring_connections)}"
+        )
+
+        # Send initial connection confirmation
+        await websocket.send_text(
+            json.dumps(
+                {
+                    "type": "connection_established",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "message": "Monitoring WebSocket connected successfully",
+                    "capabilities": [
+                        "system_status",
+                        "health_updates",
+                        "performance_metrics",
+                        "real_time_monitoring",
+                    ],
+                }
+            )
+        )
+
+        # Send initial system status
+        try:
+            system_status = await get_system_status()
+            await websocket.send_text(
+                json.dumps(
+                    {
+                        "type": "system_status",
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "data": system_status,
+                    }
+                )
+            )
+        except Exception as e:
+            logger.warning(f"Failed to send initial system status: {e}")
+
+        # Keep connection alive and handle incoming messages
+        while True:
+            try:
+                # Wait for messages from client (ping/pong, requests, etc.)
+                message = await websocket.receive_text()
+
+                # Handle ping/pong for connection health
+                if message == "ping":
+                    await websocket.send_text("pong")
+                elif message.startswith("{"):
+                    # Handle JSON messages
+                    try:
+                        data = json.loads(message)
+                        if data.get("type") == "request_status":
+                            # Send current system status
+                            system_status = await get_system_status()
+                            await websocket.send_text(
+                                json.dumps(
+                                    {
+                                        "type": "system_status",
+                                        "timestamp": datetime.now(
+                                            timezone.utc
+                                        ).isoformat(),
+                                        "data": system_status,
+                                    }
+                                )
+                            )
+                    except json.JSONDecodeError:
+                        logger.warning(f"Invalid JSON received: {message}")
+
+            except WebSocketDisconnect:
+                break
+            except Exception as e:
+                logger.error(f"Error in monitoring WebSocket: {e}")
+                break
+
+    except Exception as e:
+        logger.error(f"Failed to establish monitoring WebSocket connection: {e}")
+    finally:
+        # Clean up connection
+        if websocket in active_monitoring_connections:
+            active_monitoring_connections.remove(websocket)
+        logger.info(
+            f"🔌 Monitoring WebSocket disconnected. Active connections: {len(active_monitoring_connections)}"
+        )
+
+
+async def broadcast_monitoring_update(message_type: str, data: Dict[str, Any]):
+    """
+    Broadcast monitoring updates to all connected WebSocket clients.
+
+    Args:
+        message_type: Type of update (system_status, health_alert, etc.)
+        data: Update data to broadcast
+    """
+    if not active_monitoring_connections:
+        return
+
+    message = {
+        "type": message_type,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "data": data,
+    }
+
+    disconnected_connections = []
+
+    for websocket in active_monitoring_connections:
+        try:
+            await websocket.send_text(json.dumps(message))
+        except Exception as e:
+            logger.warning(f"Failed to send monitoring update to WebSocket: {e}")
+            disconnected_connections.append(websocket)
+
+    # Remove disconnected connections
+    for websocket in disconnected_connections:
+        if websocket in active_monitoring_connections:
+            active_monitoring_connections.remove(websocket)
+
+    if disconnected_connections:
+        logger.info(
+            f"Removed {len(disconnected_connections)} disconnected monitoring WebSocket(s)"
+        )

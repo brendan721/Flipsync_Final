@@ -23,7 +23,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from fs_agt_clean.core.auth.auth_factory import AuthenticationFactory
-from fs_agt_clean.database.models.unified_user import UnifiedUserResponse
+from fs_agt_clean.core.models.user import UnifiedUserResponse
 from fs_agt_clean.api.dependencies.dependencies import get_current_user
 from fs_agt_clean.core.ai.barcode_extractor import BarcodeExtractor
 from fs_agt_clean.core.ai.enhanced_vision_processor import EnhancedVisionProcessor

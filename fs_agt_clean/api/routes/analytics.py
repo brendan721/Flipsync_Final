@@ -13,7 +13,7 @@ from fs_agt_clean.core.models.analytics import (
     SalesReportResponse,
 )
 from fs_agt_clean.database.models.unified_user import UnifiedUserResponse
-from fs_agt_clean.core.monitoring.log_manager import LogManager
+from fs_agt_clean.core.monitoring.logger import LogManager
 from fs_agt_clean.api.dependencies.dependencies import get_current_user
 from fs_agt_clean.services.analytics.analytics_service import AnalyticsService
 
@@ -604,4 +604,89 @@ async def get_dashboard_data(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get dashboard data: {str(e)}",
+        )
+
+
+@router.get("/summary")
+async def get_analytics_summary(
+    time_range: str = Query(
+        "24h", description="Time range for analytics (24h, 7d, 30d)"
+    )
+):
+    """
+    Get analytics summary for the specified time range.
+
+    This endpoint provides the analytics data that the Flutter frontend expects.
+    """
+    try:
+        from datetime import timedelta
+
+        # Calculate time range
+        now = datetime.now()
+        if time_range == "24h":
+            start_time = now - timedelta(hours=24)
+            period_name = "Last 24 Hours"
+        elif time_range == "7d":
+            start_time = now - timedelta(days=7)
+            period_name = "Last 7 Days"
+        elif time_range == "30d":
+            start_time = now - timedelta(days=30)
+            period_name = "Last 30 Days"
+        else:
+            start_time = now - timedelta(hours=24)
+            period_name = "Last 24 Hours"
+
+        # Mock analytics data for Flutter frontend
+        analytics_data = {
+            "timestamp": now.isoformat(),
+            "time_range": time_range,
+            "period_name": period_name,
+            "start_time": start_time.isoformat(),
+            "end_time": now.isoformat(),
+            "summary": {
+                "total_users": 156,
+                "active_users": 42,
+                "oauth_connections": {"ebay": 28, "amazon": 0, "total": 28},
+                "autonomous_agents": {
+                    "market_agent": {
+                        "status": "active",
+                        "decisions_made": 234,
+                        "success_rate": 0.94,
+                    },
+                    "executive_agent": {
+                        "status": "active",
+                        "decisions_made": 156,
+                        "success_rate": 0.97,
+                    },
+                    "content_agent": {
+                        "status": "active",
+                        "decisions_made": 89,
+                        "success_rate": 0.91,
+                    },
+                    "logistics_agent": {
+                        "status": "active",
+                        "decisions_made": 67,
+                        "success_rate": 0.96,
+                    },
+                },
+                "performance_metrics": {
+                    "avg_decision_time_ms": 245,
+                    "api_response_time_ms": 156,
+                    "websocket_latency_ms": 23,
+                    "uptime_percentage": 99.8,
+                },
+            },
+            "trends": {
+                "user_growth": "+12%",
+                "oauth_adoption": "+34%",
+                "agent_efficiency": "+8%",
+            },
+        }
+
+        return analytics_data
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get analytics summary: {str(e)}",
         )

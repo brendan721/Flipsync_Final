@@ -72,8 +72,8 @@ from fs_agt_clean.core.models.user import UnifiedUserResponse
 # Configure logging
 logger = logging.getLogger(__name__)
 
-# Create router with prefix and tags
-router = APIRouter(prefix="/agents", tags=["4+1-architecture-agents"])
+# Create router without prefix (prefix will be added in main.py)
+router = APIRouter(tags=["4+1-architecture-agents"])
 
 # Database and repository instances
 database = get_database()
@@ -825,10 +825,15 @@ async def authenticate_websocket(websocket: WebSocket) -> bool:
             logger.warning("🔒 WebSocket authentication failed: No token provided")
             return False
 
-        # For now, accept any non-empty token (production should validate JWT)
-        # TODO: Implement proper JWT validation in production
-        logger.info("🔒 WebSocket authentication successful")
-        return True
+        # PRODUCTION FIX: Use proper JWT validation with consistent secret logic
+        from fs_agt_clean.core.websocket.mobile_auth_fix import _validate_jwt_token
+
+        if _validate_jwt_token(token):
+            logger.info("🔒 WebSocket authentication successful with valid JWT")
+            return True
+        else:
+            logger.warning("🔒 WebSocket authentication failed: Invalid JWT token")
+            return False
 
     except Exception as e:
         logger.error(f"🔒 WebSocket authentication error: {e}")

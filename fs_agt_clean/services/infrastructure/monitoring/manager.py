@@ -383,9 +383,7 @@ class MonitoringManager(
         # Implementation will be added in metrics module
         return set()
 
-    def get_label_values(
-        self: str, metric_name: Optional[str] = None
-    ) -> Set[str]:
+    def get_label_values(self: str, metric_name: Optional[str] = None) -> Set[str]:
         """Get all values for a specific label key."""
         # Implementation will be added in metrics module
         return set()
@@ -951,8 +949,8 @@ class MonitoringManager(
             except Exception as e:
                 logger.error("Error in metrics collection loop: %s", e)
 
-            # Sleep for the collection interval
-            time.sleep(self._collection_interval.total_seconds())
+            # Sleep for the collection interval (async)
+            await asyncio.sleep(self._collection_interval.total_seconds())
 
     def _collect_metrics(self) -> None:
         """Collect metrics from registered components and collectors."""

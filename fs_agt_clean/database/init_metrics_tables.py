@@ -20,7 +20,7 @@ async def create_metrics_tables():
     # Get database URL from environment - use correct test database as fallback
     db_url = os.getenv(
         "DATABASE_URL",
-        "postgresql+asyncpg://postgres:your_password@localhost:5432/flipsync_db",
+        "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test",
     )
 
     # Create engine and session

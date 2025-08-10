@@ -39,7 +39,7 @@ class ShippingArbitrageCalculation(Base):
         String(36), default=lambda: str(uuid.uuid4()), unique=True, index=True
     )
     user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        UUID(as_uuid=True), ForeignKey("unified_users.id"), nullable=False, index=True
     )
     product_id = Column(String(100), nullable=True, index=True)
 
@@ -110,7 +110,7 @@ class RevenueTracking(Base):
         String(36), default=lambda: str(uuid.uuid4()), unique=True, index=True
     )
     user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        UUID(as_uuid=True), ForeignKey("unified_users.id"), nullable=False, index=True
     )
 
     # Revenue details
@@ -175,7 +175,7 @@ class UnifiedUserRewardsBalance(Base):
     # Primary identification
     user_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("users.id"),
+        ForeignKey("unified_users.id"),
         nullable=False,
         unique=True,
         index=True,
@@ -240,7 +240,7 @@ class RevenueOptimizationLog(Base):
         String(36), default=lambda: str(uuid.uuid4()), unique=True, index=True
     )
     user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        UUID(as_uuid=True), ForeignKey("unified_users.id"), nullable=False, index=True
     )
 
     # Optimization details

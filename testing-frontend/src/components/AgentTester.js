@@ -115,12 +115,29 @@ const AgentTester = () => {
   const loadAgentStatus = async () => {
     setIsLoading(true);
     try {
-      const response = await api.getAgentStatus();
-      setAgents(response.agents || []);
-      toast.success('Agent status loaded');
+      // Use 4+1 architecture endpoints
+      const [agentsResponse, chatResponse] = await Promise.allSettled([
+        api.get4Plus1Agents(),
+        api.getChatAgentStatus()
+      ]);
+
+      let agentsList = [];
+
+      // Process 4+1 agents response
+      if (agentsResponse.status === 'fulfilled') {
+        agentsList = agentsResponse.value.agents || [];
+      }
+
+      // Process chat agents response
+      if (chatResponse.status === 'fulfilled' && chatResponse.value.agents) {
+        agentsList = [...agentsList, ...chatResponse.value.agents];
+      }
+
+      setAgents(agentsList);
+      toast.success(`4+1 Architecture: ${agentsList.length} agents loaded`);
     } catch (error) {
       console.error('Failed to load agent status:', error);
-      toast.error('Failed to load agent status');
+      toast.error('Failed to load 4+1 agent status');
     } finally {
       setIsLoading(false);
     }

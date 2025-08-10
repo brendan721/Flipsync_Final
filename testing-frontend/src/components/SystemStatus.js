@@ -35,25 +35,34 @@ const SystemStatus = () => {
   const loadSystemData = async () => {
     setIsLoading(true);
     try {
-      const [health, agents, aiStatus, ebayStatus] = await Promise.allSettled([
-        api.getHealth(),
-        api.getAgentStatus(),
-        api.getAIStatus(),
-        api.getEbayStatus()
-      ]);
+      // Use the new 4+1 architecture system status method
+      const systemStatus = await api.getSystemStatus();
 
       setSystemData({
-        health: health.status === 'fulfilled' ? health.value : { error: health.reason?.message },
-        agents: agents.status === 'fulfilled' ? agents.value : { error: agents.reason?.message },
-        aiStatus: aiStatus.status === 'fulfilled' ? aiStatus.value : { error: aiStatus.reason?.message },
-        ebayStatus: ebayStatus.status === 'fulfilled' ? ebayStatus.value : { error: ebayStatus.reason?.message }
+        health: systemStatus.health,
+        agents: systemStatus.agents,
+        decisions: systemStatus.decisions,
+        chat: systemStatus.chat,
+        // Keep legacy fields for compatibility
+        aiStatus: systemStatus.chat || { status: 'not_available' },
+        ebayStatus: { status: 'not_available', message: 'eBay integration testing' }
       });
 
       setLastUpdate(new Date());
-      toast.success('System status updated');
+      toast.success('4+1 Architecture status updated');
     } catch (error) {
       console.error('Failed to load system data:', error);
       toast.error('Failed to load system status');
+
+      // Set error state
+      setSystemData({
+        health: { error: error.message },
+        agents: { error: 'Failed to fetch' },
+        decisions: { error: 'Failed to fetch' },
+        chat: { error: 'Failed to fetch' },
+        aiStatus: { error: 'Failed to fetch' },
+        ebayStatus: { error: 'Failed to fetch' }
+      });
     } finally {
       setIsLoading(false);
     }
@@ -146,9 +155,12 @@ const SystemStatus = () => {
           <div className="flex items-center">
             <Cpu className="w-8 h-8 text-blue-500 mr-3" />
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Agents</p>
+              <p className="text-sm font-medium text-gray-600">4+1 Agents</p>
               <p className="text-lg font-semibold text-gray-900">
-                {systemData.agents?.total_agents || '0'} / 5
+                {systemData.agents?.total_agents || '0'} Total
+              </p>
+              <p className="text-xs text-gray-500">
+                {systemData.agents?.autonomous_agents || '0'} Autonomous + {systemData.agents?.conversational_interfaces || '0'} Chat
               </p>
             </div>
           </div>
@@ -158,9 +170,12 @@ const SystemStatus = () => {
           <div className="flex items-center">
             <Database className="w-8 h-8 text-purple-500 mr-3" />
             <div>
-              <p className="text-sm font-medium text-gray-600">AI System</p>
+              <p className="text-sm font-medium text-gray-600">Decisions</p>
               <p className="text-lg font-semibold text-gray-900">
-                {systemData.aiStatus?.success ? 'Active' : 'Inactive'}
+                {systemData.decisions?.total_decisions || '0'} Total
+              </p>
+              <p className="text-xs text-gray-500">
+                {systemData.decisions?.compliance_metrics?.compliant_decisions || '0'} Compliant
               </p>
             </div>
           </div>
@@ -170,9 +185,12 @@ const SystemStatus = () => {
           <div className="flex items-center">
             <Globe className="w-8 h-8 text-orange-500 mr-3" />
             <div>
-              <p className="text-sm font-medium text-gray-600">eBay Integration</p>
+              <p className="text-sm font-medium text-gray-600">Chat Interface</p>
               <p className="text-lg font-semibold text-gray-900">
-                {systemData.ebayStatus?.is_initialized ? 'Ready' : 'Not Ready'}
+                {systemData.chat?.success ? 'Active' : 'Inactive'}
+              </p>
+              <p className="text-xs text-gray-500">
+                {systemData.chat?.summary?.active_agents || '0'} Active Agents
               </p>
             </div>
           </div>
@@ -190,26 +208,26 @@ const SystemStatus = () => {
         />
 
         <StatusCard
-          title="Agent Status"
+          title="4+1 Agents"
           icon={Cpu}
           data={systemData.agents}
-          status={systemData.agents?.overall_status}
+          status={systemData.agents?.status}
           error={systemData.agents?.error}
         />
 
         <StatusCard
-          title="AI System"
+          title="Agent Decisions"
           icon={Database}
-          data={systemData.aiStatus}
-          status={systemData.aiStatus?.success ? 'operational' : 'error'}
-          error={systemData.aiStatus?.error}
+          data={systemData.decisions}
+          status={systemData.decisions?.status || 'operational'}
+          error={systemData.decisions?.error}
         />
 
         <StatusCard
-          title="eBay Integration"
+          title="Chat Interface"
           icon={Globe}
-          data={systemData.ebayStatus}
-          status={systemData.ebayStatus?.is_initialized ? 'ready' : 'not_ready'}
+          data={systemData.chat}
+          status={systemData.chat?.success ? 'operational' : 'error'}
           error={systemData.ebayStatus?.error}
         />
       </div>

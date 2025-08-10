@@ -305,6 +305,11 @@ class AdvancedSecurityMiddleware(BaseHTTPMiddleware):
         """
         Dispatch the middleware with comprehensive security checks.
         """
+        # Skip security checks for WebSocket connections
+        if request.headers.get("upgrade", "").lower() == "websocket":
+            logger.debug("Skipping security middleware for WebSocket connection")
+            return await call_next(request)
+
         start_time = datetime.now(timezone.utc)
         client_ip = self._get_client_ip(request)
 

@@ -76,19 +76,29 @@ class Settings(BaseModel):
     redis_password: Optional[str] = None
     redis_db: int = 0
 
-    # JWT settings
-    jwt_secret_key: str = "your-secret-key"  # Should be overridden in production
+    # JWT settings - SECURITY: Must be set via environment variables
+    jwt_secret_key: str = Field(
+        default_factory=lambda: os.getenv("JWT_SECRET", "dev-only-insecure-key")
+    )
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 
-    # Monitoring settings
+    # Monitoring settings - Use environment variables for production
     enable_metrics: bool = True
     metrics_port: int = 9090
-    INFLUXDB_URL: str = "http://localhost:8086"
-    INFLUXDB_TOKEN: str = "my-token"
-    INFLUXDB_ORG: str = "my-org"
-    INFLUXDB_BUCKET: str = "my-bucket"
+    INFLUXDB_URL: str = Field(
+        default_factory=lambda: os.getenv("INFLUXDB_URL", "http://localhost:8086")
+    )
+    INFLUXDB_TOKEN: str = Field(
+        default_factory=lambda: os.getenv("INFLUXDB_TOKEN", "dev-token")
+    )
+    INFLUXDB_ORG: str = Field(
+        default_factory=lambda: os.getenv("INFLUXDB_ORG", "dev-org")
+    )
+    INFLUXDB_BUCKET: str = Field(
+        default_factory=lambda: os.getenv("INFLUXDB_BUCKET", "dev-bucket")
+    )
 
     # Vision-aligned settings
     mobile: MobileConfig = Field(default_factory=MobileConfig)

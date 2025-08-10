@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 async def create_chat_and_agent_tables(
-    connection_string: str = "postgresql+asyncpg://postgres:password@localhost:5432/flipsync_dev",
+    connection_string: str = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test",
 ):
     """Create chat and agent tables in the database.
 
@@ -153,7 +153,7 @@ async def create_chat_and_agent_tables(
 
 
 async def drop_chat_and_agent_tables(
-    connection_string: str = "postgresql+asyncpg://postgres:password@localhost:5432/flipsync_dev",
+    connection_string: str = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test",
 ):
     """Drop chat and agent tables from the database.
 
@@ -180,7 +180,7 @@ async def drop_chat_and_agent_tables(
 
 
 async def reset_database(
-    connection_string: str = "postgresql+asyncpg://postgres:password@localhost:5432/flipsync_dev",
+    connection_string: str = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test",
 ):
     """Reset the database by dropping and recreating all tables.
 
@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
     connection_string = os.getenv(
         "DATABASE_URL",
-        "postgresql+asyncpg://postgres:password@localhost:5432/flipsync_dev",
+        "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test",
     )
 
     # Parse command line arguments

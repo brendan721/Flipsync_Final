@@ -351,40 +351,69 @@ class DatabaseDecisionMaker(DecisionMaker):
                     return False
         return True
 
+    async def _get_agent_db_id(self, agent_id: str) -> Optional[str]:
+        """Get the database ID for an agent by agent_id."""
+        try:
+            async with self.database.get_session() as session:
+                result = await session.execute(
+                    text("SELECT id FROM autonomous_agents WHERE agent_id = :agent_id"),
+                    {"agent_id": agent_id},
+                )
+                return result.scalar()
+        except Exception as e:
+            logger.error(f"Failed to get agent DB ID for {agent_id}: {e}")
+            return None
+
     async def _store_decision(self, decision: Decision) -> None:
         """Store decision in the database."""
         try:
+            # Get the correct database ID for the agent
+            agent_db_id = await self._get_agent_db_id(self.maker_id)
+            if not agent_db_id:
+                raise DecisionError(
+                    f"Agent {self.maker_id} not found in autonomous_agents table"
+                )
+
             async with self.database.get_session() as session:
                 result = await session.execute(
                     text(
                         """
-                        INSERT INTO agent_decisions
-                        (id, agent_id, decision_type, parameters, confidence, rationale,
-                         status, created_at, executed_at, result)
-                        VALUES (gen_random_uuid(), :agent_id, :decision_type, :parameters, :confidence,
-                                :rationale, :status, :created_at, :executed_at, :result)
+                        INSERT INTO autonomous_agent_decisions
+                        (id, decision_id, agent_id, decision_type, context, result,
+                         execution_time_ms, confidence, status, used_llm, used_standard_pipeline,
+                         algorithm_used, started_at, created_at)
+                        VALUES (gen_random_uuid(), :decision_id, :agent_id, :decision_type, :context, :result,
+                                :execution_time_ms, :confidence, :status, :used_llm, :used_standard_pipeline,
+                                :algorithm_used, :started_at, :created_at)
                         RETURNING id
                     """
                     ),
                     {
-                        "agent_id": self.maker_id,
+                        "decision_id": decision.metadata.decision_id,
+                        "agent_id": agent_db_id,
                         "decision_type": decision.decision_type.value,
-                        "parameters": json.dumps(
+                        "context": (
+                            json.dumps(decision.context) if decision.context else None
+                        ),
+                        "result": json.dumps(
                             {
-                                "decision_id": decision.metadata.decision_id,
                                 "action": decision.action,
                                 "alternatives": decision.alternatives,
-                                "context": decision.context,
+                                "reasoning": decision.reasoning,
                                 "battery_efficient": decision.battery_efficient,
                                 "network_efficient": decision.network_efficient,
                             }
                         ),
+                        "execution_time_ms": getattr(
+                            decision.metadata, "execution_time_ms", 0.0
+                        ),
                         "confidence": decision.confidence,
-                        "rationale": decision.reasoning,
                         "status": decision.metadata.status.value,
+                        "used_llm": False,  # Always False for autonomous agents
+                        "used_standard_pipeline": True,  # Always True for autonomous agents
+                        "algorithm_used": "standard_decision_pipeline",
+                        "started_at": decision.metadata.created_at,
                         "created_at": decision.metadata.created_at,
-                        "executed_at": None,
-                        "result": None,
                     },
                 )
 

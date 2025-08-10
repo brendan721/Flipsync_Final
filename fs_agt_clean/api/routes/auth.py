@@ -1476,53 +1476,48 @@ async def get_auth_status(
         }
 
 
-@router.get("/validate-token", response_model=TokenValidationResponse)
+@router.get("/validate-token")
 async def validate_token(
     token: str = Depends(oauth2_scheme),
-) -> TokenValidationResponse:
+):
     """
-    Validate a token.
+    Validate a token - Frontend compatible endpoint.
 
     Args:
         token: The OAuth2 token from authorization header
-        auth_service: Authentication service
 
     Returns:
-        Token validation response
+        Token validation response in format expected by frontend
     """
     try:
-        # For development/testing purposes, create a simple JWT decoder
-        pass
-
         import jwt
 
         # Use the same secret key as the token endpoint
-        jwt_secret = "development-jwt-secret-not-for-production-use"
-
-        # Allow expired tokens in development mode for easier testing
-        # We'll set verify_exp to False to match the token creation
+        jwt_secret = os.getenv(
+            "JWT_SECRET", "development-jwt-secret-not-for-production-use"
+        )
 
         # Decode the token
         payload = jwt.decode(
             token, jwt_secret, algorithms=["HS256"], options={"verify_exp": False}
         )
 
-        # Return validation response
-        return TokenValidationResponse(
-            valid=True,
-            user_id=payload.get("sub"),
-            username=payload.get("username"),
-            email=payload.get("email"),
-            expires_at=(
-                datetime.fromtimestamp(payload.get("exp"), tz=timezone.utc)
+        # Return validation response in format expected by frontend
+        return {
+            "valid": True,
+            "user_id": payload.get("sub"),
+            "username": payload.get("username"),
+            "email": payload.get("email"),
+            "expires_at": (
+                datetime.fromtimestamp(payload.get("exp"), tz=timezone.utc).isoformat()
                 if payload.get("exp")
                 else None
             ),
-        )
+        }
     except Exception as e:
         logger.error("Error validating token: %s", str(e))
-        # Return invalid response
-        return TokenValidationResponse(valid=False)
+        # Return invalid response in format expected by frontend
+        return {"valid": False, "error": "Authentication not implemented"}
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK, response_model=LogoutResponse)

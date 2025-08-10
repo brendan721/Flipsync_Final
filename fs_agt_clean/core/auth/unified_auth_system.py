@@ -57,12 +57,16 @@ class UnifiedAuthSystem:
         # FIXED: Use consistent JWT secret logic across all authentication components
         import os
 
-        environment = os.getenv("ENVIRONMENT", "").lower()
-        if environment in ("development", "dev", "test"):
-            self.jwt_secret = "development-jwt-secret-not-for-production-use"
-        else:
-            self.jwt_secret = os.getenv("JWT_SECRET")
-            if not self.jwt_secret:
+        # SECURITY: JWT secret must always come from environment
+        self.jwt_secret = os.getenv("JWT_SECRET")
+        if not self.jwt_secret:
+            environment = os.getenv("ENVIRONMENT", "").lower()
+            if environment in ("development", "dev", "test"):
+                logger.warning(
+                    "Using insecure JWT secret for development - set JWT_SECRET environment variable"
+                )
+                self.jwt_secret = "development-jwt-secret-not-for-production-use"
+            else:
                 raise ValueError(
                     "JWT_SECRET environment variable must be set for production"
                 )
@@ -71,10 +75,13 @@ class UnifiedAuthSystem:
         self.refresh_token_expire_days = 30
         self.is_initialized = False
 
-        # Test users for development/testing
+        # Test users for development/testing - passwords from environment
+        test_password = os.getenv("TEST_USER_PASSWORD", "SecurePassword!")
+        admin_password = os.getenv("ADMIN_USER_PASSWORD", "AdminPassword123!")
+
         self.test_users = {
             "test@example.com": {
-                "password_hash": self._hash_password("SecurePassword!"),
+                "password_hash": self._hash_password(test_password),
                 "user_id": "test_user_001",
                 "username": "testuser",
                 "roles": ["user", "tester"],
@@ -82,7 +89,7 @@ class UnifiedAuthSystem:
                 "is_active": True,
             },
             "admin@flipsync.com": {
-                "password_hash": self._hash_password("AdminPassword123!"),
+                "password_hash": self._hash_password(admin_password),
                 "user_id": "admin_user_001",
                 "username": "admin",
                 "roles": ["admin", "user"],
@@ -370,8 +377,50 @@ class UnifiedAuthSystem:
         query = "SELECT * FROM auth_users WHERE email = $1 AND is_active = TRUE;"
         result = await self.database.fetch_one(query, email)
 
-        if result and self._verify_password(password, result["password_hash"]):
-            return dict(result)
+        if result:
+            # Safely extract password hash
+            password_hash = None
+            if isinstance(result, dict):
+                password_hash = result.get("password_hash")
+            elif hasattr(result, "password_hash"):
+                password_hash = result.password_hash
+            elif hasattr(result, "__getitem__"):
+                try:
+                    password_hash = result["password_hash"]
+                except (KeyError, TypeError):
+                    pass
+
+            if password_hash and self._verify_password(password, password_hash):
+                # Ensure we return a dictionary
+                if isinstance(result, dict):
+                    return result
+                else:
+                    # Convert to dict if it's not already
+                    try:
+                        return dict(result)
+                    except (TypeError, ValueError):
+                        # Manual conversion for SQLAlchemy Row objects
+                        if hasattr(result, "_mapping"):
+                            return dict(result._mapping)
+                        elif hasattr(result, "keys") and callable(result.keys):
+                            return {
+                                key: getattr(result, key, None) for key in result.keys()
+                            }
+                        else:
+                            # Last resort: create dict from known attributes
+                            return {
+                                "user_id": getattr(
+                                    result, "user_id", getattr(result, "id", None)
+                                ),
+                                "email": getattr(result, "email", None),
+                                "username": getattr(result, "username", None),
+                                "password_hash": password_hash,
+                                "is_active": getattr(result, "is_active", True),
+                                "roles": getattr(result, "roles", []),
+                                "permissions": getattr(result, "permissions", []),
+                                "created_at": getattr(result, "created_at", None),
+                                "last_login": getattr(result, "last_login", None),
+                            }
 
         return None
 
@@ -383,7 +432,39 @@ class UnifiedAuthSystem:
         query = "SELECT * FROM auth_users WHERE user_id = $1;"
         result = await self.database.fetch_one(query, user_id)
 
-        return dict(result) if result else None
+        if result:
+            # Ensure we return a dictionary
+            if isinstance(result, dict):
+                return result
+            else:
+                # Convert to dict if it's not already
+                try:
+                    return dict(result)
+                except (TypeError, ValueError):
+                    # Manual conversion for SQLAlchemy Row objects
+                    if hasattr(result, "_mapping"):
+                        return dict(result._mapping)
+                    elif hasattr(result, "keys") and callable(result.keys):
+                        return {
+                            key: getattr(result, key, None) for key in result.keys()
+                        }
+                    else:
+                        # Last resort: create dict from known attributes
+                        return {
+                            "user_id": getattr(
+                                result, "user_id", getattr(result, "id", None)
+                            ),
+                            "email": getattr(result, "email", None),
+                            "username": getattr(result, "username", None),
+                            "password_hash": getattr(result, "password_hash", None),
+                            "is_active": getattr(result, "is_active", True),
+                            "roles": getattr(result, "roles", []),
+                            "permissions": getattr(result, "permissions", []),
+                            "created_at": getattr(result, "created_at", None),
+                            "last_login": getattr(result, "last_login", None),
+                        }
+
+        return None
 
     async def _check_user_active(self, user_id: str) -> bool:
         """Check if user is active."""
@@ -393,7 +474,19 @@ class UnifiedAuthSystem:
         query = "SELECT is_active FROM auth_users WHERE user_id = $1;"
         result = await self.database.fetch_one(query, user_id)
 
-        return result["is_active"] if result else False
+        if result:
+            # Safely extract is_active value
+            if isinstance(result, dict):
+                return result.get("is_active", False)
+            elif hasattr(result, "is_active"):
+                return result.is_active
+            elif hasattr(result, "__getitem__"):
+                try:
+                    return result["is_active"]
+                except (KeyError, TypeError):
+                    return False
+
+        return False
 
     async def _update_last_login(self, user_id: str):
         """Update user's last login timestamp."""

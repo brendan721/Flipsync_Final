@@ -1,9 +1,0 @@
-{
-  "redis_connected": false,
-  "keys_found": [],
-  "token_status": {},
-  "needs_refresh": [],
-  "errors": [
-    "Redis connection error: invalid username-password pair or user is disabled."
-  ]
-}

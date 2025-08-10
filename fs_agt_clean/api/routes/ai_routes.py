@@ -43,7 +43,7 @@ from fs_agt_clean.core.ai.openai_client import (
     TaskComplexity,
 )
 from fs_agt_clean.core.auth.auth_factory import AuthenticationFactory
-from fs_agt_clean.database.models.unified_user import UnifiedUserResponse
+from fs_agt_clean.core.models.user import UnifiedUserResponse
 from fs_agt_clean.api.dependencies.dependencies import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -51,8 +51,17 @@ logger = logging.getLogger(__name__)
 # Initialize router (no prefix - will be added in main.py)
 router = APIRouter(tags=["ai-analysis"])
 
-# Content agent for enhanced analysis
-content_agent = ContentAutonomousAgent()
+# 🔧 CRITICAL FIX: Lazy initialization to prevent resource leaks
+# Content agent for enhanced analysis - initialized on first use to prevent resource leaks during import
+_content_agent: Optional[ContentAutonomousAgent] = None
+
+
+def get_content_agent() -> ContentAutonomousAgent:
+    """Get the global ContentAutonomousAgent instance with lazy initialization."""
+    global _content_agent
+    if _content_agent is None:
+        _content_agent = ContentAutonomousAgent()
+    return _content_agent
 
 
 class ProductAnalysisRequest(BaseModel):
@@ -284,6 +293,7 @@ async def generate_listing_content(
 
         # Enhance with content agent if available
         try:
+            content_agent = get_content_agent()
             enhanced_content = await content_agent.enhance_listing_content(
                 listing_data["listing_content"], marketplace=request.marketplace
             )
@@ -324,6 +334,7 @@ async def optimize_product_category(
     """
     try:
         # Use content agent for category optimization
+        content_agent = get_content_agent()
         optimization_result = await content_agent.optimize_category_placement(
             product_name=request.product_name,
             current_category=request.current_category,

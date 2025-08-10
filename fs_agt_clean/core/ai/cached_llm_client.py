@@ -159,7 +159,7 @@ class CachedLLMClientFactory:
     @staticmethod
     async def create_cached_client(
         llm_client: Union[HybridLLMClient, HybridLLMAdapter],
-        redis_url: str = "redis://flipsync-infrastructure-redis:6379",
+        redis_url: str = "redis://localhost:6379",
         cache_db: int = 2,
     ) -> CachedLLMClient:
         """Create a cached LLM client with Redis cache."""
@@ -178,7 +178,7 @@ class CachedLLMClientFactory:
     @staticmethod
     async def create_cached_hybrid_client(
         client_type: str = "business",
-        redis_url: str = "redis://flipsync-infrastructure-redis:6379",
+        redis_url: str = "redis://localhost:6379",
         cache_db: int = 2,
     ) -> CachedLLMClient:
         """Create a cached HybridLLMAdapter client for strategic OpenAI optimization."""

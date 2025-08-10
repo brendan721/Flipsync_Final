@@ -28,7 +28,7 @@ class TestDatabaseConnection:
     @pytest.fixture
     def mock_database_url(self):
         """Mock database URL for testing"""
-        return "postgresql+asyncpg://test:test@localhost:5432/test_flipsync"
+        return "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test"
 
     @pytest.mark.asyncio
     async def test_database_initialization(self, mock_database_url):

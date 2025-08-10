@@ -244,7 +244,9 @@ class AutonomousAgentMonitor:
 
         # Log health status changes
         if status != AutonomousAgentHealthStatus.STATUS_HEALTHY:
-            logger.warning(f"AutonomousAgent {agent_id} health status changed to {status}")
+            logger.warning(
+                f"AutonomousAgent {agent_id} health status changed to {status}"
+            )
         else:
             logger.info(f"AutonomousAgent {agent_id} health status: {status}")
 
@@ -317,7 +319,7 @@ class AutonomousAgentMonitor:
                 except Exception as e:
                     logger.error(f"Error in resource monitoring: {str(e)}")
 
-                time.sleep(interval)
+                await asyncio.sleep(interval)
 
         self.resource_monitor_running = True
         self.resource_monitor_thread = threading.Thread(target=monitor_resources)

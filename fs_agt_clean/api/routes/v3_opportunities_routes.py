@@ -12,8 +12,8 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from fs_agt_clean.core.auth.dependencies import get_current_user
-from fs_agt_clean.core.models.unified_user import UnifiedUserResponse
+from fs_agt_clean.api.dependencies.dependencies import get_current_user
+from fs_agt_clean.database.models.unified_user import UnifiedUserResponse
 from fs_agt_clean.api.routes.v3_user_profile_routes import get_user_profile
 
 logger = logging.getLogger(__name__)

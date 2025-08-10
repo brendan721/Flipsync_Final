@@ -21,7 +21,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from fs_agt_clean.core.auth.auth_factory import AuthenticationFactory
-from fs_agt_clean.database.models.unified_user import UnifiedUserResponse
+from fs_agt_clean.core.models.user import UnifiedUserResponse
 from fs_agt_clean.api.dependencies.dependencies import get_current_user
 from fs_agt_clean.agents.market.advertising_module import AdvertisingModule
 
@@ -37,35 +37,51 @@ advertising_module = AdvertisingModule()
 # Request/Response Models
 class BoostListingRequest(BaseModel):
     """Request model for creating boost listing campaigns."""
-    
+
     listing_id: str = Field(..., description="eBay listing ID to boost")
-    ad_platform: str = Field(..., description="Advertising platform (facebook, google, instagram)")
+    ad_platform: str = Field(
+        ..., description="Advertising platform (facebook, google, instagram)"
+    )
     budget: float = Field(..., gt=0, description="User's advertising budget")
-    duration_days: int = Field(default=7, ge=1, le=30, description="Campaign duration in days")
-    target_audience: Optional[Dict[str, Any]] = Field(default=None, description="Targeting parameters")
-    optimization_goal: str = Field(default="conversions", description="Campaign optimization goal")
+    duration_days: int = Field(
+        default=7, ge=1, le=30, description="Campaign duration in days"
+    )
+    target_audience: Optional[Dict[str, Any]] = Field(
+        default=None, description="Targeting parameters"
+    )
+    optimization_goal: str = Field(
+        default="conversions", description="Campaign optimization goal"
+    )
 
 
 class CampaignUpdateRequest(BaseModel):
     """Request model for updating campaigns."""
-    
+
     budget: Optional[float] = Field(None, gt=0, description="Updated budget")
     status: Optional[str] = Field(None, description="Campaign status (active, paused)")
-    target_audience: Optional[Dict[str, Any]] = Field(None, description="Updated targeting")
+    target_audience: Optional[Dict[str, Any]] = Field(
+        None, description="Updated targeting"
+    )
 
 
 class RevenueTrackingRequest(BaseModel):
     """Request model for tracking advertising revenue."""
-    
+
     campaign_id: str = Field(..., description="Campaign ID")
-    revenue_amount: float = Field(..., gt=0, description="FlipSync revenue from campaign")
-    revenue_source: str = Field(..., description="Revenue source (management_fee, performance_bonus)")
-    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional revenue metadata")
+    revenue_amount: float = Field(
+        ..., gt=0, description="FlipSync revenue from campaign"
+    )
+    revenue_source: str = Field(
+        ..., description="Revenue source (management_fee, performance_bonus)"
+    )
+    metadata: Optional[Dict[str, Any]] = Field(
+        default=None, description="Additional revenue metadata"
+    )
 
 
 class ExternalAdCampaign(BaseModel):
     """Response model for external advertising campaigns."""
-    
+
     campaign_id: str
     listing_id: str
     ad_platform: str
@@ -85,7 +101,7 @@ async def create_boost_listing_campaign(
 ):
     """
     Create external advertising campaign for boost listings.
-    
+
     This endpoint:
     - Creates external ad campaigns on specified platforms
     - Calculates FlipSync management fees (revenue source)
@@ -94,11 +110,11 @@ async def create_boost_listing_campaign(
     """
     try:
         logger.info(f"Creating boost listing campaign for listing {request.listing_id}")
-        
+
         # Calculate FlipSync management fee (15% of user budget)
         flipsync_fee = request.budget * 0.15
         effective_ad_budget = request.budget - flipsync_fee
-        
+
         # Prepare campaign data for advertising module
         campaign_data = {
             "listing_id": request.listing_id,
@@ -108,7 +124,7 @@ async def create_boost_listing_campaign(
             "target_audience": request.target_audience or {},
             "optimization_goal": request.optimization_goal,
         }
-        
+
         # Create campaign using advertising module
         campaign_result = await advertising_module.create_optimized_campaign(
             listing_id=request.listing_id,
@@ -121,22 +137,22 @@ async def create_boost_listing_campaign(
                 "total_budget": effective_ad_budget,
                 "daily_budget": effective_ad_budget / request.duration_days,
                 "max_bid": effective_ad_budget * 0.1,
-            }
+            },
         )
-        
+
         if not campaign_result.get("success"):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Failed to create campaign: {campaign_result.get('error', 'Unknown error')}"
+                detail=f"Failed to create campaign: {campaign_result.get('error', 'Unknown error')}",
             )
-        
+
         campaign_id = campaign_result["campaign_id"]
-        
+
         # Calculate ROI estimate
         roi_estimate = await _calculate_roi_estimate(
             request.ad_platform, effective_ad_budget, request.optimization_goal
         )
-        
+
         # Prepare response
         campaign_response = {
             "success": True,
@@ -156,11 +172,11 @@ async def create_boost_listing_campaign(
             "roi_estimate": roi_estimate,
             "status": "active",
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "expires_at": datetime.now(timezone.utc).replace(
-                day=datetime.now().day + request.duration_days
-            ).isoformat(),
+            "expires_at": datetime.now(timezone.utc)
+            .replace(day=datetime.now().day + request.duration_days)
+            .isoformat(),
         }
-        
+
         # Track FlipSync revenue from management fee
         await _track_advertising_revenue(
             user_id=str(current_user.id),
@@ -171,23 +187,24 @@ async def create_boost_listing_campaign(
                 "listing_id": request.listing_id,
                 "ad_platform": request.ad_platform,
                 "user_budget": request.budget,
-            }
+            },
         )
-        
-        logger.info(f"Boost listing campaign created: {campaign_id}, FlipSync revenue: ${flipsync_fee:.2f}")
-        
+
+        logger.info(
+            f"Boost listing campaign created: {campaign_id}, FlipSync revenue: ${flipsync_fee:.2f}"
+        )
+
         return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
-            content=campaign_response
+            status_code=status.HTTP_201_CREATED, content=campaign_response
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error creating boost listing campaign: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Campaign creation failed: {str(e)}"
+            detail=f"Campaign creation failed: {str(e)}",
         )
 
 
@@ -199,7 +216,7 @@ async def list_active_campaigns(
 ):
     """
     List active advertising campaigns for the current user.
-    
+
     This endpoint:
     - Returns all campaigns created by the user
     - Provides real-time performance metrics
@@ -208,30 +225,34 @@ async def list_active_campaigns(
     """
     try:
         logger.info(f"Listing campaigns for user {current_user.id}")
-        
+
         # Get campaigns from advertising module (mock implementation)
         campaigns = await _get_user_campaigns(
             user_id=str(current_user.id),
             status_filter=status_filter,
-            platform_filter=platform_filter
+            platform_filter=platform_filter,
         )
-        
+
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
                 "success": True,
                 "campaigns": campaigns,
                 "total_campaigns": len(campaigns),
-                "active_campaigns": len([c for c in campaigns if c["status"] == "active"]),
-                "total_flipsync_revenue": sum(c.get("flipsync_revenue", 0) for c in campaigns),
-            }
+                "active_campaigns": len(
+                    [c for c in campaigns if c["status"] == "active"]
+                ),
+                "total_flipsync_revenue": sum(
+                    c.get("flipsync_revenue", 0) for c in campaigns
+                ),
+            },
         )
-        
+
     except Exception as e:
         logger.error(f"Error listing campaigns: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to list campaigns: {str(e)}"
+            detail=f"Failed to list campaigns: {str(e)}",
         )
 
 
@@ -243,7 +264,7 @@ async def update_campaign(
 ):
     """
     Update an existing advertising campaign.
-    
+
     This endpoint:
     - Updates campaign parameters (budget, targeting, status)
     - Recalculates FlipSync fees if budget changes
@@ -252,34 +273,34 @@ async def update_campaign(
     """
     try:
         logger.info(f"Updating campaign {campaign_id}")
-        
+
         # Validate campaign ownership
         campaign = await _get_campaign_by_id(campaign_id, str(current_user.id))
         if not campaign:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Campaign not found or access denied"
+                detail="Campaign not found or access denied",
             )
-        
+
         # Update campaign
         updated_campaign = await _update_campaign_details(campaign_id, request)
-        
+
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
                 "success": True,
                 "campaign": updated_campaign,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
-            }
+            },
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error updating campaign {campaign_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Campaign update failed: {str(e)}"
+            detail=f"Campaign update failed: {str(e)}",
         )
 
 
@@ -290,7 +311,7 @@ async def cancel_campaign(
 ):
     """
     Cancel an active advertising campaign.
-    
+
     This endpoint:
     - Stops the external advertising campaign
     - Calculates final FlipSync revenue
@@ -299,18 +320,18 @@ async def cancel_campaign(
     """
     try:
         logger.info(f"Cancelling campaign {campaign_id}")
-        
+
         # Validate campaign ownership
         campaign = await _get_campaign_by_id(campaign_id, str(current_user.id))
         if not campaign:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Campaign not found or access denied"
+                detail="Campaign not found or access denied",
             )
-        
+
         # Cancel campaign
         cancellation_result = await _cancel_campaign(campaign_id)
-        
+
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
@@ -318,21 +339,23 @@ async def cancel_campaign(
                 "campaign_id": campaign_id,
                 "cancellation_result": cancellation_result,
                 "cancelled_at": datetime.now(timezone.utc).isoformat(),
-            }
+            },
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error cancelling campaign {campaign_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Campaign cancellation failed: {str(e)}"
+            detail=f"Campaign cancellation failed: {str(e)}",
         )
 
 
 # Helper functions
-async def _calculate_roi_estimate(platform: str, budget: float, optimization_goal: str) -> float:
+async def _calculate_roi_estimate(
+    platform: str, budget: float, optimization_goal: str
+) -> float:
     """Calculate ROI estimate based on platform and budget."""
     # Platform-specific ROI multipliers
     platform_multipliers = {
@@ -341,9 +364,9 @@ async def _calculate_roi_estimate(platform: str, budget: float, optimization_goa
         "instagram": 2.5,
         "tiktok": 2.1,
     }
-    
+
     base_multiplier = platform_multipliers.get(platform.lower(), 2.5)
-    
+
     # Optimization goal adjustments
     goal_adjustments = {
         "conversions": 1.0,
@@ -351,19 +374,24 @@ async def _calculate_roi_estimate(platform: str, budget: float, optimization_goa
         "impressions": 0.6,
         "engagement": 0.7,
     }
-    
+
     adjustment = goal_adjustments.get(optimization_goal.lower(), 1.0)
-    
+
     return round(base_multiplier * adjustment, 2)
 
 
 async def _track_advertising_revenue(
-    user_id: str, campaign_id: str, revenue_amount: float, 
-    revenue_source: str, metadata: Dict[str, Any]
+    user_id: str,
+    campaign_id: str,
+    revenue_amount: float,
+    revenue_source: str,
+    metadata: Dict[str, Any],
 ) -> None:
     """Track FlipSync revenue from advertising campaigns."""
     # This would integrate with the revenue tracking system
-    logger.info(f"Tracking advertising revenue: ${revenue_amount:.2f} from {revenue_source}")
+    logger.info(
+        f"Tracking advertising revenue: ${revenue_amount:.2f} from {revenue_source}"
+    )
 
 
 async def _get_user_campaigns(
@@ -384,22 +412,26 @@ async def _get_user_campaigns(
                 "clicks": 45,
                 "conversions": 3,
                 "ctr": 3.6,
-                "roas": 2.8
+                "roas": 2.8,
             },
-            "created_at": "2025-01-29T10:00:00Z"
+            "created_at": "2025-01-29T10:00:00Z",
         }
     ]
-    
+
     return mock_campaigns
 
 
-async def _get_campaign_by_id(campaign_id: str, user_id: str) -> Optional[Dict[str, Any]]:
+async def _get_campaign_by_id(
+    campaign_id: str, user_id: str
+) -> Optional[Dict[str, Any]]:
     """Get campaign by ID if user has access."""
     # Mock implementation
     return {"campaign_id": campaign_id, "user_id": user_id, "status": "active"}
 
 
-async def _update_campaign_details(campaign_id: str, request: CampaignUpdateRequest) -> Dict[str, Any]:
+async def _update_campaign_details(
+    campaign_id: str, request: CampaignUpdateRequest
+) -> Dict[str, Any]:
     """Update campaign details."""
     # Mock implementation
     return {"campaign_id": campaign_id, "updated": True}

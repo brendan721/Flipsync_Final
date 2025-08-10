@@ -16,8 +16,8 @@ from datetime import datetime
 
 class V3CompletionPlanner:
     def __init__(self):
-        self.base_url = "http://174.138.77.110:8000"
-        self.ws_url = "ws://174.138.77.110:8000/ws/flipsync"
+        self.base_url = "http://localhost:8000"
+        self.ws_url = "ws://localhost:8000/ws/flipsync"
         self.session = requests.Session()
         self.session.timeout = 10
         

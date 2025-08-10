@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 # Database configuration
 DATABASE_CONFIG = {
-    "host": "174.138.77.110",
+    "host": "localhost",
     "port": 5432,
     "database": "flipsync_agentic_test",
     "user": "postgres",

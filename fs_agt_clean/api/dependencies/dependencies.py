@@ -276,7 +276,9 @@ async def get_agent_manager():
         )
 
         _agent_manager_instance = AutonomousAgentManager()
-        await _agent_manager_instance.initialize()
+        # 🔧 CRITICAL FIX: Don't initialize agents automatically to prevent resource leaks
+        # await _agent_manager_instance.initialize()
+        # Agents will be initialized on-demand when first requested
 
     return _agent_manager_instance
 

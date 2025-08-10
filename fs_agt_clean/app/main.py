@@ -22,6 +22,7 @@ from typing import Any, Awaitable, Callable, Dict, Optional
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -64,11 +65,18 @@ from fs_agt_clean.api.routes.marketplace import marketplace_router
 
 # Import the monitoring router (migrated)
 from fs_agt_clean.api.routes.monitoring import router as monitoring_router
+from fs_agt_clean.api.routes.agent_monitoring import router as agent_monitoring_router
 from fs_agt_clean.api.routes.revenue_routes import (
     router as revenue_router,  # ✅ NEW - Revenue Model
 )
 from fs_agt_clean.api.routes.websocket_simple import (
     router as websocket_simple_router,  # ✅ ENABLED - Simple WebSocket implementation
+)
+from fs_agt_clean.api.routes.websocket_monitoring import (
+    router as websocket_monitoring_router,  # ✅ NEW - Monitoring WebSocket for Flutter
+)
+from fs_agt_clean.api.routes.websocket_unified import (
+    router as websocket_unified_router,  # ✅ NEW - Unified WebSocket with authentication
 )
 
 # CLEANED: Legacy WebSocket routers removed - consolidated into websocket_unified_router
@@ -342,11 +350,11 @@ async def init_services() -> Dict[str, Any]:
                     )
                 else:
                     # Only use hardcoded default as last resort
-                    # Use localhost for direct droplet deployment
+                    # Use the correct database name for FlipSync
                     db_host = "localhost"
-                    connection_string = f"postgresql+asyncpg://postgres:postgres@{db_host}:5432/postgres"
+                    connection_string = f"postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@{db_host}:5432/flipsync_agentic_test"
                     logger.warning(
-                        f"No database connection string found in config or environment, using default: {connection_string}"
+                        f"No database connection string found in config or environment, using FlipSync default: {connection_string}"
                     )
 
             # Create the database connection manager with retry capabilities
@@ -587,22 +595,23 @@ async def init_services() -> Dict[str, Any]:
                     "✅ DYNAMIC IMPORT: Real Agent Manager created successfully"
                 )
 
-                # Initialize complete FlipSync agent system (27 specialized agents)
-                logger.info("Initializing complete FlipSync agent system...")
-                initialization_success = await real_agent_manager.initialize()
+                # 🔧 CRITICAL FIX: Skip agent initialization during startup to prevent resource leaks
+                logger.info(
+                    "🔧 RESOURCE LEAK FIX: Skipping agent initialization during startup"
+                )
+                logger.info(
+                    "📝 Agents will be initialized on-demand when first requested"
+                )
+                logger.info(
+                    "✅ Real Agent Manager created (agents will initialize lazily)"
+                )
 
-                if initialization_success:
-                    logger.info(
-                        "✅ Real Agent Manager initialization completed successfully"
-                    )
-                    # Log agent status for verification
-                    agent_statuses = await real_agent_manager.get_all_agent_statuses()
-                    logger.info(
-                        f"✅ Initialized {agent_statuses.get('total_agents', 0)} agents with status: {agent_statuses.get('overall_status', 'unknown')}"
-                    )
-                else:
-                    logger.error("❌ Real Agent Manager initialization failed")
-                    real_agent_manager = None
+                # Don't initialize agents during startup - they will be initialized on-demand
+                # This prevents resource leaks and improves startup time
+                # initialization_success = await real_agent_manager.initialize()
+
+                # Mark as successful without actually initializing agents
+                initialization_success = True
 
             except Exception as e:
                 logger.error(f"Failed to initialize Real Agent Manager: {e}")
@@ -728,9 +737,8 @@ async def lifespan(app: FastAPI):
 
     try:
         # Initialize core services
-        # TEMPORARILY DISABLED FOR DEBUGGING
-        # services = await init_services()
-        services = {}
+        # Re-enabled after debugging - services are required for authentication
+        services = await init_services()
 
         # Initialize global database instance for dependency injection
         logger.info("Initializing global database instance...")
@@ -937,6 +945,27 @@ async def lifespan(app: FastAPI):
             app.state.ebay_integration = None
             services["ebay_integration"] = None
 
+        # 🔄 Initialize eBay Token Lifecycle Manager
+        logger.info("🔄 Initializing eBay Token Lifecycle Manager...")
+        try:
+            from fs_agt_clean.services.marketplace.ebay_token_lifecycle_manager import (
+                get_token_lifecycle_manager,
+            )
+
+            token_lifecycle_manager = get_token_lifecycle_manager()
+            await token_lifecycle_manager.start_background_services()
+            app.state.token_lifecycle_manager = token_lifecycle_manager
+            services["token_lifecycle_manager"] = token_lifecycle_manager
+            logger.info("🔄 eBay Token Lifecycle Manager initialized successfully")
+            logger.info("   - Proactive refresh: Every hour")
+            logger.info("   - Refresh token monitoring: Daily")
+            logger.info("   - Health monitoring: Every 15 minutes")
+        except Exception as e:
+            logger.error(f"🔄 Failed to initialize Token Lifecycle Manager: {e}")
+            logger.warning("🔄 Continuing without Token Lifecycle Manager")
+            app.state.token_lifecycle_manager = None
+            services["token_lifecycle_manager"] = None
+
         # Additional service initialization would go here
         # ...
 
@@ -958,6 +987,18 @@ async def lifespan(app: FastAPI):
         # Cleanup services
         try:
             logger.info("Shutting down services...")
+
+            # Shutdown Token Lifecycle Manager if it was initialized
+            if (
+                hasattr(app.state, "token_lifecycle_manager")
+                and app.state.token_lifecycle_manager
+            ):
+                logger.info("🔄 Shutting down eBay Token Lifecycle Manager...")
+                try:
+                    await app.state.token_lifecycle_manager.stop_background_services()
+                    logger.info("🔄 eBay Token Lifecycle Manager shutdown complete")
+                except Exception as e:
+                    logger.error(f"🔄 Error shutting down Token Lifecycle Manager: {e}")
 
             # Shutdown ML service if it was initialized
             if ml_service_available:
@@ -1042,6 +1083,68 @@ async def lifespan(app: FastAPI):
                 except Exception as e:
                     logger.warning(f"Error shutting down real agent manager: {str(e)}")
 
+            # 🔧 CRITICAL FIX: Cleanup autonomous agents that may have been initialized during startup
+            logger.info("🧹 Cleaning up autonomous agents...")
+            try:
+                # Import agent registry to find any registered agents
+                from fs_agt_clean.core.registry.agent_registry import get_agent_registry
+
+                agent_registry = get_agent_registry()
+                registered_agents = await agent_registry.get_all_agents()
+
+                # Clean up each registered agent
+                for agent_info in registered_agents:
+                    try:
+                        agent_instance = agent_info.get("instance")
+                        agent_id = agent_info.get("agent_id", "unknown")
+
+                        if agent_instance and hasattr(agent_instance, "cleanup"):
+                            logger.info(f"🧹 Cleaning up agent: {agent_id}")
+                            await agent_instance.cleanup()
+                            logger.info(f"✅ Agent {agent_id} cleaned up successfully")
+                        elif agent_instance and hasattr(agent_instance, "close"):
+                            logger.info(f"🧹 Closing agent: {agent_id}")
+                            await agent_instance.close()
+                            logger.info(f"✅ Agent {agent_id} closed successfully")
+                        else:
+                            logger.debug(f"Agent {agent_id} has no cleanup method")
+
+                    except Exception as e:
+                        logger.warning(f"Error cleaning up agent {agent_id}: {e}")
+
+                # Shutdown the agent registry itself
+                await agent_registry.shutdown()
+                logger.info("✅ Agent registry shutdown complete")
+
+            except Exception as e:
+                logger.warning(f"Error during agent cleanup: {e}")
+
+            # 🔧 CRITICAL FIX: Cleanup any global database connections
+            logger.info("🧹 Cleaning up global database connections...")
+            try:
+                from fs_agt_clean.core.db.database import get_database
+
+                global_db = get_database()
+                if global_db and hasattr(global_db, "close"):
+                    await global_db.close()
+                    logger.info("✅ Global database connection closed")
+
+            except Exception as e:
+                logger.warning(f"Error closing global database connection: {e}")
+
+            # 🔧 CRITICAL FIX: Cleanup WebSocket connections
+            logger.info("🧹 Cleaning up WebSocket connections...")
+            try:
+                # Check if there's a WebSocket manager in app state
+                if hasattr(app, "state") and hasattr(app.state, "websocket_manager"):
+                    websocket_manager = app.state.websocket_manager
+                    if websocket_manager and hasattr(websocket_manager, "cleanup"):
+                        await websocket_manager.cleanup()
+                        logger.info("✅ WebSocket manager cleaned up")
+
+            except Exception as e:
+                logger.warning(f"Error cleaning up WebSocket connections: {e}")
+
             # Shutdown metrics service if it was initialized
             if metrics_service_available:
                 logger.info("Shutting down metrics service...")
@@ -1121,7 +1224,8 @@ def create_app() -> FastAPI:
         )
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+            "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
+            "connect-src 'self' wss: ws: https: http:; img-src 'self' data: https:; font-src 'self' data:"
         )
 
         # Hide server information
@@ -1229,6 +1333,7 @@ def create_app() -> FastAPI:
             router as decisions_4plus1_router,
         )
         from fs_agt_clean.api.routes.chat_4plus1 import router as chat_4plus1_router
+        from fs_agt_clean.api.routes.agent_tasks import router as agent_tasks_router
 
         # Register 4+1 Architecture API routes with proper prefixes
         app.include_router(
@@ -1247,6 +1352,11 @@ def create_app() -> FastAPI:
             chat_4plus1_router, prefix="/api/v1/chat/4plus1", tags=["4plus1-chat"]
         )
         logger.info("✅ 4+1 Chat API registered at /api/v1/chat/4plus1")
+
+        app.include_router(
+            agent_tasks_router, prefix="/api/v1", tags=["4plus1-agent-tasks"]
+        )
+        logger.info("✅ 4+1 Agent Tasks API registered at /api/v1/agents/tasks")
 
         logger.info("🎉 4+1 Architecture API Routes integration complete!")
 
@@ -1360,10 +1470,24 @@ def create_app() -> FastAPI:
     app.include_router(
         chat_router, prefix="/api/v1/chat", tags=["chat-legacy-compat"]
     )  # ✅ ENABLED - Database integration complete
+    # DISABLED: Simple WebSocket router conflicts with unified WebSocket authentication
+    # app.include_router(
+    #     websocket_simple_router, prefix="", tags=["websocket-simple"]
+    # )  # ❌ DISABLED - Conflicts with authenticated unified WebSocket endpoint
+    # logger.info("✅ Simple WebSocket router registered successfully at /ws/flipsync")
+
+    # Register unified WebSocket router with authentication
     app.include_router(
-        websocket_simple_router, prefix="", tags=["websocket-simple"]
-    )  # ✅ ENABLED - Simple WebSocket implementation for all real-time communication
-    logger.info("✅ Simple WebSocket router registered successfully at /ws/flipsync")
+        websocket_unified_router, prefix="/ws", tags=["websocket-unified"]
+    )  # ✅ ENABLED - Unified WebSocket with proper authentication
+    logger.info("✅ Unified WebSocket router registered successfully at /ws/flipsync")
+
+    app.include_router(
+        websocket_monitoring_router, prefix="", tags=["websocket-monitoring"]
+    )  # ✅ NEW - Monitoring WebSocket for Flutter frontend
+    logger.info(
+        "✅ Monitoring WebSocket router registered successfully at /ws/monitoring"
+    )
 
     # Week 3: Real-time Agent Showcase System
     try:
@@ -1459,6 +1583,30 @@ def create_app() -> FastAPI:
     except ImportError as e:
         logger.warning(f"⚠️ eBay Integration router not available: {e}")
 
+    # New Clean eBay OAuth System V2
+    try:
+        from fs_agt_clean.api.routes.ebay_oauth_v2 import router as ebay_oauth_v2_router
+        from fs_agt_clean.api.websockets.ebay_oauth_ws import (
+            ws_router as ebay_oauth_ws_router,
+        )
+
+        app.include_router(ebay_oauth_v2_router, tags=["eBay OAuth V2"])
+        app.include_router(ebay_oauth_ws_router, tags=["eBay OAuth WebSocket"])
+
+        # Add token monitoring routes
+        from fs_agt_clean.api.routes.ebay_token_monitoring import (
+            router as token_monitoring_router,
+        )
+
+        app.include_router(token_monitoring_router, tags=["eBay Token Monitoring"])
+
+        logger.info("✅ Clean eBay OAuth V2 system registered successfully")
+        logger.info("   - REST API: /api/v1/ebay/oauth/*")
+        logger.info("   - Token Monitoring: /api/v1/ebay/tokens/*")
+        logger.info("   - WebSocket: /ws/ebay/oauth/{user_id}")
+    except ImportError as e:
+        logger.warning(f"⚠️ eBay OAuth V2 system not available: {e}")
+
     # Week 4: Production Validation System
     try:
         from fs_agt_clean.api.routes.production_validation import (
@@ -1537,6 +1685,9 @@ def create_app() -> FastAPI:
     )
     app.include_router(
         enhanced_monitoring_router, prefix="/api/v1", tags=["enhanced-monitoring"]
+    )
+    app.include_router(
+        agent_monitoring_router, prefix="/api/v1", tags=["agent-monitoring"]
     )
 
     # AI Performance Monitoring
@@ -1822,20 +1973,17 @@ def create_app() -> FastAPI:
             "data_source": "real_user_data",
         }
 
-        # Get real eBay data using existing OAuth service
+        # Get real eBay data using new OAuth service
         try:
-            from fs_agt_clean.services.marketplace.ebay_oauth_service import (
-                EbayOAuthService,
-            )
-            from fs_agt_clean.services.marketplace.ebay_oauth_factory import (
-                EbayOAuthFactory,
+            from fs_agt_clean.services.marketplace.ebay_oauth_service_v2 import (
+                get_ebay_oauth_service,
             )
 
-            # Create eBay OAuth service using existing factory
-            oauth_service = EbayOAuthFactory.create_from_environment()
+            # Create eBay OAuth service using new implementation
+            oauth_service = get_ebay_oauth_service()
 
             # Get user's eBay token
-            token = await oauth_service.get_valid_token(db, current_user.user_id)
+            token = await oauth_service.get_user_tokens(current_user.user_id)
             if token:
                 # Use existing eBay service to get user's inventory
                 from fs_agt_clean.services.marketplace.ebay.compat import (
@@ -2142,15 +2290,15 @@ def create_app() -> FastAPI:
             "notifications": 0,
         }
 
-        # Sync eBay data using existing OAuth service
+        # Sync eBay data using new OAuth service
         try:
-            from fs_agt_clean.services.marketplace.ebay_oauth_factory import (
-                EbayOAuthFactory,
+            from fs_agt_clean.services.marketplace.ebay_oauth_service_v2 import (
+                get_ebay_oauth_service,
             )
             from fs_agt_clean.services.marketplace.ebay.compat import get_ebay_service
 
-            oauth_service = EbayOAuthFactory.create_from_environment()
-            token = await oauth_service.get_valid_token(db, current_user.user_id)
+            oauth_service = get_ebay_oauth_service()
+            token = await oauth_service.get_user_tokens(current_user.user_id)
 
             if token:
                 ebay_service = await get_ebay_service()
@@ -2381,6 +2529,7 @@ def create_app() -> FastAPI:
             "status": "operational",
             "documentation": "/docs",
             "health_check": "/api/v1/health",
+            "testing_frontend": "/testing-frontend/",
             "endpoints": {
                 "authentication": "/api/v1/auth",
                 "agents": "/api/v1/agents",
@@ -2433,24 +2582,16 @@ self.addEventListener('fetch', function(event) {
         that sends the result to the Flutter app via postMessage.
         """
         try:
-            # Import the callback handler and HTML generator
-            from fs_agt_clean.api.routes.marketplace.ebay import (
-                handle_ebay_oauth_callback_get,
-                generate_oauth_callback_html,
-                get_marketplace_repository,
-            )
+            # Import the new callback handler
+            from fs_agt_clean.api.routes.ebay_oauth_v2 import handle_ebay_oauth_callback
 
-            # Use the Redis-based marketplace repository (same as eBay routes)
-            marketplace_repo = await get_marketplace_repository()
-
-            # Call the existing OAuth callback handler (no authentication required - user_id extracted from state)
-            return await handle_ebay_oauth_callback_get(
+            # Call the new OAuth callback handler
+            return await handle_ebay_oauth_callback(
                 request=request,
                 code=code,
                 state=state,
                 error=error,
                 error_description=error_description,
-                marketplace_repo=marketplace_repo,
             )
         except Exception as e:
             logger.error(f"eBay OAuth callback error: {e}")
@@ -2490,6 +2631,25 @@ self.addEventListener('fetch', function(event) {
                 )
 
     app.include_router(root_router, tags=["root"])
+
+    # Mount static files for testing frontend
+    try:
+        import os
+
+        testing_frontend_path = "/opt/flipsync/testing-frontend"
+        if os.path.exists(testing_frontend_path):
+            app.mount(
+                "/testing-frontend",
+                StaticFiles(directory=testing_frontend_path, html=True),
+                name="testing-frontend",
+            )
+            logger.info("✅ Testing frontend mounted at /testing-frontend/")
+        else:
+            logger.warning(
+                f"⚠️ Testing frontend directory not found: {testing_frontend_path}"
+            )
+    except Exception as e:
+        logger.error(f"❌ Failed to mount testing frontend: {e}")
 
     # Webhook routes (migrated)
     try:

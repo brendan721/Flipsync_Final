@@ -91,7 +91,7 @@ fi
 # Environment-specific configuration
 case $ENVIRONMENT in
   production)
-    API_BASE_URL="${API_BASE_URL:-https://flipsyncai.com/api/v1}"
+    API_BASE_URL="${API_BASE_URL:-https://flipsyncai.com}"
     BASE_URL="${BASE_URL:-https://flipsyncai.com}"
     WEBSOCKET_URL="${WEBSOCKET_URL:-wss://flipsyncai.com/ws/flipsync}"
     SSL_ENABLED="${SSL_ENABLED:-true}"
@@ -132,7 +132,7 @@ case $ENVIRONMENT in
     ;;
     
   staging)
-    API_BASE_URL="${API_BASE_URL:-https://staging.flipsyncai.com/api/v1}"
+    API_BASE_URL="${API_BASE_URL:-https://staging.flipsyncai.com}"
     BASE_URL="${BASE_URL:-https://staging.flipsyncai.com}"
     WEBSOCKET_URL="${WEBSOCKET_URL:-wss://staging.flipsyncai.com/ws/flipsync}"
     SSL_ENABLED="${SSL_ENABLED:-true}"
@@ -141,7 +141,7 @@ case $ENVIRONMENT in
     ;;
     
   development)
-    API_BASE_URL="${API_BASE_URL:-http://localhost:8000/api/v1}"
+    API_BASE_URL="${API_BASE_URL:-http://localhost:8000}"
     BASE_URL="${BASE_URL:-http://localhost:8000}"
     WEBSOCKET_URL="${WEBSOCKET_URL:-ws://localhost:8000/ws/flipsync}"
     SSL_ENABLED="${SSL_ENABLED:-false}"

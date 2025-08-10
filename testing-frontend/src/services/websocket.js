@@ -1,4 +1,5 @@
 // WebSocket service for FlipSync real-time communication
+import { getWebSocketUrl, logConfiguration } from '../config/environment.js';
 
 class WebSocketService {
   constructor() {
@@ -11,11 +12,15 @@ class WebSocketService {
 
   connect() {
     try {
-      // Use WebSocket directly for FlipSync backend
-      // Use relative URL in development, absolute in production
-      const wsUrl = process.env.NODE_ENV === 'development'
-        ? 'ws://localhost:3000/ws/flipsync'
-        : 'ws://174.138.77.110:8000/ws/flipsync';
+      // Use working WebSocket endpoint for agent monitoring
+      const wsUrl = getWebSocketUrl('/ws/monitoring');
+
+      // Log configuration in development
+      if (process.env.NODE_ENV === 'development') {
+        logConfiguration();
+      }
+
+      console.log('Connecting to WebSocket:', wsUrl);
       this.socket = new WebSocket(wsUrl);
       
       this.socket.onopen = () => {
@@ -37,12 +42,15 @@ class WebSocketService {
         try {
           const data = JSON.parse(event.data);
           console.log('📥 WebSocket message received:', data);
-          
+
+          // Handle enhanced token lifecycle events
+          this.handleTokenLifecycleEvents(data);
+
           // Emit to specific listeners
           if (data.type) {
             this.emit(data.type, data);
           }
-          
+
           // Emit to general message listeners
           this.emit('message', data);
         } catch (error) {
@@ -71,12 +79,69 @@ class WebSocketService {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-      
+
       console.log(`🔄 Reconnecting in ${delay}ms... (attempt ${this.reconnectAttempts})`);
       setTimeout(() => this.connect(), delay);
     } else {
       console.error('❌ Max reconnection attempts reached');
       this.emit('max_reconnect_attempts', { attempts: this.reconnectAttempts });
+    }
+  }
+
+  handleTokenLifecycleEvents(data) {
+    // Handle enhanced eBay OAuth V2 and Token Lifecycle Management events
+    switch (data.type) {
+      case 'token_refresh_success':
+        console.log('🔄 Token refreshed successfully:', data.data);
+        this.emit('token_status_changed', {
+          type: 'refresh_success',
+          user_id: data.data?.user_id,
+          new_expires_at: data.data?.new_expires_at,
+          message: 'Token refreshed successfully'
+        });
+        break;
+
+      case 'token_cleared':
+        console.log('🧹 Token cleared:', data.data);
+        this.emit('token_status_changed', {
+          type: 'token_cleared',
+          user_id: data.data?.user_id,
+          reason: data.data?.reason,
+          message: 'Token cleared - re-authentication required'
+        });
+        break;
+
+      case 'reauth_required':
+        console.log('🔐 Re-authentication required:', data.data);
+        this.emit('token_status_changed', {
+          type: 'reauth_required',
+          user_id: data.data?.user_id,
+          message: data.data?.message || 'Re-authentication required'
+        });
+        break;
+
+      case 'token_refresh_failed':
+        console.log('❌ Token refresh failed:', data.data);
+        this.emit('token_status_changed', {
+          type: 'refresh_failed',
+          user_id: data.data?.user_id,
+          error: data.data?.error,
+          message: 'Token refresh failed'
+        });
+        break;
+
+      case 'proactive_refresh':
+        console.log('⏰ Proactive token refresh:', data.data);
+        this.emit('token_status_changed', {
+          type: 'proactive_refresh',
+          user_id: data.data?.user_id,
+          message: 'Token proactively refreshed'
+        });
+        break;
+
+      default:
+        // Handle other events normally
+        break;
     }
   }
 

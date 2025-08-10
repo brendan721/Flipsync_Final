@@ -94,16 +94,21 @@ class WebhookRegistration(BaseModel):
 # Get Shippo service instance
 async def get_shippo_service() -> ShippoService:
     """Get the Shippo service instance."""
-    # In a real implementation, the API key would be retrieved from a secure configuration
-    # For now, we'll use a test key
-    api_key = "shippo_test_cf1b6d0655e59fc71d3c42597adc5a1f4f043b60"
-    # Note: In a real implementation, we would properly handle the type compatibility
-    # between the metrics and notification services
+    import os
+
+    # SECURITY: API key must be provided via environment variable
+    api_key = os.getenv("SHIPPO_API_KEY")
+    if not api_key:
+        raise ValueError("SHIPPO_API_KEY environment variable must be set")
+
+    # Determine test mode based on environment
+    test_mode = os.getenv("ENVIRONMENT", "development") != "production"
+
     return ShippoService(
         api_key=api_key,
         metrics_service=None,  # Temporarily set to None to avoid type errors
         notification_service=None,  # Temporarily set to None to avoid type errors
-        test_mode=True,
+        test_mode=test_mode,
     )
 
 

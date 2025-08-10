@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { 
-  Activity, 
-  Settings, 
-  LogOut, 
-  Wifi, 
+import {
+  Activity,
+  Settings,
+  LogOut,
+  Wifi,
   WifiOff,
   RefreshCw,
   CheckCircle,
   AlertCircle,
-  Clock
+  Clock,
+  Zap,
+  GitBranch,
+  BarChart3,
+  Shield
 } from 'lucide-react';
 
 import SystemStatus from './SystemStatus';
@@ -17,6 +21,10 @@ import EbayOAuthTester from './EbayOAuthTester';
 import AgentTester from './AgentTester';
 import WebSocketTester from './WebSocketTester';
 import ProductPipelineTester from './ProductPipelineTester';
+import AdvancedAgentTester from './AdvancedAgentTester';
+import WorkflowSimulator from './WorkflowSimulator';
+import AnalyticsDashboard from './AnalyticsDashboard';
+import ProductionTester from './ProductionTester';
 
 import api from '../services/api';
 import websocket from '../services/websocket';
@@ -65,9 +73,13 @@ const Dashboard = ({ user, onLogout }) => {
 
   const tabs = [
     { id: 'system', label: 'System Status', icon: Activity },
-    { id: 'ebay', label: 'eBay OAuth', icon: Settings },
     { id: 'agents', label: 'Agent Testing', icon: RefreshCw },
+    { id: 'advanced-agents', label: 'Advanced Testing', icon: Zap },
+    { id: 'workflows', label: 'Workflow Simulator', icon: GitBranch },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'production', label: 'Production Testing', icon: Shield },
     { id: 'websocket', label: 'WebSocket', icon: Wifi },
+    { id: 'ebay', label: 'eBay OAuth', icon: Settings },
     { id: 'pipeline', label: 'Product Pipeline', icon: CheckCircle }
   ];
 
@@ -75,12 +87,20 @@ const Dashboard = ({ user, onLogout }) => {
     switch (activeTab) {
       case 'system':
         return <SystemStatus />;
-      case 'ebay':
-        return <EbayOAuthTester />;
       case 'agents':
         return <AgentTester />;
+      case 'advanced-agents':
+        return <AdvancedAgentTester />;
+      case 'workflows':
+        return <WorkflowSimulator />;
+      case 'analytics':
+        return <AnalyticsDashboard />;
+      case 'production':
+        return <ProductionTester />;
       case 'websocket':
         return <WebSocketTester />;
+      case 'ebay':
+        return <EbayOAuthTester />;
       case 'pipeline':
         return <ProductPipelineTester />;
       default:

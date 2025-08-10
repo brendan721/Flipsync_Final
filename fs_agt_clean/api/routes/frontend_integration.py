@@ -38,6 +38,7 @@ from fs_agt_clean.api.dependencies.dependencies import (
     get_orchestration_service,
     get_pipeline_controller,
     get_state_manager,
+    DisabledOrchestrationService,
 )
 from fs_agt_clean.core.agents.autonomous_agent_manager import AutonomousAgentManager
 from fs_agt_clean.core.pipeline.controller import PipelineController
@@ -296,7 +297,7 @@ async def enhanced_analyze_product(
     agent_manager: AutonomousAgentManager = Depends(get_agent_manager),
     pipeline_controller: PipelineController = Depends(get_pipeline_controller),
     state_manager: StateManager = Depends(get_state_manager),
-    orchestration_service: AutonomousAgentOrchestrationService = Depends(
+    orchestration_service: DisabledOrchestrationService = Depends(
         get_orchestration_service
     ),
 ):
@@ -395,7 +396,7 @@ async def enhanced_generate_listing(
     agent_manager: AutonomousAgentManager = Depends(get_agent_manager),
     pipeline_controller: PipelineController = Depends(get_pipeline_controller),
     state_manager: StateManager = Depends(get_state_manager),
-    orchestration_service: AutonomousAgentOrchestrationService = Depends(
+    orchestration_service: DisabledOrchestrationService = Depends(
         get_orchestration_service
     ),
 ):
@@ -494,7 +495,7 @@ async def enhanced_sales_optimization(
     agent_manager: AutonomousAgentManager = Depends(get_agent_manager),
     pipeline_controller: PipelineController = Depends(get_pipeline_controller),
     state_manager: StateManager = Depends(get_state_manager),
-    orchestration_service: AutonomousAgentOrchestrationService = Depends(
+    orchestration_service: DisabledOrchestrationService = Depends(
         get_orchestration_service
     ),
 ):

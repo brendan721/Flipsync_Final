@@ -269,6 +269,70 @@ class UnifiedWebSocketHandler:
         )
 
 
+async def authenticate_websocket_unified(
+    websocket: WebSocket, token: Optional[str] = None
+) -> bool:
+    """
+    Authenticate WebSocket connection using token from query parameters or headers.
+
+    Returns:
+        bool: True if authenticated, False otherwise
+    """
+    try:
+        logger.info("🔒 WebSocket authentication function called")
+
+        # Check for token in query parameters first
+        if not token:
+            token = websocket.query_params.get("token")
+            logger.info(
+                f"🔒 Token from query params: {'Found' if token else 'Not found'}"
+            )
+
+        # Check for token in headers if not in query params
+        if not token:
+            auth_header = websocket.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                token = auth_header[7:]  # Remove "Bearer " prefix
+                logger.info("🔒 Token from Authorization header: Found")
+            else:
+                logger.info("🔒 Token from Authorization header: Not found")
+
+        if not token:
+            logger.warning(
+                "🔒 Unified WebSocket authentication failed: No token provided"
+            )
+            return False
+
+        logger.info(f"🔒 Token received: {token[:30]}...")
+
+        # PRODUCTION FIX: Use proper JWT validation with consistent secret logic
+        from fs_agt_clean.core.websocket.mobile_auth_fix import _validate_jwt_token
+
+        if _validate_jwt_token(token):
+            logger.info("🔒 Unified WebSocket authentication successful with valid JWT")
+            return True
+        else:
+            logger.warning(
+                "🔒 Unified WebSocket authentication failed: Invalid JWT token"
+            )
+            return False
+
+    except Exception as e:
+        logger.error(f"🔒 Unified WebSocket authentication error: {e}")
+        return False
+
+
+@router.websocket("/test")
+async def test_websocket_endpoint(websocket: WebSocket):
+    """Simple test WebSocket endpoint to debug routing issues."""
+    logger.info("🔒 TEST WebSocket endpoint called!")
+    await websocket.accept()
+    await websocket.send_text(
+        json.dumps({"type": "test", "message": "Test endpoint working"})
+    )
+    await websocket.close()
+
+
 @router.websocket("/flipsync")
 async def unified_websocket_endpoint(
     websocket: WebSocket,
@@ -303,8 +367,13 @@ async def unified_websocket_endpoint(
         f"Unified WebSocket connection: client={client_id}, user={user_id}, conversation={conversation_id}"
     )
 
-    # Accept the WebSocket connection
+    # FIXED: Accept WebSocket connection first, then authenticate
     await websocket.accept()
+
+    # Authenticate WebSocket connection after accepting
+    if not await authenticate_websocket_unified(websocket, token):
+        await websocket.close(code=1008, reason="Authentication required")
+        return
 
     try:
         # Send connection confirmation

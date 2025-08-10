@@ -20,7 +20,7 @@ async def get_real_ebay_item_details():
         # Get access token from Redis
         import redis
         redis_client = redis.Redis(
-            host="174.138.77.110", 
+            host="localhost", 
             port=6379, 
             password="FlipSync2024SecureRedis!", 
             db=1

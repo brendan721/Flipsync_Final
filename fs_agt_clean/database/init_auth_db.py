@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 # Database configuration - use environment variable or fallback to correct test database
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+asyncpg://postgres:your_password@localhost:5432/flipsync_db",
+    "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test",
 )
 
 

@@ -17,7 +17,9 @@ from fs_agt_clean.core.models.content import (
     SEOAnalysisResponse,
 )
 from fs_agt_clean.core.monitoring.log_manager import LogManager
-from fs_agt_clean.services.llm.ollama_service import OllamaLLMService
+
+# REMOVED: LLM service import violates 4+1 architecture LLM-free requirement
+# from fs_agt_clean.services.llm.ollama_service import OllamaLLMService
 
 logger = logging.getLogger(__name__)
 
@@ -29,18 +31,18 @@ class ContentAutonomousAgentService:
         self,
         config: ConfigManager,
         log_manager: LogManager,
-        llm_service: Optional[OllamaLLMService] = None,
     ):
         """Initialize content agent service.
 
         Args:
             config: Configuration manager
             log_manager: Log manager for recording events
-            llm_service: Optional LLM service for content generation
+
+        Note: LLM service removed to maintain 4+1 architecture LLM-free compliance
         """
         self.config = config
         self.log_manager = log_manager
-        self.llm_service = llm_service
+        # REMOVED: LLM service to maintain autonomous agent LLM-free architecture
         self.templates = self._load_templates()
 
     async def start(self) -> None:
@@ -91,8 +93,10 @@ class ContentAutonomousAgentService:
 
             # Get template for marketplace
             template = self.templates.get(
-                request.marketplace.lower(), self.templates.get("amazon")
+                request.marketplace.lower(), self.templates.get("amazon", {})
             )
+            if not template:
+                template = self.templates.get("amazon", {})
 
             # Generate title
             title = self._generate_title(request, template)

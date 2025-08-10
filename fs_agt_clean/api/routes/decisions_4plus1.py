@@ -72,8 +72,8 @@ from fs_agt_clean.core.models.user import UnifiedUserResponse
 # Configure logging
 logger = logging.getLogger(__name__)
 
-# Create router with prefix and tags
-router = APIRouter(prefix="/decisions", tags=["4+1-architecture-decisions"])
+# Create router without prefix (prefix will be added in main.py)
+router = APIRouter(tags=["4+1-architecture-decisions"])
 
 # Database and repository instances
 database = get_database()
@@ -866,9 +866,19 @@ async def authenticate_websocket_decisions(websocket: WebSocket) -> bool:
             )
             return False
 
-        # For now, accept any non-empty token (production should validate JWT)
-        logger.info("🔒 Decisions WebSocket authentication successful")
-        return True
+        # PRODUCTION FIX: Use proper JWT validation with consistent secret logic
+        from fs_agt_clean.core.websocket.mobile_auth_fix import _validate_jwt_token
+
+        if _validate_jwt_token(token):
+            logger.info(
+                "🔒 Decisions WebSocket authentication successful with valid JWT"
+            )
+            return True
+        else:
+            logger.warning(
+                "🔒 Decisions WebSocket authentication failed: Invalid JWT token"
+            )
+            return False
 
     except Exception as e:
         logger.error(f"🔒 Decisions WebSocket authentication error: {e}")

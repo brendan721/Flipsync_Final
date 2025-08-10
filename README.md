@@ -91,11 +91,28 @@ The autonomous agents orchestrate 23+ specialized service components:
 
 ## 🔌 **WebSocket Architecture**
 
-### **Unified WebSocket Integration**
+### Public Monitoring WebSocket (no auth)
+```
+Endpoint: wss://www.flipsyncai.com/ws/monitoring
+Purpose: Health/telemetry and general real-time monitoring
+Auth: None required
+```
+
+### Unified WebSocket (authenticated)
 ```
 Endpoint: wss://www.flipsyncai.com/ws/flipsync
-Authentication: JWT Bearer token
+Authentication: JWT Bearer token via query (?token=...) or Authorization header
 Message Types: chat_message, agent_response_stream, agent_status, system_notification
+Notes: This is NOT the public monitoring socket. Attempting to connect without a token will be rejected.
+```
+
+### 4+1 WebSocket Endpoints (authenticated)
+```
+Agents Status: wss://www.flipsyncai.com/api/v1/agents/4plus1/ws/status
+Agent Decisions (by agent): wss://www.flipsyncai.com/api/v1/agents/4plus1/ws/decisions/{agent_id}
+Live Decisions Stream: wss://www.flipsyncai.com/api/v1/decisions/4plus1/ws/live
+Compliance Stream: wss://www.flipsyncai.com/api/v1/decisions/4plus1/ws/compliance
+Auth: JWT required via query (?token=...) or Authorization header
 ```
 
 ### **Real-time Workflow**
@@ -218,7 +235,10 @@ python3 test_websocket_authenticated.py
 ### **API Documentation**
 - **OpenAPI**: Available at `/docs` endpoint
 - **Agent Endpoints**: `/api/v1/agents/*`
-- **WebSocket**: `/ws/flipsync` with authentication
+- **WebSockets**:
+  - Public monitoring: `/ws/monitoring` (no auth)
+  - Unified: `/ws/flipsync` (JWT required)
+  - 4+1: `/api/v1/agents/4plus1/ws/*`, `/api/v1/decisions/4plus1/ws/*` (JWT required)
 
 ## 🤝 **Contributing**
 

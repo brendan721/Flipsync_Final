@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-DROPLET_IP="174.138.77.110"
+DROPLET_IP="192.168.110.71"
 DROPLET_USER="root"
 REMOTE_DIR="/opt/flipsync"
 LOCAL_DIR="/home/brend/Flipsync_Final"
@@ -64,4 +64,4 @@ fi
 
 echo ""
 echo "🎉 Code sync and restart complete!"
-echo "FlipSync Backend is running at: http://174.138.77.110:8000"
+echo "FlipSync Backend is running at: http://192.168.110.71:8000"

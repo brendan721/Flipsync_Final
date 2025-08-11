@@ -40,17 +40,17 @@ const ENVIRONMENT_CONFIG = {
   development: {
     // Development uses React proxy or relative URLs
     API_BASE_URL: '',
-    WS_BASE_URL: 'ws://174.138.77.110:8000',
+    WS_BASE_URL: 'ws://192.168.110.71:8000',
     OAUTH_REDIRECT_BASE: 'http://localhost:3000',
     ENVIRONMENT_NAME: 'Development',
     USE_HTTPS: false,
     ENABLE_DEBUG: true
   },
-  
+
   local: {
     // Local testing against production backend
-    API_BASE_URL: 'http://174.138.77.110:8000',
-    WS_BASE_URL: 'ws://174.138.77.110:8000',
+    API_BASE_URL: 'http://192.168.110.71:8000',
+    WS_BASE_URL: 'ws://192.168.110.71:8000',
     OAUTH_REDIRECT_BASE: 'http://localhost:3000',
     ENVIRONMENT_NAME: 'Local Testing',
     USE_HTTPS: false,
@@ -126,7 +126,7 @@ export function validateConfiguration() {
   }
   
   // Check for direct backend access in production
-  if (config.ENVIRONMENT === 'production' && config.API_BASE_URL.includes('174.138.77.110')) {
+  if (config.ENVIRONMENT === 'production' && config.API_BASE_URL.includes('192.168.110.71')) {
     issues.push({
       type: 'ARCHITECTURE_VIOLATION',
       message: 'Production frontend bypassing nginx proxy',

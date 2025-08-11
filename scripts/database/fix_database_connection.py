@@ -237,14 +237,14 @@ class DatabaseConnectionFixer:
 
         # Fix 1: Ensure correct environment variables
         if any("DATABASE_URL" in issue for issue in self.connection_issues):
-            correct_url = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test"
+            correct_url = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@192.168.110.71:5432/flipsync_agentic_test"
             os.environ["DATABASE_URL"] = correct_url
             os.environ["DB_NAME"] = "flipsync_agentic_test"
             fixes.append("✅ Set correct DATABASE_URL and DB_NAME")
 
         # Fix 2: Set other required environment variables
         required_env = {
-            "DB_HOST": "174.138.77.110",
+            "DB_HOST": "192.168.110.71",
             "DB_PORT": "5432",
             "DB_USER": "postgres",
             "DB_PASSWORD": "FlipSync_DB_Prod_2024_Secure_Key_9x7z",
@@ -277,8 +277,8 @@ sys.path.append('/home/brend/Flipsync_Final')
 
 async def init_database():
     """Initialize database for agent learning."""
-    # Set correct environment
-    os.environ["DATABASE_URL"] = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test"
+    # Set correct environment for Proxmox server
+    os.environ["DATABASE_URL"] = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@localhost:5432/flipsync_agentic_test"
     os.environ["DB_NAME"] = "flipsync_agentic_test"
     
     from fs_agt_clean.core.db.database import Database
@@ -311,7 +311,7 @@ if __name__ == "__main__":
                 "🔧 Fix database connectivity before proceeding with agent testing"
             )
             recommendations.append(
-                "📋 Verify database 'flipsync_agentic_test' exists on 174.138.77.110"
+                "📋 Verify database 'flipsync_agentic_test' exists on 192.168.110.71"
             )
             recommendations.append("🔑 Confirm database credentials are correct")
 

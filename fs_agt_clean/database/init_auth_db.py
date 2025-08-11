@@ -25,10 +25,10 @@ from fs_agt_clean.database.models.unified_base import Base
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Database configuration - use environment variable or fallback to correct test database
+# Database configuration - use environment variable or fallback to Proxmox server database
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test",
+    "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@localhost:5432/flipsync_agentic_test",
 )
 
 

@@ -20,7 +20,7 @@ const SANDBOX_CREDENTIALS = {
 };
 
 // Production backend
-const BACKEND_API = 'http://174.138.77.110:8000';
+const BACKEND_API = 'http://192.168.110.71:8000';
 
 class EbayOAuthCompleter {
   constructor() {

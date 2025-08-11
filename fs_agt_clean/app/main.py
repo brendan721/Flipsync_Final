@@ -16,7 +16,7 @@ except ImportError:
 import logging
 import os
 import time
-from contextlib import asynccontextmanager
+
 from datetime import datetime, timedelta, timezone
 from typing import Any, Awaitable, Callable, Dict, Optional
 
@@ -32,7 +32,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from fs_agt_clean.api.openapi import setup_openapi
 
 # Import additional migrated routes
-from fs_agt_clean.api.routes.agents import router as agents_router
+from fs_agt_clean.api.routes.agents import (
+    router as agents_router,
+    get_all_agent_statuses as get_agents_status,
+)
 from fs_agt_clean.api.routes.ai_routes import (
     router as ai_router,  # ✅ NEW - AI Vision Analysis
 )
@@ -69,9 +72,7 @@ from fs_agt_clean.api.routes.agent_monitoring import router as agent_monitoring_
 from fs_agt_clean.api.routes.revenue_routes import (
     router as revenue_router,  # ✅ NEW - Revenue Model
 )
-from fs_agt_clean.api.routes.websocket_simple import (
-    router as websocket_simple_router,  # ✅ ENABLED - Simple WebSocket implementation
-)
+
 from fs_agt_clean.api.routes.websocket_monitoring import (
     router as websocket_monitoring_router,  # ✅ NEW - Monitoring WebSocket for Flutter
 )
@@ -93,28 +94,19 @@ from fs_agt_clean.api.routes.websocket_unified import (
 # from fs_agt_clean.api.routes.secure import router as secure_router
 # from fs_agt_clean.api.routes.social_auth import router as social_auth_router
 # from fs_agt_clean.api.routes.token_rotation import router as token_rotation_router
-from fs_agt_clean.core.auth.auth_factory import AuthenticationFactory
-from fs_agt_clean.core.config.config_manager import ConfigManager
-from fs_agt_clean.core.db.connection_manager import DatabaseConnectionManager
-
 # from fs_agt_clean.core.security.sql_injection import sql_injection_guidelines  # Unused import
 # from fs_agt_clean.core.security.xss_prevention import get_secure_csp_config  # Unused import
-from fs_agt_clean.core.events.bus.secure_event_bus import SecureEventBus
 from fs_agt_clean.core.monitoring.exporters.prometheus import (
     API_ERROR_COUNT,
     ERROR_COUNT,
     REQUEST_COUNT,
     REQUEST_LATENCY,
-    SERVICE_STATUS,
     registry,
 )
-from fs_agt_clean.core.monitoring.logger import LogManager
-from fs_agt_clean.core.monitoring.metrics.collector import MetricsCollector
 
 # Import the NLP dashboard integration
 # from fs_agt_clean.core.nlp.web.dashboard_integration import integrate_dashboard  # Temporarily disabled - NLP module not migrated
-from fs_agt_clean.core.redis.redis_manager import RedisConfig, RedisManager
-from fs_agt_clean.core.security.audit_logger import ComplianceAuditLogger
+
 
 # Import our new security modules
 from fs_agt_clean.database.models.unified_user import UnifiedUserResponse
@@ -124,8 +116,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fs_agt_clean.api.dependencies.dependencies import get_current_user
 from fs_agt_clean.core.db.database import get_db
 from fs_agt_clean.core.security.csrf import get_csrf_token  # CSRFConfig is unused
-from fs_agt_clean.core.vault.secret_manager import VaultSecretManager
-from fs_agt_clean.core.vault.vault_client import VaultClient, VaultConfig
+
 
 # from fs_agt_clean.services.listing_generation.content_optimizer import ContentOptimizer  # Temporarily disabled - not migrated
 # from fs_agt_clean.services.listing_generation.listing_generator import ListingGenerator  # Temporarily disabled - not migrated
@@ -156,42 +147,42 @@ logger = logging.getLogger(__name__)
 try:
     from fs_agt_clean.services.notifications.service import NotificationService
 
-    notification_service_available = True
+    NOTIFICATION_SERVICE_AVAILABLE = True
 except ImportError:
     logger.warning("NotificationService not available - notifications will be disabled")
-    notification_service_available = False
+    NOTIFICATION_SERVICE_AVAILABLE = False
     NotificationService = None  # Define NotificationService as None to avoid NameError
 
 try:
-    db_monitoring_available = False
+    DB_MONITORING_AVAILABLE = False
 except ImportError:
     logger.warning("Database monitoring not available - will not be initialized")
-    db_monitoring_available = False
+    DB_MONITORING_AVAILABLE = False
 
 try:
     from fs_agt_clean.core.security.security_headers import (
         SecurityHeadersMiddleware as SecurityMiddleware,
     )
 
-    security_middleware_available = True
+    SECURITY_MIDDLEWARE_AVAILABLE = True
 except ImportError:
-    security_middleware_available = False
+    SECURITY_MIDDLEWARE_AVAILABLE = False
     logger.warning("SecurityMiddleware not available - import failed")
 
 # Import ML service components if available
 try:
     from fs_agt_clean.services.ml.service import MLService
 
-    ml_service_available = True
+    ML_SERVICE_AVAILABLE = True
 except ImportError:
     logger.warning("MLService not available - ML capabilities will be disabled")
-    ml_service_available = False
+    ML_SERVICE_AVAILABLE = False
 
 # Import dashboard functionality
 try:
     pass
 
-    dashboard_available = True
+    DASHBOARD_AVAILABLE = True
 except ImportError:
     try:
 
@@ -201,29 +192,29 @@ except ImportError:
 
     except Exception as e:
 
-        logger.warning(f"Dashboard initialization failed: {str(e)}")
-    dashboard_available = False
+        logger.warning("Dashboard initialization failed: %s", str(e))
+    DASHBOARD_AVAILABLE = False
 
 # Import document models
 try:
     pass
 
-    documents_models_available = True
+    DOCUMENTS_MODELS_AVAILABLE = True
 except ImportError:
     logger.warning(
         "Document models functionality disabled pending import path resolution"
     )
-    documents_models_available = False
+    DOCUMENTS_MODELS_AVAILABLE = False
 
 # Import metrics models to ensure they're registered with SQLAlchemy
 try:
     pass
 
     logger.info("Metrics models imported successfully")
-    metrics_models_available = True
+    METRICS_MODELS_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"Metrics models not available: {e}")
-    metrics_models_available = False
+    logger.warning("Metrics models not available: %s", e)
+    METRICS_MODELS_AVAILABLE = False
 
 # In-memory document storage (when document functionality is enabled)
 documents: Dict[str, Any] = {}
@@ -232,16 +223,16 @@ documents: Dict[str, Any] = {}
 try:
     pass
 
-    agent_coordinator_available = True
+    AGENT_COORDINATOR_AVAILABLE = True
     logger.info("Agent Coordinator module imported successfully")
 except ImportError as e:
-    logger.warning(f"Agent Coordinator functionality disabled: {str(e)}")
-    agent_coordinator_available = False
+    logger.warning("Agent Coordinator functionality disabled: %s", str(e))
+    AGENT_COORDINATOR_AVAILABLE = False
 
 # Real Agent Manager - DYNAMIC IMPORT APPROACH
 # Import will be done dynamically when needed to avoid startup issues
-real_agent_manager_available = True  # Assume available, will check dynamically
-RealAgentManager = None
+REAL_AGENT_MANAGER_AVAILABLE = True  # Assume available, will check dynamically
+REAL_AGENT_MANAGER = None
 
 logger.info("🔄 Real Agent Manager will be imported dynamically when needed")
 
@@ -249,10 +240,10 @@ logger.info("🔄 Real Agent Manager will be imported dynamically when needed")
 try:
     from fs_agt_clean.core.metrics.service import MetricsService
 
-    metrics_service_available = True
+    METRICS_SERVICE_AVAILABLE = True
 except ImportError:
     logger.warning("Metrics service support disabled pending import path resolution")
-    metrics_service_available = False
+    METRICS_SERVICE_AVAILABLE = False
 
 
 class MetricsMiddleware(BaseHTTPMiddleware):
@@ -286,878 +277,9 @@ class MetricsMiddleware(BaseHTTPMiddleware):
             raise
 
 
-async def init_services() -> Dict[str, Any]:
-    """Initialize core services in the correct order."""
-    config = ConfigManager()
-    log_manager = LogManager()
-    logger = log_manager.get_logger(__name__)
-
-    try:
-        # 1. Initialize Redis first using unified configuration
-        logger.info("Initializing Redis connection...")
-        from fs_agt_clean.core.config.redis_config_unified import (
-            get_global_redis_config,
-        )
-
-        unified_redis_config = get_global_redis_config()
-        logger.info(
-            f"Connecting to Redis at {unified_redis_config.host}:{unified_redis_config.port} "
-            f"(db: {unified_redis_config.db}, auth: {'yes' if unified_redis_config.password else 'no'})"
-        )
-
-        # Convert unified config to RedisManager compatible config
-        redis_config = RedisConfig(
-            host=unified_redis_config.host,
-            port=unified_redis_config.port,
-            db=unified_redis_config.db,
-            password=unified_redis_config.password,
-            encoding=unified_redis_config.encoding,
-            decode_responses=unified_redis_config.decode_responses,
-            socket_timeout=unified_redis_config.socket_timeout,
-            socket_connect_timeout=unified_redis_config.socket_connect_timeout,
-            retry_on_timeout=unified_redis_config.retry_on_timeout,
-            max_connections=unified_redis_config.max_connections,
-        )
-        redis_manager = RedisManager(redis_config)
-        await redis_manager.initialize()
-        logger.info("Redis connection established successfully")
-
-        # 2. Initialize Database
-        logger.info("Initializing Database...")
-
-        # Import the real Database class
-        from fs_agt_clean.core.db.database import Database
-
-        # Create a real database connection with enhanced error handling
-        try:
-            # Get database configuration from config
-            db_config = config.get_section("database") or {}
-            connection_string = db_config.get("connection_string")
-
-            # If no connection string is provided, check environment variables first
-            if not connection_string:
-                # Check for DATABASE_URL environment variable first
-                connection_string = os.getenv("DATABASE_URL")
-
-                if connection_string:
-                    # Convert from standard PostgreSQL URL to asyncpg format if needed
-                    if connection_string.startswith("postgresql://"):
-                        connection_string = connection_string.replace(
-                            "postgresql://", "postgresql+asyncpg://", 1
-                        )
-                    logger.info(
-                        f"Using DATABASE_URL environment variable: {connection_string}"
-                    )
-                else:
-                    # Only use hardcoded default as last resort
-                    # Use the correct database name for FlipSync
-                    db_host = "localhost"
-                    connection_string = f"postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@{db_host}:5432/flipsync_agentic_test"
-                    logger.warning(
-                        f"No database connection string found in config or environment, using FlipSync default: {connection_string}"
-                    )
-
-            # Create the database connection manager with retry capabilities
-            connection_manager = DatabaseConnectionManager(
-                config_manager=config,
-                connection_string=connection_string,
-                pool_size=db_config.get("pool_size", 5),
-                max_overflow=db_config.get("max_overflow", 10),
-                echo=db_config.get("echo", False),
-                max_retries=db_config.get("max_retries", 3),
-                retry_delay=db_config.get("retry_delay", 1.0),
-                max_retry_delay=db_config.get("max_retry_delay", 30.0),
-                jitter=db_config.get("jitter", True),
-            )
-
-            # Initialize the database connection with retry
-            success = await connection_manager.initialize()
-            if not success:
-                raise Exception(
-                    "Failed to initialize database connection after retries"
-                )
-
-            logger.info("Database connection initialized successfully")
-
-            # For backward compatibility, use the original Database class
-            # This will be replaced with the connection manager in future updates
-            database = Database(
-                config_manager=config,
-                connection_string=connection_string,
-                pool_size=db_config.get("pool_size", 5),
-                max_overflow=db_config.get("max_overflow", 10),
-                echo=db_config.get("echo", False),
-            )
-
-            # Initialize the database
-            await database.initialize()
-
-            # Create database tables if they don't exist
-            await database.create_tables()
-            logger.info("Database tables created successfully")
-
-            # Initialize WebSocket handler with the database
-            from fs_agt_clean.core.websocket.handlers import (
-                initialize_websocket_handler,
-            )
-
-            initialize_websocket_handler(database, app)
-            logger.info("WebSocket handler initialized with database and app reference")
-
-            # Store the connection manager for health checks and future use
-            database.connection_manager = connection_manager
-        except Exception as e:
-            logger.error(f"Error initializing database: {str(e)}")
-            logger.warning("Falling back to mock database for development")
-
-            # Instead of using a mock database, raise an exception to fail fast
-            # This ensures we don't run with a non-functional database
-            logger.error("Database connection failed and no fallback is available")
-            logger.error(
-                "Please check your database configuration and ensure the database is running"
-            )
-            logger.error(
-                "If you're running in development mode and want to proceed without a database,"
-            )
-            logger.error("set the ALLOW_NO_DB=true environment variable")
-
-            # PRODUCTION SECURITY: No mock database fallback allowed
-            # Fail fast if database connection cannot be established
-            logger.error(
-                "Database connection failed - production deployment requires functional database"
-            )
-            logger.error(
-                "ALLOW_NO_DB environment variable is deprecated and removed for security"
-            )
-            raise Exception(
-                "Database connection failed - production deployment requires functional database"
-            )
-
-        # Create database tables if they don't exist
-        await database.create_tables()
-        logger.info("Database tables created successfully")
-
-        # 3. Initialize Unified Authentication System (FlipSync Users Only)
-        logger.info("Initializing Unified Authentication System for FlipSync users...")
-        logger.info("📝 Note: This is separate from eBay OAuth integration")
-
-        try:
-            # Initialize unified authentication system using factory
-            unified_auth_system = await AuthenticationFactory.get_auth_system()
-            logger.info("✅ Unified FlipSync user authentication system initialized")
-
-            # Set the unified system as the primary auth service
-            auth_service = unified_auth_system
-            db_auth_service = unified_auth_system  # Use unified system for both
-
-            logger.info(
-                "✅ Authentication consolidation: Using UnifiedAuthSystem as primary"
-            )
-            logger.info("📝 Note: Legacy authentication systems have been removed")
-
-        except Exception as e:
-            logger.error(f"❌ Failed to initialize unified authentication system: {e}")
-            logger.error("🚨 No fallback available - unified auth system is required")
-            raise RuntimeError(f"Authentication system initialization failed: {e}")
-
-        # Initialize webhook database
-        try:
-            from fs_agt_clean.core.db.init_webhook_db import init_webhook_db
-
-            logger.info("Imported init_webhook_db function")
-
-            logger.info("Getting database session for webhook initialization")
-            async with database.get_session_context() as session:
-                logger.info("Starting webhook database initialization")
-                await init_webhook_db(session)
-                logger.info("Webhook database initialized successfully")
-        except Exception as e:
-            logger.error(
-                f"Error initializing webhook database: {str(e)}", exc_info=True
-            )
-
-        logger.info("Auth services initialized successfully")
-
-        # 3. Initialize Event Bus and Core Services
-        logger.info("Initializing core services...")
-        event_bus = SecureEventBus()
-        metrics_collector = MetricsCollector()
-        ComplianceAuditLogger()
-
-        # 4. Initialize Token Management and Rotation Services
-        # These imports are inside the function to avoid circular imports
-
-        # from fs_agt_clean.core.security.audit_logger import SecurityAuditLogger  # Temporarily disabled
-        # from fs_agt_clean.core.security.token_manager import TokenManager  # Temporarily disabled
-        # from fs_agt_clean.core.security.token_rotation import TokenRotationService  # Temporarily disabled
-
-        logger.info("Initializing token management services...")
-
-        # Create a security audit logger for token operations
-        try:
-            from fs_agt_clean.core.security.token_manager import (
-                SecurityAuditLogger,
-                TokenManager,
-                VaultSecretManager,
-            )
-
-            # Create mock instances for development
-            security_audit_logger = SecurityAuditLogger()
-            vault_secret_manager = VaultSecretManager()
-
-            # Initialize token manager
-            token_manager = TokenManager(
-                secret_manager=vault_secret_manager, audit_logger=security_audit_logger
-            )
-            await token_manager.start()
-
-            # Token rotation service is not implemented yet
-            token_rotation_service = None
-
-            logger.info("Token management services initialized successfully")
-        except Exception as e:
-            logger.warning(f"Failed to initialize token management services: {e}")
-            security_audit_logger = None
-            token_manager = None
-            token_rotation_service = None
-
-        # 5. Initialize Business Logic Services
-        # content_optimizer = ContentOptimizer(  # Temporarily disabled - not migrated
-        #     event_bus=event_bus,
-        #     metrics_collector=metrics_collector,
-        #     audit_logger=audit_logger,
-        # )
-
-        # listing_generator = ListingGenerator(  # Temporarily disabled - not migrated
-        #     event_bus=event_bus,
-        #     content_optimizer=content_optimizer,
-        #     metrics_collector=metrics_collector,
-        #     audit_logger=audit_logger,
-        # )
-
-        # 6. Initialize Vector Store
-        logger.info("Initializing Vector Store...")
-        try:
-            from fs_agt_clean.core.vector_store.models import (
-                VectorDistanceMetric,
-                VectorStoreConfig,
-            )
-            from fs_agt_clean.core.vector_store.providers.qdrant import (
-                QdrantVectorStore,
-            )
-
-            # Create Qdrant configuration
-            qdrant_config = VectorStoreConfig(
-                store_id="flipsync-vectors",
-                dimension=1536,  # Standard OpenAI embedding dimension
-                distance_metric=VectorDistanceMetric.COSINE,
-                host=os.getenv("QDRANT_HOST", "localhost"),
-                port=int(os.getenv("QDRANT_PORT", "6333")),
-            )
-
-            # Initialize Qdrant vector store
-            qdrant = QdrantVectorStore(qdrant_config)
-            await qdrant.initialize()
-            logger.info("Vector Store (Qdrant) initialized successfully")
-        except Exception as e:
-            logger.warning(f"Failed to initialize Vector Store: {e}")
-            qdrant = None
-
-        # Set service status to up
-        SERVICE_STATUS.labels(service="fs_agt").set(1)
-
-        # Initialize SimpleQdrantService
-        logger.info("Initializing SimpleQdrantService...")
-        try:
-            from fs_agt_clean.services.qdrant.simple_service import SimpleQdrantService
-
-            qdrant_service = SimpleQdrantService()
-            await qdrant_service.init_schema()
-            logger.info("SimpleQdrantService initialized successfully")
-        except Exception as e:
-            logger.warning(f"Failed to initialize SimpleQdrantService: {e}")
-            qdrant_service = None
-
-        # Initialize Real Agent Manager (Skip initialization for faster startup)
-        real_agent_manager = None
-        if real_agent_manager_available:
-            try:
-                logger.info(
-                    "🚀 DYNAMIC IMPORT: Creating Real Agent Manager with dynamic import..."
-                )
-                # Dynamic import to avoid startup issues
-                from fs_agt_clean.core.agents.autonomous_agent_manager import (
-                    AutonomousAgentManager,
-                )
-
-                real_agent_manager = AutonomousAgentManager()
-                logger.info(
-                    "✅ DYNAMIC IMPORT: Real Agent Manager created successfully"
-                )
-
-                # 🔧 CRITICAL FIX: Skip agent initialization during startup to prevent resource leaks
-                logger.info(
-                    "🔧 RESOURCE LEAK FIX: Skipping agent initialization during startup"
-                )
-                logger.info(
-                    "📝 Agents will be initialized on-demand when first requested"
-                )
-                logger.info(
-                    "✅ Real Agent Manager created (agents will initialize lazily)"
-                )
-
-                # Don't initialize agents during startup - they will be initialized on-demand
-                # This prevents resource leaks and improves startup time
-                # initialization_success = await real_agent_manager.initialize()
-
-                # Mark as successful without actually initializing agents
-                initialization_success = True
-
-            except Exception as e:
-                logger.error(f"Failed to initialize Real Agent Manager: {e}")
-                logger.exception("Full Real Agent Manager initialization error:")
-                real_agent_manager = None
-        else:
-            logger.warning("Real Agent Manager not available")
-
-        # Initialize chat and realtime services with database
-        logger.info("Initializing chat and realtime services...")
-        try:
-            from fs_agt_clean.services import realtime_service as realtime_module
-            from fs_agt_clean.services.communication.strategic_chat_service import (
-                StrategicChatService,
-            )
-            from fs_agt_clean.services.communication.strategic_chat_adapter import (
-                StrategicChatAdapter,
-            )
-            from fs_agt_clean.services.realtime_service import RealtimeService
-
-            # Initialize strategic chat service with Gemini integration (4+1 architecture)
-            strategic_service = StrategicChatService(daily_budget=10.0)
-            chat_service = StrategicChatAdapter(strategic_service, database)
-
-            # Initialize realtime service with database
-            realtime_service_instance = RealtimeService(database=database)
-
-            # Update the global realtime_service instance
-            realtime_module.realtime_service = realtime_service_instance
-
-            logger.info("Chat and realtime services initialized successfully")
-
-        except Exception as e:
-            logger.error(f"Error initializing chat and realtime services: {e}")
-            # Create minimal fallback instances
-            chat_service = None
-            realtime_service_instance = None
-
-        # Return all initialized services
-        services = {
-            "config": config,
-            "log_manager": log_manager,
-            "redis_manager": redis_manager,
-            "auth_service": auth_service,
-            "db_auth_service": db_auth_service,  # Add db_auth_service to services
-            "database": database,  # Add database to services
-            "chat_service": chat_service,  # Add chat service
-            "realtime_service": realtime_service_instance,  # Add realtime service
-            # "listing_generator": listing_generator,  # Temporarily disabled - not migrated
-            "metrics_collector": metrics_collector,
-            "qdrant": qdrant,
-            "event_bus": event_bus,
-            "token_manager": token_manager,
-            "token_rotation_service": token_rotation_service,
-            "security_audit_logger": security_audit_logger,
-            "qdrant_service": qdrant_service,  # Add QdrantService to services
-            "real_agent_manager": real_agent_manager,  # Add Real Agent Manager
-        }
-
-        # Initialize optional database if available
-        if db_monitoring_available:
-            # Database would be initialized here if available
-            logger.info("Database monitoring available, but no database configured yet")
-            # If you have a database component, add it to services here
-
-        # Initialize webhook module
-        logger.info("Initializing webhook module...")
-        try:
-            from fs_agt_clean.services.webhooks.ebay_handler import EbayWebhookHandler
-            from fs_agt_clean.services.webhooks.service import WebhookService
-
-            # Create webhook service
-            webhook_service = WebhookService(
-                config_manager=services.get("config"),
-                database=services.get("database"),
-                metrics_service=services.get("metrics_service"),
-                notification_service=services.get("notification_service"),
-            )
-
-            # Initialize webhook service
-            await webhook_service.initialize()
-
-            # Create eBay webhook handler
-            ebay_webhook_handler = EbayWebhookHandler(
-                ebay_service=services.get("ebay"),
-                metrics_service=services.get("metrics_service"),
-                notification_service=services.get("notification_service"),
-            )
-
-            # Register eBay handler with webhook service
-            await webhook_service.register_handler("ebay", ebay_webhook_handler)
-
-            # Add to services
-            services["webhook_service"] = webhook_service
-            services["ebay_webhook_handler"] = ebay_webhook_handler
-
-            logger.info("Webhook module initialized successfully")
-
-        except Exception as e:
-            logger.error(f"Webhook module initialization failed: {str(e)}")
-            logger.warning("Continuing without webhook module")
-
-        return services
-    except Exception as e:
-        logger.error("Service initialization failed: %s", str(e))
-        logger.exception("Full exception details:")
-        # Set service status to down on error
-        SERVICE_STATUS.labels(service="fs_agt").set(0)
-        raise RuntimeError(f"Failed to initialize services: {str(e)}") from e
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Manage application startup and shutdown.
-
-    This is the consolidated lifespan manager incorporating functionality from:
-    - fs_agt/main.py
-    - fs_agt/services/ml/app.py
-    - fs_agt/services/api/main.py
-    - fs_agt/services/dashboard/main.py
-    """
-    services = {}
-
-    try:
-        # Initialize core services
-        # Re-enabled after debugging - services are required for authentication
-        services = await init_services()
-
-        # Initialize global database instance for dependency injection
-        logger.info("Initializing global database instance...")
-        try:
-            from fs_agt_clean.core.db.database import initialize_global_database
-
-            await initialize_global_database()
-            logger.info("Global database instance initialized successfully")
-        except Exception as e:
-            logger.error(f"Failed to initialize global database instance: {e}")
-            # Don't fail startup, as the main database is already initialized
-
-        # Store services in app state for dependency injection
-        app.state.redis = services.get("redis_manager")
-        app.state.auth = services.get("auth_service")  # Unified auth system
-        app.state.db_auth = services.get("db_auth_service")  # Also unified auth system
-        app.state.unified_auth = services.get("auth_service")  # Explicit reference
-        app.state.database = services.get("database")
-        app.state.chat_service = services.get("chat_service")
-        app.state.realtime_service = services.get("realtime_service")
-        app.state.qdrant_service = services.get("qdrant_service")
-        app.state.real_agent_manager = services.get("real_agent_manager")
-        app.state.webhook_service = services.get("webhook_service")
-        app.state.ebay_webhook_handler = services.get("ebay_webhook_handler")
-
-        # ✅ CRITICAL FIX: Ensure chat service has app reference for RealAgentManager access
-        if app.state.chat_service and not hasattr(app.state.chat_service, "app"):
-            logger.info(
-                "Setting app reference in chat service for RealAgentManager access"
-            )
-            app.state.chat_service.app = app
-            logger.info("✅ Chat service app reference set successfully")
-        elif app.state.chat_service and app.state.chat_service.app is None:
-            logger.info("Updating null app reference in chat service")
-            app.state.chat_service.app = app
-            logger.info("✅ Chat service app reference updated successfully")
-        else:
-            logger.info(
-                "Chat service already has app reference or chat service is None"
-            )
-
-        # Initialize metrics service (previously in services/api/main.py)
-        if metrics_service_available:
-            logger.info("Initializing metrics service...")
-            # During actual consolidation, this would be replaced with real metrics service init
-            try:
-                # Get the required services
-                config_manager = services.get("config")
-                log_manager = services.get("log_manager")
-
-                # Make sure they are not None
-                if not config_manager or not log_manager:
-                    # If they're not available, create them
-                    if not config_manager:
-                        config_manager = ConfigManager()
-                    if not log_manager:
-                        log_manager = LogManager()
-
-                # Create the metrics service (no constructor parameters)
-                metrics_service = MetricsService()
-
-                # Add it to the services dictionary
-                services["metrics_service"] = metrics_service
-
-                logger.info("Metrics service initialized successfully")
-
-            except Exception as e:
-                logger.warning(f"Metrics service initialization failed: {str(e)}")
-                # Don't set metrics_service to None here, as it's not used
-
-        # Initialize ML service (previously in services/ml/app.py)
-        if ml_service_available:
-            logger.info("Initializing ML service...")
-            # During actual consolidation, this would initialize the ML service
-            # await ml_service.setup()
-            try:
-
-                # Initialize ML service with config and metrics
-                ml_service = MLService(
-                    config_manager=services.get("config"),
-                    metrics_service=services.get("metrics_service"),
-                )
-
-                # Add to services dictionary
-                services["ml_service"] = ml_service
-
-                # Make sure it's available in the app state
-                app.state.ml_service = ml_service
-
-                logger.info("ML service initialized successfully")
-
-            except Exception as e:
-
-                logger.warning(f"ML service initialization failed: {str(e)}")
-
-                ml_service = None
-
-        # Initialize Dashboard service (previously in services/dashboard/main.py)
-        # Define dashboard_available at the module level to avoid UnboundLocalError
-        global dashboard_available
-        dashboard_available = True  # Force dashboard to be available
-        if dashboard_available:
-            # We'll use the real dashboard service instead of a mock
-            logger.info("Initializing Dashboard service...")
-            try:
-                from fs_agt_clean.services.dashboard.service import DashboardService
-
-                # Create and initialize the dashboard service
-                dashboard_service = DashboardService(
-                    config_manager=services.get("config"),
-                    metrics_service=services.get("metrics_service")
-                    or services.get("metrics_collector"),
-                    database=services.get("database"),
-                )
-
-                # Initialize the dashboard service
-                await dashboard_service.initialize()
-
-                # Add to services
-                services["dashboard_service"] = dashboard_service
-
-                # Make sure it's available in the app state
-                app.state.dashboard_service = dashboard_service
-
-                logger.info("Dashboard service initialized successfully")
-            except ImportError as ie:
-                logger.warning(
-                    f"Dashboard service module not found - using placeholder: {str(ie)}"
-                )
-                logger.info("Dashboard service initialization placeholder")
-            except Exception as e:
-                logger.warning(f"Dashboard service initialization failed: {str(e)}")
-                logger.info("Dashboard service initialization placeholder")
-
-        # Initialize enhanced monitoring services
-        logger.info("Initializing enhanced monitoring services...")
-        try:
-            from fs_agt_clean.core.monitoring.health_monitor import RealHealthMonitor
-            from fs_agt_clean.services.monitoring.alert_service import (
-                EnhancedAlertService,
-            )
-            from fs_agt_clean.services.monitoring.metrics_collector import (
-                MetricsCollector as EnhancedMetricsCollector,
-            )
-            from fs_agt_clean.services.monitoring.metrics_service import (
-                MetricsService as EnhancedMetricsService,
-            )
-
-            # Create enhanced monitoring services
-            enhanced_metrics_service = EnhancedMetricsService(services["database"])
-            alert_service = EnhancedAlertService(services["database"])
-            health_monitor = RealHealthMonitor()
-            enhanced_metrics_collector = EnhancedMetricsCollector(
-                metrics_service=enhanced_metrics_service,
-                health_monitor=health_monitor,
-                collection_interval=60,  # Collect metrics every minute
-                service_name="flipsync-api",
-            )
-
-            # Store enhanced monitoring services
-            services["enhanced_metrics_service"] = enhanced_metrics_service
-            services["enhanced_alert_service"] = alert_service
-            services["enhanced_health_monitor"] = health_monitor
-            services["enhanced_metrics_collector"] = enhanced_metrics_collector
-
-            # Start the metrics collector
-            await enhanced_metrics_collector.start()
-
-            logger.info("Enhanced monitoring services initialized successfully")
-        except Exception as e:
-            logger.error(f"Failed to initialize enhanced monitoring services: {e}")
-            logger.warning("Continuing without enhanced monitoring")
-
-        # Model pre-loading is now handled by startup script (scripts/preload_ollama_models.sh)
-        # This eliminates the need for application-based pre-loading and reduces complexity
-        logger.info(
-            "Model pre-loading handled by startup script - no application-based pre-loading needed"
-        )
-
-        # 🤖 Initialize eBay Agentic Integration Service
-        if os.getenv("ENABLE_AGENTIC_INTEGRATION", "true").lower() == "true":
-            logger.info("🤖 Initializing eBay Agentic Integration Service...")
-            try:
-                from fs_agt_clean.services.marketplace.ebay_inventory_integration import (
-                    get_ebay_integration_service,
-                )
-
-                ebay_integration = await get_ebay_integration_service()
-                app.state.ebay_integration = ebay_integration
-                services["ebay_integration"] = ebay_integration
-                logger.info(
-                    "🤖 eBay Agentic Integration Service initialized successfully"
-                )
-            except Exception as e:
-                logger.error(
-                    f"🤖 Failed to initialize eBay Agentic Integration Service: {e}"
-                )
-                logger.warning("🤖 Continuing without eBay Agentic Integration Service")
-                # Don't fail startup if agentic integration fails
-                app.state.ebay_integration = None
-                services["ebay_integration"] = None
-        else:
-            logger.info("🤖 eBay Agentic Integration Service disabled via feature flag")
-            app.state.ebay_integration = None
-            services["ebay_integration"] = None
-
-        # 🔄 Initialize eBay Token Lifecycle Manager
-        logger.info("🔄 Initializing eBay Token Lifecycle Manager...")
-        try:
-            from fs_agt_clean.services.marketplace.ebay_token_lifecycle_manager import (
-                get_token_lifecycle_manager,
-            )
-
-            token_lifecycle_manager = get_token_lifecycle_manager()
-            await token_lifecycle_manager.start_background_services()
-            app.state.token_lifecycle_manager = token_lifecycle_manager
-            services["token_lifecycle_manager"] = token_lifecycle_manager
-            logger.info("🔄 eBay Token Lifecycle Manager initialized successfully")
-            logger.info("   - Proactive refresh: Every hour")
-            logger.info("   - Refresh token monitoring: Daily")
-            logger.info("   - Health monitoring: Every 15 minutes")
-        except Exception as e:
-            logger.error(f"🔄 Failed to initialize Token Lifecycle Manager: {e}")
-            logger.warning("🔄 Continuing without Token Lifecycle Manager")
-            app.state.token_lifecycle_manager = None
-            services["token_lifecycle_manager"] = None
-
-        # Additional service initialization would go here
-        # ...
-
-        # Update service status - using registry directly to avoid linter errors
-        # During actual consolidation this would use the proper ServiceStatus method
-        logger.info("Services started successfully")
-        yield services
-
-    except Exception as e:
-        logger.error("Error during application startup: %s", str(e))
-        logger.exception(e)
-        # Update service status - using logger to avoid linter errors
-        # During actual consolidation this would use the proper ServiceStatus method
-        logger.error("Service status: down due to startup error")
-        # Re-raise to prevent app startup with failed initialization
-        raise
-
-    finally:
-        # Cleanup services
-        try:
-            logger.info("Shutting down services...")
-
-            # Shutdown Token Lifecycle Manager if it was initialized
-            if (
-                hasattr(app.state, "token_lifecycle_manager")
-                and app.state.token_lifecycle_manager
-            ):
-                logger.info("🔄 Shutting down eBay Token Lifecycle Manager...")
-                try:
-                    await app.state.token_lifecycle_manager.stop_background_services()
-                    logger.info("🔄 eBay Token Lifecycle Manager shutdown complete")
-                except Exception as e:
-                    logger.error(f"🔄 Error shutting down Token Lifecycle Manager: {e}")
-
-            # Shutdown ML service if it was initialized
-            if ml_service_available:
-                logger.info("Shutting down ML service...")
-                # During actual consolidation, this would clean up the ML service
-                # await ml_service.cleanup()
-
-            # Shutdown eBay integration service (temporarily disabled)
-            # if hasattr(app.state, "ebay_integration"):
-            #     try:
-            #         from fs_agt_clean.services.marketplace.ebay_inventory_integration import (
-            #             shutdown_ebay_integration_service,
-            #         )
-            #
-            #         await shutdown_ebay_integration_service()
-            #         logger.info("eBay integration service shutdown complete")
-            #     except Exception as e:
-            #         logger.error(f"Error shutting down eBay integration service: {e}")
-
-            # Shutdown other services
-            if "auth_service" in services:
-                logger.info(
-                    "AuthService shutdown skipped - no shutdown method available"
-                )
-
-            if "redis_manager" in services:
-                await services["redis_manager"].close()
-
-            # Shutdown dashboard service if it was initialized
-            if dashboard_available and "dashboard_service" in services:
-                logger.info("Shutting down Dashboard service...")
-                try:
-                    await services["dashboard_service"].shutdown()
-                    logger.info("Dashboard service shutdown complete")
-                except Exception as e:
-                    logger.warning(f"Error shutting down Dashboard service: {str(e)}")
-
-            # Shutdown webhook module if it was initialized
-            if "webhook_module" in services:
-                logger.info("Shutting down webhook module...")
-                try:
-                    # Call shutdown method if it exists
-                    if hasattr(services["webhook_module"], "shutdown"):
-                        await services["webhook_module"].shutdown()
-                        logger.info("Webhook module shutdown complete")
-                    else:
-                        logger.info("Webhook module has no shutdown method")
-                except Exception as e:
-                    logger.warning(f"Error shutting down webhook module: {str(e)}")
-
-            # Shutdown enhanced monitoring services if they were initialized
-            if "enhanced_metrics_collector" in services:
-                logger.info("Shutting down enhanced metrics collector...")
-                try:
-                    await services["enhanced_metrics_collector"].stop()
-                    logger.info("Enhanced metrics collector shutdown complete")
-                except Exception as e:
-                    logger.warning(
-                        f"Error shutting down enhanced metrics collector: {str(e)}"
-                    )
-
-            # 🤖 Shutdown eBay Agentic Integration Service if it was initialized
-            if (
-                "ebay_integration" in services
-                and services["ebay_integration"] is not None
-            ):
-                logger.info("🤖 Shutting down eBay Agentic Integration Service...")
-                try:
-                    # The integration service doesn't have a shutdown method, so just log
-                    logger.info("🤖 eBay Agentic Integration Service shutdown complete")
-                except Exception as e:
-                    logger.warning(
-                        f"🤖 Error shutting down eBay Agentic Integration Service: {str(e)}"
-                    )
-
-            # Shutdown real agent manager if it was initialized
-            if "real_agent_manager" in services:
-                logger.info("Shutting down real agent manager...")
-                try:
-                    await services["real_agent_manager"].shutdown()
-                    logger.info("Real agent manager shutdown complete")
-                except Exception as e:
-                    logger.warning(f"Error shutting down real agent manager: {str(e)}")
-
-            # 🔧 CRITICAL FIX: Cleanup autonomous agents that may have been initialized during startup
-            logger.info("🧹 Cleaning up autonomous agents...")
-            try:
-                # Import agent registry to find any registered agents
-                from fs_agt_clean.core.registry.agent_registry import get_agent_registry
-
-                agent_registry = get_agent_registry()
-                registered_agents = await agent_registry.get_all_agents()
-
-                # Clean up each registered agent
-                for agent_info in registered_agents:
-                    try:
-                        agent_instance = agent_info.get("instance")
-                        agent_id = agent_info.get("agent_id", "unknown")
-
-                        if agent_instance and hasattr(agent_instance, "cleanup"):
-                            logger.info(f"🧹 Cleaning up agent: {agent_id}")
-                            await agent_instance.cleanup()
-                            logger.info(f"✅ Agent {agent_id} cleaned up successfully")
-                        elif agent_instance and hasattr(agent_instance, "close"):
-                            logger.info(f"🧹 Closing agent: {agent_id}")
-                            await agent_instance.close()
-                            logger.info(f"✅ Agent {agent_id} closed successfully")
-                        else:
-                            logger.debug(f"Agent {agent_id} has no cleanup method")
-
-                    except Exception as e:
-                        logger.warning(f"Error cleaning up agent {agent_id}: {e}")
-
-                # Shutdown the agent registry itself
-                await agent_registry.shutdown()
-                logger.info("✅ Agent registry shutdown complete")
-
-            except Exception as e:
-                logger.warning(f"Error during agent cleanup: {e}")
-
-            # 🔧 CRITICAL FIX: Cleanup any global database connections
-            logger.info("🧹 Cleaning up global database connections...")
-            try:
-                from fs_agt_clean.core.db.database import get_database
-
-                global_db = get_database()
-                if global_db and hasattr(global_db, "close"):
-                    await global_db.close()
-                    logger.info("✅ Global database connection closed")
-
-            except Exception as e:
-                logger.warning(f"Error closing global database connection: {e}")
-
-            # 🔧 CRITICAL FIX: Cleanup WebSocket connections
-            logger.info("🧹 Cleaning up WebSocket connections...")
-            try:
-                # Check if there's a WebSocket manager in app state
-                if hasattr(app, "state") and hasattr(app.state, "websocket_manager"):
-                    websocket_manager = app.state.websocket_manager
-                    if websocket_manager and hasattr(websocket_manager, "cleanup"):
-                        await websocket_manager.cleanup()
-                        logger.info("✅ WebSocket manager cleaned up")
-
-            except Exception as e:
-                logger.warning(f"Error cleaning up WebSocket connections: {e}")
-
-            # Shutdown metrics service if it was initialized
-            if metrics_service_available:
-                logger.info("Shutting down metrics service...")
-                # During actual consolidation, this would clean up the metrics service
-
-            logger.info("Services shutdown completed")
-
-        except Exception as e:
-            logger.error("Error during service shutdown: %s", str(e))
-            logger.exception(e)
-            # Update service status - using logger to avoid linter errors
-            # During actual consolidation this would use the proper ServiceStatus method
-            logger.error("Service status: error during shutdown")
+# Import the refactored service initialization and lifecycle management
+from fs_agt_clean.app.services.service_initializer import init_services
+from fs_agt_clean.app.lifecycle import lifespan
 
 
 def create_app() -> FastAPI:
@@ -1262,7 +384,7 @@ def create_app() -> FastAPI:
     setup_error_handlers(app)
 
     # Apply security middleware
-    if security_middleware_available:
+    if SECURITY_MIDDLEWARE_AVAILABLE:
         # Configure CSP
         # csp_config = get_secure_csp_config()  # Unused variable
 
@@ -1949,7 +1071,6 @@ def create_app() -> FastAPI:
     @mobile_router.get("/mobile/dashboard")
     async def get_mobile_dashboard(
         current_user: UnifiedUserResponse = Depends(get_current_user),
-        db: AsyncSession = Depends(get_db),
     ):
         """Get mobile dashboard data using existing integrated services."""
         # Get real agent count from agent manager (4+1 architecture)
@@ -2268,7 +1389,6 @@ def create_app() -> FastAPI:
     @mobile_router.post("/mobile/sync")
     async def mobile_sync(
         current_user: UnifiedUserResponse = Depends(get_current_user),
-        db: AsyncSession = Depends(get_db),
     ):
         """Sync mobile app data with backend using existing integrated services."""
         # Get real agent count for sync status (4+1 architecture)
@@ -2635,18 +1755,38 @@ self.addEventListener('fetch', function(event) {
     # Mount static files for testing frontend
     try:
         import os
+        from pathlib import Path
 
-        testing_frontend_path = "/opt/flipsync/testing-frontend"
-        if os.path.exists(testing_frontend_path):
+        # Try multiple possible paths for testing frontend
+        possible_paths = [
+            "/opt/flipsync/testing-frontend",  # Production path
+            str(
+                Path(__file__).parent.parent.parent / "testing-frontend"
+            ),  # Local development path
+            "testing-frontend",  # Relative path
+        ]
+
+        testing_frontend_path = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                testing_frontend_path = path
+                break
+
+        if testing_frontend_path:
             app.mount(
                 "/testing-frontend",
                 StaticFiles(directory=testing_frontend_path, html=True),
                 name="testing-frontend",
             )
-            logger.info("✅ Testing frontend mounted at /testing-frontend/")
+            logger.info(
+                f"✅ Testing frontend mounted at /testing-frontend/ from {testing_frontend_path}"
+            )
         else:
-            logger.warning(
-                f"⚠️ Testing frontend directory not found: {testing_frontend_path}"
+            logger.info(
+                f"ℹ️ Testing frontend not found in any of these locations: {possible_paths}"
+            )
+            logger.info(
+                "This is normal for production deployments without the testing frontend"
             )
     except Exception as e:
         logger.error(f"❌ Failed to mount testing frontend: {e}")

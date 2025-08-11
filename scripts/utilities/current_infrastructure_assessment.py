@@ -180,13 +180,13 @@ class InfrastructureAssessment:
             },
             "redis": {
                 "type": "systemd",
-                "host": "174.138.77.110",
+                "host": "192.168.110.71",
                 "port": 6379,
                 "authentication": "password_protected",
             },
             "qdrant": {
                 "type": "custom_systemd",
-                "host": "174.138.77.110",
+                "host": "192.168.110.71",
                 "http_port": 6333,
                 "grpc_port": 6334,
                 "storage": "/opt/qdrant/storage",

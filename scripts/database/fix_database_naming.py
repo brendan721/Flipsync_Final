@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # Standard database configuration
 CORRECT_DATABASE_NAME = "flipsync_agentic_test"
-CORRECT_DATABASE_URL = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test"
+CORRECT_DATABASE_URL = "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@192.168.110.71:5432/flipsync_agentic_test"
 
 class DatabaseNamingFixer:
     """Fix database naming inconsistencies throughout the codebase."""
@@ -153,7 +153,7 @@ class DatabaseNamingFixer:
         env_vars = {
             'DATABASE_URL': CORRECT_DATABASE_URL,
             'DB_NAME': CORRECT_DATABASE_NAME,
-            'DB_HOST': '174.138.77.110',
+            'DB_HOST': '192.168.110.71',
             'DB_PORT': '5432',
             'DB_USER': 'postgres',
             'DB_PASSWORD': 'FlipSync_DB_Prod_2024_Secure_Key_9x7z'
@@ -176,7 +176,7 @@ class DatabaseNamingFixer:
             
             async def test_connection():
                 conn = await asyncpg.connect(
-                    host='174.138.77.110',
+                    host='192.168.110.71',
                     port=5432,
                     database=CORRECT_DATABASE_NAME,
                     user='postgres',

@@ -155,7 +155,7 @@ check_database_connectivity() {
     
     # Test PostgreSQL connection
     if command -v psql >/dev/null 2>&1; then
-        if PGPASSWORD="FlipSync_DB_Prod_2024_Secure_Key_9x7z" psql -h 174.138.77.110 -U postgres -d flipsync_agentic_test -c "SELECT 1;" >/dev/null 2>&1; then
+        if PGPASSWORD="FlipSync_DB_Prod_2024_Secure_Key_9x7z" psql -h 192.168.110.71 -U postgres -d flipsync_agentic_test -c "SELECT 1;" >/dev/null 2>&1; then
             success "PostgreSQL database is accessible"
         else
             error "PostgreSQL database connection failed"

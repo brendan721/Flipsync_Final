@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-DROPLET_IP="174.138.77.110"
+DROPLET_IP="192.168.110.71"
 DROPLET_USER="root"  # Change if you use a different user
 SSH_KEY_PATH="$HOME/.ssh/id_rsa"  # Change to your SSH key path
 

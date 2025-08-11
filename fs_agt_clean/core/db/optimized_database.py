@@ -31,7 +31,7 @@ class OptimizedDatabase:
         """Initialize optimized database connection."""
         self.connection_string = connection_string or os.getenv(
             "DATABASE_URL",
-            "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@174.138.77.110:5432/flipsync_agentic_test",
+            "postgresql+asyncpg://postgres:FlipSync_DB_Prod_2024_Secure_Key_9x7z@localhost:5432/flipsync_agentic_test",
         )
 
         # Ensure asyncpg driver

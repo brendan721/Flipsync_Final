@@ -561,7 +561,7 @@ class ConfigurationConsolidationAnalyzer:
         """Suggest environment variable name based on content."""
         content_lower = content.lower()
 
-        if "174.138.77.110" in content:
+        if "192.168.110.71" in content:
             return "FLIPSYNC_SERVER_HOST"
         elif "localhost" in content_lower:
             return "FLIPSYNC_LOCAL_HOST"

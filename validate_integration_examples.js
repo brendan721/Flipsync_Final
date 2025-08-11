@@ -8,10 +8,10 @@ const https = require('https');
 const http = require('http');
 const WebSocket = require('ws');
 
-// Configuration from integration guide
+// Configuration for Proxmox deployment
 const FLIPSYNC_CONFIG = {
-  baseURL: 'http://174.138.77.110',
-  wsURL: 'ws://174.138.77.110/ws/flipsync',
+  baseURL: 'http://localhost:8000',
+  wsURL: 'ws://localhost:8000/ws/flipsync',
   apiVersion: 'v1',
   timeout: 30000,
   retryAttempts: 3

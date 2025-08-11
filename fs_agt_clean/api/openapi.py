@@ -222,8 +222,13 @@ def setup_openapi(app: FastAPI):
 
         logger.info("Successfully loaded consolidated OpenAPI schema")
 
+    except FileNotFoundError as e:
+        # Expected error when schema files don't exist - use custom schema
+        logger.info(f"Consolidated OpenAPI schema not found: {str(e)}")
+        logger.info("Using dynamically generated OpenAPI schema")
+        app.openapi = lambda: custom_openapi(app)
     except Exception as e:
-        # Fall back to the custom schema if loading fails
-        logger.error(f"Failed to load consolidated OpenAPI schema: {str(e)}")
+        # Unexpected error - log as error but still fall back gracefully
+        logger.error(f"Unexpected error loading consolidated OpenAPI schema: {str(e)}")
         logger.info("Falling back to dynamically generated OpenAPI schema")
         app.openapi = lambda: custom_openapi(app)

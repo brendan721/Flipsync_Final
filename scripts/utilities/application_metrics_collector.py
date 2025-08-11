@@ -25,7 +25,7 @@ METRICS_CONFIG = {
     "redis_host": "127.0.0.1",
     "redis_port": 6379,
     "redis_password": "",  # Set if Redis requires auth
-    "db_host": "174.138.77.110",
+    "db_host": "192.168.110.71",
     "db_port": 5432,
     "db_name": "flipsync_agentic_test",
     "db_user": "postgres",

@@ -52,7 +52,7 @@ warning() {
 # Function to check if running on production server
 check_production_server() {
     if [[ "$(hostname)" != *"flipsync"* ]] && [[ ! -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]]; then
-        error "This script must be run on the production server (174.138.77.110)"
+        error "This script must be run on the production server (192.168.110.71)"
         exit 1
     fi
 }

@@ -30,8 +30,11 @@ from fs_agt_clean.core.websocket.events import (
     WorkflowEvent,
     create_workflow_event,
 )
+from fs_agt_clean.core.agent_coordination.orchestrator import (
+    AutonomousAgentOrchestrator,
+)
 
-# AutonomousAgentOrchestrationService disabled for 4+1 architecture
+# AutonomousAgentOrchestrationService replaced with AutonomousAgentOrchestrator for 4+1 architecture
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +109,7 @@ class MarketSynchronizationWorkflow:
         agent_manager: RealAutonomousAgentManager,
         pipeline_controller: PipelineController,
         state_manager: StateManager,
-        orchestration_service: AutonomousAgentOrchestrationService,
+        orchestration_service: AutonomousAgentOrchestrator,
     ):
         self.agent_manager = agent_manager
         self.pipeline_controller = pipeline_controller

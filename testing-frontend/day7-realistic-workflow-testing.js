@@ -16,9 +16,9 @@
 const axios = require('axios');
 const WebSocket = require('ws');
 
-// Production backend configuration
-const PRODUCTION_API_BASE = 'http://174.138.77.110:8000';
-const WS_URL = 'ws://174.138.77.110:8000/ws/flipsync';
+// Proxmox backend configuration
+const PRODUCTION_API_BASE = 'http://localhost:8000';
+const WS_URL = 'ws://localhost:8000/ws/flipsync';
 const TIMEOUT_MS = 30000;
 
 class RealisticWorkflowTester {

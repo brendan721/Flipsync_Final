@@ -594,7 +594,7 @@ class ContentAutonomousAgent(BaseAutonomousAgent):
             logger.info(
                 "Content agent using pure algorithmic decision-making (no LLM dependencies)"
             )
-            self.openai_client = None  # Removed for 4+1 architecture compliance
+            self.openai_client = None  # Removed LLM dependency for autonomous operation
 
             # Initialize Qdrant vector store (production)
             from fs_agt_clean.core.vector_store.models import (
@@ -746,7 +746,7 @@ class ContentAutonomousAgent(BaseAutonomousAgent):
             vector_store = await get_vector_store_or_mock(f"content-{self.agent_id}")
 
             # AUTONOMOUS AGENT: No LLM client for learning module - using algorithmic learning only
-            learning_llm_client = None  # None  # Removed LLM dependency for autonomous learning
+            learning_llm_client = None  # Removed LLM dependency for autonomous learning
 
             # Initialize database-backed LearningModule for content knowledge sharing
             self.learning_module = DatabaseLearningModule(

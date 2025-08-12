@@ -4,6 +4,8 @@ This is the consolidated entry point for the FlipSync application, integrating f
 from multiple previously separate entry points.
 """
 
+print("🔍 DEBUG: main.py module loading started")
+
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
@@ -292,6 +294,13 @@ def create_app() -> FastAPI:
     - fs_agt/services/ml/app.py
     - fs_agt/services/dashboard/main.py
     """
+    import sys
+
+    print("🔍 DEBUG: Starting create_app() function - BEFORE LOGGER", flush=True)
+    sys.stdout.flush()
+    logger.info("🔍 DEBUG: Starting create_app() function")
+    print("🔍 DEBUG: Starting create_app() function - AFTER LOGGER", flush=True)
+    sys.stdout.flush()
     # Create FastAPI app
     app = FastAPI(
         title="FlipSync API",
@@ -434,9 +443,17 @@ def create_app() -> FastAPI:
     #     setup_rate_limiting(app, app.state.redis)  # Temporarily disabled - not migrated
 
     # Register routes from migrated components only
+    logger.info("🔍 DEBUG: Reached route registration section")
+    print("🔍 DEBUG: Reached route registration section", flush=True)
+    sys.stdout.flush()
 
     # Core API routes (migrated)
+    logger.info("🔍 DEBUG: About to register auth router")
+    print("🔍 DEBUG: About to register auth router", flush=True)
+    sys.stdout.flush()
+    print("🔍 DEBUG: About to register auth router")
     app.include_router(auth_router, prefix="/api/v1/auth", tags=["authentication"])
+    logger.info("🔍 DEBUG: Auth router registered successfully")
 
     # ✅ PHASE 3.1.2: Legacy Agent Routes - 4+1 Architecture Compliant
     # Note: This route is already 4+1 architecture compliant and uses AutonomousAgentRepository
@@ -447,6 +464,7 @@ def create_app() -> FastAPI:
 
     # ✅ PHASE 3.1.1: 4+1 Architecture API Routes Integration
     logger.info("🚀 Integrating 4+1 Architecture API Routes...")
+    logger.info("🔍 DEBUG: Reached 4+1 route registration section")
 
     try:
         # Import 4+1 Architecture API routers
@@ -554,6 +572,14 @@ def create_app() -> FastAPI:
     except ImportError as e:
         logger.error(f"❌ Failed to import 4+1 Architecture API routes: {e}")
         logger.warning("⚠️ Continuing without 4+1 Architecture API routes")
+        print(f"🔍 DEBUG: ImportError in 4+1 route registration: {e}")
+    except Exception as e:
+        logger.error(f"❌ Unexpected error in 4+1 Architecture API routes: {e}")
+        logger.warning("⚠️ Continuing without 4+1 Architecture API routes")
+        print(f"🔍 DEBUG: Unexpected error in 4+1 route registration: {e}")
+        import traceback
+
+        print(f"🔍 DEBUG: Traceback: {traceback.format_exc()}")
 
     # Optimized services routes (Priority 2 implementation) - Re-enabled with simplified services
     from fs_agt_clean.api.routes.optimized_services import (
@@ -2010,7 +2036,13 @@ self.addEventListener('fetch', function(event) {
 
 
 # Create the FastAPI application instance
+import sys
+
+print("🔍 DEBUG: About to call create_app()", flush=True)
+sys.stdout.flush()
 app = create_app()
+print("🔍 DEBUG: create_app() completed successfully", flush=True)
+sys.stdout.flush()
 
 # Expose application for ASGI servers
 application = app

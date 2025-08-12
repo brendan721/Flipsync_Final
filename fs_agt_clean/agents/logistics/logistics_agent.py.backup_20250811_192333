@@ -396,7 +396,7 @@ class LogisticsAutonomousAgent(BaseAutonomousAgent):
             await self.database.initialize()
 
             # AUTONOMOUS AGENT: No LLM dependencies - using algorithmic decision-making only
-            self.openai_client = None  # Removed for 4+1 architecture compliance
+            self.openai_client = None  # Removed LLM dependency for autonomous operation
             logger.info(
                 "Logistics Agent using pure algorithmic decision-making (no LLM dependencies)"
             )

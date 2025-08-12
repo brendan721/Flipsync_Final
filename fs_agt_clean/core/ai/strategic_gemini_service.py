@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 class StrategicUseCase(str, Enum):
     """Strategic use cases for Gemini integration."""
-    
+
     VISION_ANALYSIS = "vision_analysis"
     MARKET_TRENDS = "market_trends"
     SEASONALITY_ANALYSIS = "seasonality_analysis"
@@ -38,7 +38,7 @@ class StrategicUseCase(str, Enum):
 @dataclass
 class StrategicAnalysisRequest:
     """Request for strategic Gemini analysis."""
-    
+
     use_case: StrategicUseCase
     content: str
     context: Dict[str, Any] = None
@@ -51,7 +51,7 @@ class StrategicAnalysisRequest:
 @dataclass
 class StrategicAnalysisResponse:
     """Response from strategic Gemini analysis."""
-    
+
     success: bool
     content: str
     use_case: StrategicUseCase
@@ -66,24 +66,24 @@ class StrategicAnalysisResponse:
 class StrategicGeminiService:
     """
     Strategic Gemini service for high-value FlipSync tasks.
-    
+
     Implements 15% strategic LLM usage with cost optimization and
     intelligent routing for maximum business value.
     """
-    
+
     def __init__(self, api_key: Optional[str] = None, daily_budget: float = 15.0):
         """Initialize strategic Gemini service."""
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY environment variable required")
-        
+
         # Initialize Gemini client with cost controls
         self.gemini_client = GeminiClient(
             api_key=self.api_key,
             default_model=GeminiModel.FLASH_2_5,  # Cost-effective default
             daily_budget=daily_budget,
         )
-        
+
         # Usage tracking for 15% target
         self.usage_stats = {
             "total_requests": 0,
@@ -91,7 +91,7 @@ class StrategicGeminiService:
             "cost_total": 0.0,
             "use_case_breakdown": {},
         }
-        
+
         # Model selection for different use cases
         self.use_case_models = {
             StrategicUseCase.VISION_ANALYSIS: GeminiModel.FLASH_2_5,
@@ -101,38 +101,49 @@ class StrategicGeminiService:
             StrategicUseCase.USER_COMMUNICATION: GeminiModel.FLASH_LITE_2_5,  # Cost-effective
             StrategicUseCase.SEO_OPTIMIZATION: GeminiModel.FLASH_2_5,
         }
-        
-        logger.info(f"Strategic Gemini service initialized with ${daily_budget} daily budget")
 
-    async def analyze(self, request: StrategicAnalysisRequest) -> StrategicAnalysisResponse:
+        logger.info(
+            f"Strategic Gemini service initialized with ${daily_budget} daily budget"
+        )
+
+    async def analyze(
+        self, request: StrategicAnalysisRequest
+    ) -> StrategicAnalysisResponse:
         """Perform strategic analysis using Gemini."""
         start_time = time.perf_counter()
-        
+
         try:
             # Track usage
             self.usage_stats["total_requests"] += 1
             self.usage_stats["strategic_requests"] += 1
-            
-            use_case_count = self.usage_stats["use_case_breakdown"].get(request.use_case.value, 0)
-            self.usage_stats["use_case_breakdown"][request.use_case.value] = use_case_count + 1
-            
+
+            use_case_count = self.usage_stats["use_case_breakdown"].get(
+                request.use_case.value, 0
+            )
+            self.usage_stats["use_case_breakdown"][request.use_case.value] = (
+                use_case_count + 1
+            )
+
             # Select appropriate model for use case
             model = self.use_case_models.get(request.use_case, GeminiModel.FLASH_2_5)
-            
+
             # Generate system prompt based on use case
             system_prompt = self._get_system_prompt(request.use_case)
-            
+
             # Handle vision analysis separately
-            if request.use_case == StrategicUseCase.VISION_ANALYSIS and request.image_data:
+            if (
+                request.use_case == StrategicUseCase.VISION_ANALYSIS
+                and request.image_data
+            ):
                 response = await self._analyze_image(request, model, system_prompt)
             else:
                 response = await self._analyze_text(request, model, system_prompt)
-            
+
             processing_time = time.perf_counter() - start_time
-            
+
             # Update cost tracking
             self.usage_stats["cost_total"] += response.usage.cost_estimate
-            
+
             return StrategicAnalysisResponse(
                 success=True,
                 content=response.text,
@@ -142,16 +153,17 @@ class StrategicGeminiService:
                 confidence_score=0.85,  # High confidence for strategic analysis
                 model_used=response.model_used,
                 metadata={
-                    "tokens_used": response.usage.input_tokens + response.usage.output_tokens,
+                    "tokens_used": response.usage.input_tokens
+                    + response.usage.output_tokens,
                     "priority": request.priority,
                     "context_provided": bool(request.context),
                 },
             )
-            
+
         except Exception as e:
             processing_time = time.perf_counter() - start_time
             logger.error(f"Strategic Gemini analysis failed: {e}")
-            
+
             return StrategicAnalysisResponse(
                 success=False,
                 content="",
@@ -184,7 +196,7 @@ class StrategicGeminiService:
         if request.context:
             context_str = "\n".join([f"{k}: {v}" for k, v in request.context.items()])
             full_prompt = f"Context:\n{context_str}\n\nRequest: {request.content}"
-        
+
         return await self.gemini_client.generate_content(
             prompt=full_prompt,
             system_prompt=system_prompt,
@@ -207,7 +219,6 @@ Analyze product images for:
 - Estimated market value range
 Provide structured, actionable insights for e-commerce optimization.
             """.strip(),
-            
             StrategicUseCase.MARKET_TRENDS: """
 You are a market intelligence analyst specializing in e-commerce trends.
 Analyze market data for:
@@ -219,7 +230,6 @@ Analyze market data for:
 - Market opportunity identification
 Provide data-driven insights for strategic decision-making.
             """.strip(),
-            
             StrategicUseCase.SEASONALITY_ANALYSIS: """
 You are a seasonality expert for e-commerce markets.
 Analyze seasonal patterns for:
@@ -231,7 +241,6 @@ Analyze seasonal patterns for:
 - Risk assessment for seasonal items
 Provide actionable seasonal intelligence for business planning.
             """.strip(),
-            
             StrategicUseCase.CONTENT_ENHANCEMENT: """
 You are an SEO and content optimization specialist for e-commerce.
 Enhance content for:
@@ -243,7 +252,6 @@ Enhance content for:
 - Search visibility enhancement
 Provide optimized content that drives sales and engagement.
             """.strip(),
-            
             StrategicUseCase.USER_COMMUNICATION: """
 You are a customer service expert for FlipSync e-commerce platform.
 Provide helpful, professional responses that:
@@ -255,7 +263,6 @@ Provide helpful, professional responses that:
 - Drive positive user experience
 Be concise, helpful, and solution-oriented.
             """.strip(),
-            
             StrategicUseCase.SEO_OPTIMIZATION: """
 You are an SEO specialist for e-commerce platforms.
 Optimize content for:
@@ -268,15 +275,16 @@ Optimize content for:
 Provide SEO-optimized content that improves search rankings.
             """.strip(),
         }
-        
+
         return prompts.get(use_case, "You are a helpful AI assistant.")
 
     def get_usage_stats(self) -> Dict[str, Any]:
         """Get current usage statistics."""
         strategic_percentage = (
-            (self.usage_stats["strategic_requests"] / max(self.usage_stats["total_requests"], 1)) * 100
-        )
-        
+            self.usage_stats["strategic_requests"]
+            / max(self.usage_stats["total_requests"], 1)
+        ) * 100
+
         return {
             **self.usage_stats,
             "strategic_percentage": strategic_percentage,
@@ -284,7 +292,9 @@ Provide SEO-optimized content that improves search rankings.
             "on_target": 10.0 <= strategic_percentage <= 20.0,  # 15% ± 5% tolerance
         }
 
-    async def analyze_product_image(self, image_data: bytes, product_context: Dict[str, Any] = None) -> StrategicAnalysisResponse:
+    async def analyze_product_image(
+        self, image_data: bytes, product_context: Dict[str, Any] = None
+    ) -> StrategicAnalysisResponse:
         """Convenience method for product image analysis."""
         request = StrategicAnalysisRequest(
             use_case=StrategicUseCase.VISION_ANALYSIS,
@@ -295,7 +305,9 @@ Provide SEO-optimized content that improves search rankings.
         )
         return await self.analyze(request)
 
-    async def analyze_market_trends(self, category: str, timeframe: str = "30d") -> StrategicAnalysisResponse:
+    async def analyze_market_trends(
+        self, category: str, timeframe: str = "30d"
+    ) -> StrategicAnalysisResponse:
         """Convenience method for market trend analysis."""
         request = StrategicAnalysisRequest(
             use_case=StrategicUseCase.MARKET_TRENDS,
@@ -305,7 +317,9 @@ Provide SEO-optimized content that improves search rankings.
         )
         return await self.analyze(request)
 
-    async def enhance_content(self, content: str, content_type: str = "product_description") -> StrategicAnalysisResponse:
+    async def enhance_content(
+        self, content: str, content_type: str = "product_description"
+    ) -> StrategicAnalysisResponse:
         """Convenience method for content enhancement."""
         request = StrategicAnalysisRequest(
             use_case=StrategicUseCase.CONTENT_ENHANCEMENT,
@@ -315,8 +329,41 @@ Provide SEO-optimized content that improves search rankings.
         )
         return await self.analyze(request)
 
+    async def generate_strategic_response(
+        self,
+        prompt: str,
+        system_prompt: str = None,
+        max_tokens: int = 1000,
+        temperature: float = 0.7,
+    ) -> StrategicAnalysisResponse:
+        """Generate strategic response for backward compatibility with OpenAI client interface."""
+        request = StrategicAnalysisRequest(
+            use_case=StrategicUseCase.USER_COMMUNICATION,
+            content=prompt,
+            context={"system_prompt": system_prompt} if system_prompt else {},
+            priority="normal",
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
+        return await self.analyze(request)
+
+    async def analyze_image_strategic(
+        self, image_data: bytes, prompt: str, max_tokens: int = 1000
+    ) -> StrategicAnalysisResponse:
+        """Analyze image strategically for backward compatibility."""
+        request = StrategicAnalysisRequest(
+            use_case=StrategicUseCase.VISION_ANALYSIS,
+            content=prompt,
+            image_data=image_data,
+            priority="normal",
+            max_tokens=max_tokens,
+        )
+        return await self.analyze(request)
+
 
 # Factory function for easy service creation
-def create_strategic_gemini_service(daily_budget: float = 15.0) -> StrategicGeminiService:
+def create_strategic_gemini_service(
+    daily_budget: float = 15.0,
+) -> StrategicGeminiService:
     """Create strategic Gemini service with FlipSync defaults."""
     return StrategicGeminiService(daily_budget=daily_budget)

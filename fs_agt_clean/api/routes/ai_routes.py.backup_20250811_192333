@@ -39,6 +39,9 @@ from fs_agt_clean.core.ai.strategic_gemini_service import (
     StrategicAnalysisRequest,
     StrategicUseCase,
 )
+from fs_agt_clean.core.ai.openai_client import (
+    TaskComplexity,
+)
 from fs_agt_clean.core.auth.auth_factory import AuthenticationFactory
 from fs_agt_clean.core.models.user import UnifiedUserResponse
 from fs_agt_clean.api.dependencies.dependencies import get_current_user
@@ -777,7 +780,6 @@ async def get_strategic_gemini_client():
 async def get_openai_client():
     """Get AI client - now uses StrategicGeminiService for 4+1 architecture compliance."""
     from fs_agt_clean.core.ai.strategic_gemini_service import StrategicGeminiService
-
     return StrategicGeminiService(daily_budget=10.0)
 
 
@@ -848,18 +850,14 @@ async def analyze_confidence(
         system_prompt = "You are FlipSync's AI confidence analyzer. Provide accurate, data-driven confidence assessments for e-commerce optimizations."
 
         # Generate confidence analysis using StrategicGeminiService
-        response = await client.generate_strategic_response(
+        response = await client.generate_response(
             prompt=prompt,
             system_prompt=system_prompt,
             max_tokens=1024,
         )
 
         # StrategicGeminiService returns LLMResponse object
-        if (
-            not response or not response.content
-            if hasattr(response, "content")
-            else str(response)
-        ):
+        if not response or not response.content:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="AI analysis failed: No response content",
@@ -869,22 +867,9 @@ async def analyze_confidence(
         confidence_data = {
             "score": 0.75,  # Would parse from AI response
             "reasoning": (
-                response.content
-                if hasattr(response, "content")
-                else (
-                    str(response)[:200] + "..."
-                    if len(
-                        response.content
-                        if hasattr(response, "content")
-                        else str(response)
-                    )
-                    > 200
-                    else (
-                        response.content
-                        if hasattr(response, "content")
-                        else str(response)
-                    )
-                )
+                response.content[:200] + "..."
+                if len(response.content) > 200
+                else response.content
             ),
             "risk_factors": ["Market volatility", "Competition level"],
             "supporting_data": ["Historical performance data", "Market analysis"],
@@ -942,7 +927,7 @@ async def batch_confidence_analysis(
         Focus on cost-effective batch analysis.
         """
 
-        response = await client.generate_strategic_response(
+        response = await client.generate_response(
             prompt=prompt,
             max_tokens=512,
         )
@@ -1010,9 +995,9 @@ async def agent_confidence_breakdown(
         Include reasoning for each agent's perspective.
         """
 
-        response = await client.generate_strategic_response(
+        response = await client.generate_text(
             prompt=prompt,
-            max_tokens=1024,
+            task_complexity=TaskComplexity.MODERATE,
         )
 
         # Create agent breakdown response
@@ -1061,29 +1046,24 @@ async def generate_text(
     try:
         client = await get_openai_client()
 
-        # Map complexity string to temperature (StrategicGeminiService uses temperature instead)
-        complexity_temp_map = {
-            "simple": 0.3,
-            "moderate": 0.7,
-            "complex": 0.9,
-            "reasoning": 0.5,
+        # Map complexity string to enum
+        complexity_map = {
+            "simple": TaskComplexity.SIMPLE,
+            "moderate": TaskComplexity.MODERATE,
+            "complex": TaskComplexity.COMPLEX,
+            "reasoning": TaskComplexity.REASONING,
         }
 
-        temperature = complexity_temp_map.get(request.task_complexity, 0.7)
+        complexity_map.get(request.task_complexity, TaskComplexity.SIMPLE)
 
         # Generate text using StrategicGeminiService
-        response = await client.generate_strategic_response(
+        response = await client.generate_response(
             prompt=request.prompt,
             system_prompt=request.system_prompt,
             max_tokens=1024,
-            temperature=temperature,
         )
 
-        if (
-            not response or not response.content
-            if hasattr(response, "content")
-            else str(response)
-        ):
+        if not response or not response.content:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Text generation failed: No response content",
@@ -1092,9 +1072,7 @@ async def generate_text(
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
-                "content": (
-                    response.content if hasattr(response, "content") else str(response)
-                ),
+                "content": response.content,
                 "model": getattr(response, "model", "hybrid"),
                 "usage": {
                     "prompt_tokens": getattr(response, "prompt_tokens", 0),

@@ -832,7 +832,7 @@ class ExecutiveAutonomousAgent(BaseAutonomousAgent):
             await self.database.initialize()
 
             # AUTONOMOUS AGENT: No LLM dependencies - using algorithmic decision-making only
-            self.openai_client = None  # Removed for 4+1 architecture compliance
+            self.openai_client = None  # Removed LLM dependency for autonomous operation
             logger.info(
                 "Executive Agent using pure algorithmic decision-making (no LLM dependencies)"
             )
@@ -989,7 +989,7 @@ class ExecutiveAutonomousAgent(BaseAutonomousAgent):
             vector_store = await get_vector_store_or_mock(f"executive-{self.agent_id}")
 
             # AUTONOMOUS AGENT: No LLM client for learning module - using algorithmic learning only
-            learning_llm_client = None  # None  # Removed LLM dependency for autonomous learning
+            learning_llm_client = None  # Removed LLM dependency for autonomous learning
             logger.info(
                 "Executive Agent learning module using pure algorithmic learning"
             )
@@ -1690,7 +1690,7 @@ class ExecutiveAutonomousAgent(BaseAutonomousAgent):
         if "timeout" in error_str:
             return {
                 "error_type": "ai_timeout",
-                "user_message": "AI model is taking longer than expected to respond (30+ seconds). This is a known issue with the current gemma3:4b model that will be resolved with LLM integration removed for autonomous operation in production.",
+                "user_message": "AI model is taking longer than expected to respond (30+ seconds). This is a known issue with the current gemma3:4b model that will be resolved with OpenAI integration in production.",
                 "technical_details": f"AI model timeout: {error}",
             }
         elif "connection" in error_str or "network" in error_str:
@@ -1708,7 +1708,7 @@ class ExecutiveAutonomousAgent(BaseAutonomousAgent):
         else:
             return {
                 "error_type": "general_error",
-                "user_message": "An unexpected error occurred while processing your request. Our team has been notified and this will be resolved with the LLM integration removed for autonomous operation.",
+                "user_message": "An unexpected error occurred while processing your request. Our team has been notified and this will be resolved with the OpenAI integration.",
                 "technical_details": f"General error: {error}",
             }
 

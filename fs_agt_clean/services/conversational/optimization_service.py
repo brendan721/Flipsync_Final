@@ -85,8 +85,8 @@ class ConversationalOptimizationService:
     def client(self):
         """Lazy initialization of LLM client."""
         if self.llm_client is None:
-            # Use HybridLLMAdapter for business-optimized processing
-            self.llm_client = HybridLLMAdapterFactory.create_business_client()
+            # Use StrategicGeminiService for conversational optimization
+            self.llm_client = StrategicGeminiService()
         return self.llm_client
 
     async def process_optimization_request(

@@ -73,7 +73,7 @@ class EbayOptimizationService:
 
     def __init__(self):
         """Initialize the eBay optimization service."""
-        # StrategicGeminiService available for future AI enhancements
+        # HybridLLMAdapter available for future AI enhancements
         self.llm_client = None
         self.category_repository = CategoryOptimizationRepository()
 

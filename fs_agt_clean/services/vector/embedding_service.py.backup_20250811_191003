@@ -56,7 +56,7 @@ class VectorEmbeddingService:
 
     def __init__(self):
         """Initialize the vector embedding service."""
-        # StrategicGeminiService available for future text processing enhancements
+        # HybridLLMAdapter available for future text processing enhancements
         self.llm_client = None
 
         # Available embedding models
@@ -145,13 +145,13 @@ class VectorEmbeddingService:
                 return await self._generate_mock_embedding(text, 1536)
 
             # Initialize OpenAI client
-            client = StrategicGeminiService(daily_budget=10.0)
+            client = openai.AsyncOpenAI(api_key=api_key)
 
             # Record start time for cost tracking
             start_time = time.time()
 
             # Generate real OpenAI embedding
-            response = await client.analyze(StrategicAnalysisRequest(use_case=StrategicUseCase.CONTENT_ENHANCEMENT, content=
+            response = await client.embeddings.create(
                 model="text-embedding-ada-002", input=text, encoding_format="float"
             )
 

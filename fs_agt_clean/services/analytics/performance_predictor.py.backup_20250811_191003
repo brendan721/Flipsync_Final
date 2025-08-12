@@ -14,7 +14,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-# Migrated to StrategicGeminiService for intelligent processing
+# Migrated to HybridLLMAdapter for intelligent processing
 from fs_agt_clean.database.repositories.ai_analysis_repository import (
     FeatureUsageRepository,
 )
@@ -75,7 +75,7 @@ class PerformancePredictorService:
 
     def __init__(self):
         """Initialize the performance predictor service."""
-        # StrategicGeminiService available for future AI-enhanced predictions
+        # HybridLLMAdapter available for future AI-enhanced predictions
         self.llm_client = None
         self.usage_repository = FeatureUsageRepository()
 
